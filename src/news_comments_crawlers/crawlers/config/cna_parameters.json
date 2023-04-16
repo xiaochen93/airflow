@@ -1,0 +1,14 @@
+{
+    "domain":"www.channelnewsasia.com",
+    "website":"https://www.channelnewsasia.com/",
+    "sitemap":"https://www.channelnewsasia.com/sitemap.xml",
+    "parser":"lxml",
+    "name": "cna",
+    "css_paths": {
+    "css_title": "",
+    "css_ns_category": "",
+    "css_article": "",
+    "css_datetime":""
+    }
+
+}

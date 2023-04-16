@@ -1,0 +1,129 @@
+[2023-04-14T15:10:01.172+0000] {taskinstance.py:1084} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: execute_24hr_data_scrape.id_2 scheduled__2023-04-14T15:09:00+00:00 [queued]>
+[2023-04-14T15:10:01.179+0000] {taskinstance.py:1084} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: execute_24hr_data_scrape.id_2 scheduled__2023-04-14T15:09:00+00:00 [queued]>
+[2023-04-14T15:10:01.180+0000] {taskinstance.py:1282} INFO - 
+--------------------------------------------------------------------------------
+[2023-04-14T15:10:01.180+0000] {taskinstance.py:1283} INFO - Starting attempt 1 of 4
+[2023-04-14T15:10:01.180+0000] {taskinstance.py:1284} INFO - 
+--------------------------------------------------------------------------------
+[2023-04-14T15:10:01.192+0000] {taskinstance.py:1303} INFO - Executing <Task(BashOperator): id_2> on 2023-04-14 15:09:00+00:00
+[2023-04-14T15:10:01.197+0000] {standard_task_runner.py:55} INFO - Started process 2848 to run task
+[2023-04-14T15:10:01.199+0000] {standard_task_runner.py:82} INFO - Running: ['***', 'tasks', 'run', 'execute_24hr_data_scrape', 'id_2', 'scheduled__2023-04-14T15:09:00+00:00', '--job-id', '156', '--raw', '--subdir', 'DAGS_FOLDER/exec_web_crawlers_dag.py', '--cfg-path', '/tmp/tmp797hop2v']
+[2023-04-14T15:10:01.200+0000] {standard_task_runner.py:83} INFO - Job 156: Subtask id_2
+[2023-04-14T15:10:01.248+0000] {task_command.py:388} INFO - Running <TaskInstance: execute_24hr_data_scrape.id_2 scheduled__2023-04-14T15:09:00+00:00 [running]> on host 6f8cd9778af0
+[2023-04-14T15:10:01.307+0000] {taskinstance.py:1511} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=xiaochen
+AIRFLOW_CTX_DAG_ID=execute_24hr_data_scrape
+AIRFLOW_CTX_TASK_ID=id_2
+AIRFLOW_CTX_EXECUTION_DATE=2023-04-14T15:09:00+00:00
+AIRFLOW_CTX_TRY_NUMBER=1
+AIRFLOW_CTX_DAG_RUN_ID=scheduled__2023-04-14T15:09:00+00:00
+[2023-04-14T15:10:01.308+0000] {subprocess.py:63} INFO - Tmp dir root location: 
+ /tmp
+[2023-04-14T15:10:01.309+0000] {subprocess.py:75} INFO - Running command: ['/bin/bash', '-c', 'python /opt/***/src/news_comments_crawlers/crawlers/_EN_CNA.py --name CNA']
+[2023-04-14T15:10:01.317+0000] {subprocess.py:86} INFO - Output:
+[2023-04-14T15:10:03.740+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:03.741+0000] {subprocess.py:93} INFO - --DEBUG: __file__:     /opt/***/src/news_comments_crawlers/crawlers/config/Constants.py
+[2023-04-14T15:10:03.742+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:03.742+0000] {subprocess.py:93} INFO - -- Session Object : Good to go.
+[2023-04-14T15:10:03.742+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:03.743+0000] {subprocess.py:93} INFO - -- Folders: Good to go.
+[2023-04-14T15:10:03.743+0000] {subprocess.py:93} INFO - []
+[2023-04-14T15:10:03.743+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:03.744+0000] {subprocess.py:93} INFO - --DEBUG: Platform -  CNA
+[2023-04-14T15:10:03.744+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:03.744+0000] {subprocess.py:93} INFO - --DEBUG: Start-time -  2023-04-13 15:10:03.259549
+[2023-04-14T15:10:03.745+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:03.745+0000] {subprocess.py:93} INFO - --DEBUG: End-time -  2023-04-14 15:10:03.259549
+[2023-04-14T15:10:03.745+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:03.746+0000] {subprocess.py:93} INFO - --DEBUG: Link Path - /opt/***/src/news_comments_crawlers/crawlers/out/2023-04-14/links/CNA_2023-04-14_15.txt
+[2023-04-14T15:10:03.746+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:03.747+0000] {subprocess.py:93} INFO - --DEBUG: JSON Data Path - /opt/***/src/news_comments_crawlers/crawlers/out/2023-04-14/data/json/CNA_2023-04-14_15.json
+[2023-04-14T15:10:03.747+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:03.747+0000] {subprocess.py:93} INFO - --DEBUG: DF Data Path - /opt/***/src/news_comments_crawlers/crawlers/out/2023-04-14/data/df/CNA_2023-04-14_15.pickle
+[2023-04-14T15:10:03.748+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:03.748+0000] {subprocess.py:93} INFO - --DEBUG: True
+[2023-04-14T15:10:03.748+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:03.749+0000] {subprocess.py:93} INFO - --DEBUG: Cache file does not exist... creating now
+[2023-04-14T15:10:03.749+0000] {subprocess.py:93} INFO - Saved URLs into /opt/***/src/news_comments_crawlers/crawlers/out/2023-04-14/links/CNA_2023-04-14_15.txt
+[2023-04-14T15:10:03.750+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:03.750+0000] {subprocess.py:93} INFO - --DEBUG: Cache file does not exist... creating now
+[2023-04-14T15:10:06.654+0000] {subprocess.py:93} INFO -   0%|          | 0/68 [00:00<?, ?it/s]  1%|▏         | 1/68 [00:00<00:24,  2.78it/s] 10%|█         | 7/68 [00:00<00:03, 18.38it/s] 31%|███       | 21/68 [00:00<00:00, 49.30it/s] 41%|████      | 28/68 [00:01<00:01, 28.58it/s] 87%|████████▋ | 59/68 [00:01<00:00, 51.61it/s] 97%|█████████▋| 66/68 [00:02<00:00, 19.79it/s]100%|██████████| 68/68 [00:02<00:00, 24.71it/s]
+[2023-04-14T15:10:06.668+0000] {subprocess.py:93} INFO - Traceback (most recent call last):
+[2023-04-14T15:10:06.668+0000] {subprocess.py:93} INFO -   File "/home/***/.local/lib/python3.7/site-packages/nltk/corpus/util.py", line 84, in __load
+[2023-04-14T15:10:06.669+0000] {subprocess.py:93} INFO -     root = nltk.data.find(f"{self.subdir}/{zip_name}")
+[2023-04-14T15:10:06.669+0000] {subprocess.py:93} INFO -   File "/home/***/.local/lib/python3.7/site-packages/nltk/data.py", line 583, in find
+[2023-04-14T15:10:06.670+0000] {subprocess.py:93} INFO -     raise LookupError(resource_not_found)
+[2023-04-14T15:10:06.670+0000] {subprocess.py:93} INFO - LookupError:
+[2023-04-14T15:10:06.670+0000] {subprocess.py:93} INFO - **********************************************************************
+[2023-04-14T15:10:06.671+0000] {subprocess.py:93} INFO -   Resource [93mstopwords[0m not found.
+[2023-04-14T15:10:06.671+0000] {subprocess.py:93} INFO -   Please use the NLTK Downloader to obtain the resource:
+[2023-04-14T15:10:06.672+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:06.672+0000] {subprocess.py:93} INFO -   [31m>>> import nltk
+[2023-04-14T15:10:06.673+0000] {subprocess.py:93} INFO -   >>> nltk.download('stopwords')
+[2023-04-14T15:10:06.673+0000] {subprocess.py:93} INFO -   [0m
+[2023-04-14T15:10:06.673+0000] {subprocess.py:93} INFO -   For more information see: https://www.nltk.org/data.html
+[2023-04-14T15:10:06.674+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:06.674+0000] {subprocess.py:93} INFO -   Attempted to load [93mcorpora/stopwords.zip/stopwords/[0m
+[2023-04-14T15:10:06.674+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:06.675+0000] {subprocess.py:93} INFO -   Searched in:
+[2023-04-14T15:10:06.675+0000] {subprocess.py:93} INFO -     - '/home/***/nltk_data'
+[2023-04-14T15:10:06.675+0000] {subprocess.py:93} INFO -     - '/usr/local/nltk_data'
+[2023-04-14T15:10:06.676+0000] {subprocess.py:93} INFO -     - '/usr/local/share/nltk_data'
+[2023-04-14T15:10:06.676+0000] {subprocess.py:93} INFO -     - '/usr/local/lib/nltk_data'
+[2023-04-14T15:10:06.676+0000] {subprocess.py:93} INFO -     - '/usr/share/nltk_data'
+[2023-04-14T15:10:06.677+0000] {subprocess.py:93} INFO -     - '/usr/local/share/nltk_data'
+[2023-04-14T15:10:06.677+0000] {subprocess.py:93} INFO -     - '/usr/lib/nltk_data'
+[2023-04-14T15:10:06.678+0000] {subprocess.py:93} INFO -     - '/usr/local/lib/nltk_data'
+[2023-04-14T15:10:06.678+0000] {subprocess.py:93} INFO - **********************************************************************
+[2023-04-14T15:10:06.678+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:06.679+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:06.679+0000] {subprocess.py:93} INFO - During handling of the above exception, another exception occurred:
+[2023-04-14T15:10:06.679+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:06.679+0000] {subprocess.py:93} INFO - Traceback (most recent call last):
+[2023-04-14T15:10:06.680+0000] {subprocess.py:93} INFO -   File "/opt/***/src/news_comments_crawlers/crawlers/_EN_CNA.py", line 197, in <module>
+[2023-04-14T15:10:06.680+0000] {subprocess.py:93} INFO -     main()
+[2023-04-14T15:10:06.681+0000] {subprocess.py:93} INFO -   File "/opt/***/src/news_comments_crawlers/crawlers/_EN_CNA.py", line 173, in main
+[2023-04-14T15:10:06.681+0000] {subprocess.py:93} INFO -     articles_df = Preprocessor({'data':articles,'lang':LANG,'org':1,'source': S_ID}).preprocess(func=extract_datetime_cna)
+[2023-04-14T15:10:06.681+0000] {subprocess.py:93} INFO -   File "/opt/***/src/news_comments_crawlers/crawlers/config/Preprocessor.py", line 39, in __init__
+[2023-04-14T15:10:06.682+0000] {subprocess.py:93} INFO -     self.stop_words = set(stopwords.words('english'))
+[2023-04-14T15:10:06.682+0000] {subprocess.py:93} INFO -   File "/home/***/.local/lib/python3.7/site-packages/nltk/corpus/util.py", line 121, in __getattr__
+[2023-04-14T15:10:06.682+0000] {subprocess.py:93} INFO -     self.__load()
+[2023-04-14T15:10:06.683+0000] {subprocess.py:93} INFO -   File "/home/***/.local/lib/python3.7/site-packages/nltk/corpus/util.py", line 86, in __load
+[2023-04-14T15:10:06.684+0000] {subprocess.py:93} INFO -     raise e
+[2023-04-14T15:10:06.684+0000] {subprocess.py:93} INFO -   File "/home/***/.local/lib/python3.7/site-packages/nltk/corpus/util.py", line 81, in __load
+[2023-04-14T15:10:06.685+0000] {subprocess.py:93} INFO -     root = nltk.data.find(f"{self.subdir}/{self.__name}")
+[2023-04-14T15:10:06.685+0000] {subprocess.py:93} INFO -   File "/home/***/.local/lib/python3.7/site-packages/nltk/data.py", line 583, in find
+[2023-04-14T15:10:06.686+0000] {subprocess.py:93} INFO -     raise LookupError(resource_not_found)
+[2023-04-14T15:10:06.686+0000] {subprocess.py:93} INFO - LookupError:
+[2023-04-14T15:10:06.687+0000] {subprocess.py:93} INFO - **********************************************************************
+[2023-04-14T15:10:06.687+0000] {subprocess.py:93} INFO -   Resource [93mstopwords[0m not found.
+[2023-04-14T15:10:06.688+0000] {subprocess.py:93} INFO -   Please use the NLTK Downloader to obtain the resource:
+[2023-04-14T15:10:06.688+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:06.688+0000] {subprocess.py:93} INFO -   [31m>>> import nltk
+[2023-04-14T15:10:06.689+0000] {subprocess.py:93} INFO -   >>> nltk.download('stopwords')
+[2023-04-14T15:10:06.689+0000] {subprocess.py:93} INFO -   [0m
+[2023-04-14T15:10:06.689+0000] {subprocess.py:93} INFO -   For more information see: https://www.nltk.org/data.html
+[2023-04-14T15:10:06.690+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:06.690+0000] {subprocess.py:93} INFO -   Attempted to load [93mcorpora/stopwords[0m
+[2023-04-14T15:10:06.691+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:06.691+0000] {subprocess.py:93} INFO -   Searched in:
+[2023-04-14T15:10:06.692+0000] {subprocess.py:93} INFO -     - '/home/***/nltk_data'
+[2023-04-14T15:10:06.692+0000] {subprocess.py:93} INFO -     - '/usr/local/nltk_data'
+[2023-04-14T15:10:06.692+0000] {subprocess.py:93} INFO -     - '/usr/local/share/nltk_data'
+[2023-04-14T15:10:06.693+0000] {subprocess.py:93} INFO -     - '/usr/local/lib/nltk_data'
+[2023-04-14T15:10:06.693+0000] {subprocess.py:93} INFO -     - '/usr/share/nltk_data'
+[2023-04-14T15:10:06.694+0000] {subprocess.py:93} INFO -     - '/usr/local/share/nltk_data'
+[2023-04-14T15:10:06.694+0000] {subprocess.py:93} INFO -     - '/usr/lib/nltk_data'
+[2023-04-14T15:10:06.694+0000] {subprocess.py:93} INFO -     - '/usr/local/lib/nltk_data'
+[2023-04-14T15:10:06.695+0000] {subprocess.py:93} INFO - **********************************************************************
+[2023-04-14T15:10:06.695+0000] {subprocess.py:93} INFO - 
+[2023-04-14T15:10:06.888+0000] {subprocess.py:97} INFO - Command exited with return code 1
+[2023-04-14T15:10:06.899+0000] {taskinstance.py:1775} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/operators/bash.py", line 197, in execute
+    f"Bash command failed. The command returned a non-zero exit code {result.exit_code}."
+airflow.exceptions.AirflowException: Bash command failed. The command returned a non-zero exit code 1.
+[2023-04-14T15:10:06.903+0000] {taskinstance.py:1326} INFO - Marking task as UP_FOR_RETRY. dag_id=execute_24hr_data_scrape, task_id=id_2, execution_date=20230414T150900, start_date=20230414T151001, end_date=20230414T151006
+[2023-04-14T15:10:06.916+0000] {standard_task_runner.py:105} ERROR - Failed to execute job 156 for task id_2 (Bash command failed. The command returned a non-zero exit code 1.; 2848)
+[2023-04-14T15:10:06.948+0000] {local_task_job.py:212} INFO - Task exited with return code 1
+[2023-04-14T15:10:07.075+0000] {taskinstance.py:2585} INFO - 0 downstream tasks scheduled from follow-on schedule check

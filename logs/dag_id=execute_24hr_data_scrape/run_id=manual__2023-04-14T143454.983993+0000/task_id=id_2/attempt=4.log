@@ -1,0 +1,50 @@
+[2023-04-14T14:51:43.939+0000] {taskinstance.py:1084} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: execute_24hr_data_scrape.id_2 manual__2023-04-14T14:34:54.983993+00:00 [queued]>
+[2023-04-14T14:51:43.960+0000] {taskinstance.py:1084} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: execute_24hr_data_scrape.id_2 manual__2023-04-14T14:34:54.983993+00:00 [queued]>
+[2023-04-14T14:51:43.962+0000] {taskinstance.py:1282} INFO - 
+--------------------------------------------------------------------------------
+[2023-04-14T14:51:43.964+0000] {taskinstance.py:1283} INFO - Starting attempt 4 of 4
+[2023-04-14T14:51:43.965+0000] {taskinstance.py:1284} INFO - 
+--------------------------------------------------------------------------------
+[2023-04-14T14:51:44.005+0000] {taskinstance.py:1303} INFO - Executing <Task(BashOperator): id_2> on 2023-04-14 14:34:54.983993+00:00
+[2023-04-14T14:51:44.018+0000] {standard_task_runner.py:55} INFO - Started process 709 to run task
+[2023-04-14T14:51:44.026+0000] {standard_task_runner.py:82} INFO - Running: ['***', 'tasks', 'run', 'execute_24hr_data_scrape', 'id_2', 'manual__2023-04-14T14:34:54.983993+00:00', '--job-id', '64', '--raw', '--subdir', 'DAGS_FOLDER/exec_web_crawlers_dag.py', '--cfg-path', '/tmp/tmpx86wcz5j']
+[2023-04-14T14:51:44.031+0000] {standard_task_runner.py:83} INFO - Job 64: Subtask id_2
+[2023-04-14T14:51:44.143+0000] {task_command.py:388} INFO - Running <TaskInstance: execute_24hr_data_scrape.id_2 manual__2023-04-14T14:34:54.983993+00:00 [running]> on host 6f8cd9778af0
+[2023-04-14T14:51:44.336+0000] {taskinstance.py:1511} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=xiaochen
+AIRFLOW_CTX_DAG_ID=execute_24hr_data_scrape
+AIRFLOW_CTX_TASK_ID=id_2
+AIRFLOW_CTX_EXECUTION_DATE=2023-04-14T14:34:54.983993+00:00
+AIRFLOW_CTX_TRY_NUMBER=4
+AIRFLOW_CTX_DAG_RUN_ID=manual__2023-04-14T14:34:54.983993+00:00
+[2023-04-14T14:51:44.341+0000] {subprocess.py:63} INFO - Tmp dir root location: 
+ /tmp
+[2023-04-14T14:51:44.346+0000] {subprocess.py:75} INFO - Running command: ['/bin/bash', '-c', 'python /opt/***/src/news_comments_crawlers/crawlers/_EN_CNA.py --name CNA']
+[2023-04-14T14:51:44.369+0000] {subprocess.py:86} INFO - Output:
+[2023-04-14T14:51:48.860+0000] {subprocess.py:93} INFO - 
+[2023-04-14T14:51:48.862+0000] {subprocess.py:93} INFO - --DEBUG: getcwd:       /tmp/***tmp9ivppe5l
+[2023-04-14T14:51:48.864+0000] {subprocess.py:93} INFO - 
+[2023-04-14T14:51:48.865+0000] {subprocess.py:93} INFO - --DEBUG: __file__:     /opt/***/src/news_comments_crawlers/crawlers/_EN_CNA.py
+[2023-04-14T14:51:48.866+0000] {subprocess.py:93} INFO - 
+[2023-04-14T14:51:48.867+0000] {subprocess.py:93} INFO - -- Session Object : Good to go.
+[2023-04-14T14:51:48.869+0000] {subprocess.py:93} INFO - 
+[2023-04-14T14:51:48.870+0000] {subprocess.py:93} INFO - -- Log Folder: Failed to create.
+[2023-04-14T14:51:48.871+0000] {subprocess.py:93} INFO - [Errno 2] No such file or directory: '/opt/***/src/news_comments_crawlers/crawlers/out/2023-04-14'
+[2023-04-14T14:51:48.873+0000] {subprocess.py:93} INFO - []
+[2023-04-14T14:51:48.874+0000] {subprocess.py:93} INFO - Traceback (most recent call last):
+[2023-04-14T14:51:48.876+0000] {subprocess.py:93} INFO -   File "/opt/***/src/news_comments_crawlers/crawlers/_EN_CNA.py", line 13, in <module>
+[2023-04-14T14:51:48.880+0000] {subprocess.py:93} INFO -     from Functions import *
+[2023-04-14T14:51:48.882+0000] {subprocess.py:93} INFO -   File "<fstring>", line 1
+[2023-04-14T14:51:48.884+0000] {subprocess.py:93} INFO -     (USE_CACHE=)
+[2023-04-14T14:51:48.886+0000] {subprocess.py:93} INFO -               ^
+[2023-04-14T14:51:48.888+0000] {subprocess.py:93} INFO - SyntaxError: invalid syntax
+[2023-04-14T14:51:49.531+0000] {subprocess.py:97} INFO - Command exited with return code 1
+[2023-04-14T14:51:49.557+0000] {taskinstance.py:1775} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/operators/bash.py", line 197, in execute
+    f"Bash command failed. The command returned a non-zero exit code {result.exit_code}."
+airflow.exceptions.AirflowException: Bash command failed. The command returned a non-zero exit code 1.
+[2023-04-14T14:51:49.565+0000] {taskinstance.py:1326} INFO - Marking task as FAILED. dag_id=execute_24hr_data_scrape, task_id=id_2, execution_date=20230414T143454, start_date=20230414T145143, end_date=20230414T145149
+[2023-04-14T14:51:49.595+0000] {standard_task_runner.py:105} ERROR - Failed to execute job 64 for task id_2 (Bash command failed. The command returned a non-zero exit code 1.; 709)
+[2023-04-14T14:51:49.652+0000] {local_task_job.py:212} INFO - Task exited with return code 1
+[2023-04-14T14:51:49.684+0000] {taskinstance.py:2585} INFO - 0 downstream tasks scheduled from follow-on schedule check

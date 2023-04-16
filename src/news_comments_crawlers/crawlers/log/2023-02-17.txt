@@ -1,0 +1,25 @@
+
+
+-- Platform: CNA
+	-- No of. articles scraped: 9923
+
+-- Platform: CNA
+	-- No of. articles scraped: 9923
+
+-- Platform: CNA
+	-- No of. articles scraped: 9923
+
+-- Platform: CNA
+	-- No of. articles scraped: 9923
+
+-- Platform: CNA
+	-- No of. articles scraped: 9923
+
+-- Platform: CNA
+	-- No of. articles scraped: 9872
+
+-- Platform: ZB
+	-- No of. articles scraped: 27119
+
+-- Platform: BERITA
+	-- No of. articles scraped: 3206

@@ -1,0 +1,17 @@
+
+
+-- Platform: 8W
+	-- No of. articles scraped: 3047
+
+-- Platform: CNA
+	-- No of. articles scraped: 1660
+
+
+-- Platform: BERITA
+	-- No of. articles scraped: 8903
+
+-- Platform: BERITA
+	-- No of. articles scraped: 8903
+
+-- Platform: BERITA
+	-- No of. articles scraped: 8903

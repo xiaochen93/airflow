@@ -1,0 +1,28 @@
+[2023-04-14T15:09:00.686+0000] {taskinstance.py:1084} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: execute_24hr_data_scrape.id_1 scheduled__2023-04-14T15:08:00+00:00 [queued]>
+[2023-04-14T15:09:00.695+0000] {taskinstance.py:1084} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: execute_24hr_data_scrape.id_1 scheduled__2023-04-14T15:08:00+00:00 [queued]>
+[2023-04-14T15:09:00.696+0000] {taskinstance.py:1282} INFO - 
+--------------------------------------------------------------------------------
+[2023-04-14T15:09:00.696+0000] {taskinstance.py:1283} INFO - Starting attempt 1 of 4
+[2023-04-14T15:09:00.696+0000] {taskinstance.py:1284} INFO - 
+--------------------------------------------------------------------------------
+[2023-04-14T15:09:00.710+0000] {taskinstance.py:1303} INFO - Executing <Task(BashOperator): id_1> on 2023-04-14 15:08:00+00:00
+[2023-04-14T15:09:00.715+0000] {standard_task_runner.py:55} INFO - Started process 2733 to run task
+[2023-04-14T15:09:00.717+0000] {standard_task_runner.py:82} INFO - Running: ['***', 'tasks', 'run', 'execute_24hr_data_scrape', 'id_1', 'scheduled__2023-04-14T15:08:00+00:00', '--job-id', '150', '--raw', '--subdir', 'DAGS_FOLDER/exec_web_crawlers_dag.py', '--cfg-path', '/tmp/tmpl7g3u0bn']
+[2023-04-14T15:09:00.718+0000] {standard_task_runner.py:83} INFO - Job 150: Subtask id_1
+[2023-04-14T15:09:00.767+0000] {task_command.py:388} INFO - Running <TaskInstance: execute_24hr_data_scrape.id_1 scheduled__2023-04-14T15:08:00+00:00 [running]> on host 6f8cd9778af0
+[2023-04-14T15:09:00.832+0000] {taskinstance.py:1511} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=xiaochen
+AIRFLOW_CTX_DAG_ID=execute_24hr_data_scrape
+AIRFLOW_CTX_TASK_ID=id_1
+AIRFLOW_CTX_EXECUTION_DATE=2023-04-14T15:08:00+00:00
+AIRFLOW_CTX_TRY_NUMBER=1
+AIRFLOW_CTX_DAG_RUN_ID=scheduled__2023-04-14T15:08:00+00:00
+[2023-04-14T15:09:00.834+0000] {subprocess.py:63} INFO - Tmp dir root location: 
+ /tmp
+[2023-04-14T15:09:00.834+0000] {subprocess.py:75} INFO - Running command: ['/bin/bash', '-c', 'echo Hello World !!!! My name is xxxxx !']
+[2023-04-14T15:09:00.843+0000] {subprocess.py:86} INFO - Output:
+[2023-04-14T15:09:00.844+0000] {subprocess.py:93} INFO - Hello World !!!! My name is xxxxx !
+[2023-04-14T15:09:00.845+0000] {subprocess.py:97} INFO - Command exited with return code 0
+[2023-04-14T15:09:00.867+0000] {taskinstance.py:1326} INFO - Marking task as SUCCESS. dag_id=execute_24hr_data_scrape, task_id=id_1, execution_date=20230414T150800, start_date=20230414T150900, end_date=20230414T150900
+[2023-04-14T15:09:00.889+0000] {local_task_job.py:212} INFO - Task exited with return code 0
+[2023-04-14T15:09:00.909+0000] {taskinstance.py:2585} INFO - 1 downstream tasks scheduled from follow-on schedule check

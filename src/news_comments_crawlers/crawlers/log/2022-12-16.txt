@@ -1,0 +1,14 @@
+-- Platform: CNA
+	-- No of. articles scraped: 1713
+
+-- Platform: 8W
+	-- No of. articles scraped: 8874
+
+-- Platform: CNA
+	-- No of. articles scraped: 1713
+
+-- Platform: 8W
+	-- No of. articles scraped: 8932
+
+-- Platform: ST
+	-- No of. articles scraped: 7543

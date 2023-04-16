@@ -1,0 +1,13 @@
+
+
+-- Platform: theINDE
+	-- No of. articles scraped: 4882
+
+-- Platform: CNA
+	-- No of. articles scraped: 43
+
+-- Platform: CNA
+	-- No of. articles scraped: 43
+
+-- Platform: CNA
+	-- No of. articles scraped: 43

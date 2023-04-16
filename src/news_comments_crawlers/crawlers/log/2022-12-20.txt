@@ -1,0 +1,28 @@
+
+
+-- Platform: BERITA
+	-- No of. articles scraped: 6
+
+-- Platform: 8W
+	-- No of. articles scraped: 3047
+
+-- Platform: CNA
+	-- No of. articles scraped: 1745
+
+-- Platform: ZB
+	-- No of. articles scraped: 10561
+
+-- Platform: ST
+	-- No of. articles scraped: 122
+
+-- Platform: ANT
+	-- No of. articles scraped: 15000
+
+-- Platform: ANT
+	-- No of. articles scraped: 15000
+
+-- Platform: ANT
+	-- No of. articles scraped: 15000
+
+-- Platform: ANT
+	-- No of. articles scraped: 410630

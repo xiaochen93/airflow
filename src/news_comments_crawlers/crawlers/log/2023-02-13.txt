@@ -1,0 +1,34 @@
+
+
+-- Platform: ONLINE_CITI
+	-- No of. articles scraped: 507
+
+-- Platform: ONLINE_CITI
+	-- No of. articles scraped: 507
+
+-- Platform: ONLINE_CITI
+	-- No of. articles scraped: 507
+
+-- Platform: ONLINE_CITI
+	-- No of. articles scraped: 507
+
+-- Platform: ONLINE_CITI
+	-- No of. articles scraped: 507
+
+-- Platform: ONLINE_CITI
+	-- No of. articles scraped: 507
+
+-- Platform: ONLINE_CITI
+	-- No of. articles scraped: 507
+
+-- Platform: ONLINE_CITI
+	-- No of. articles scraped: 507
+
+-- Platform: ONLINE_CITI
+	-- No of. articles scraped: 507
+
+-- Platform: ONLINE_CITI
+	-- No of. articles scraped: 1033
+
+-- Platform: STOMP
+	-- No of. articles scraped: 2923
