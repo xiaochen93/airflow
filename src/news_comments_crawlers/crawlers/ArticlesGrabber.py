@@ -51,8 +51,8 @@ def getNewsByCSS(article_url,css_paths):
         article = ''
     
     return {'url': article_url,
-            'publish_datetime': p_datetime.strip(),
-            'date_crawler': date_crawler,
+            'published_datetime': p_datetime.strip(),
+            'crawled_datetime': date_crawler,
             'org_title': news_title.strip(),
             'category': category.strip(),
             'org_content': article.strip()}

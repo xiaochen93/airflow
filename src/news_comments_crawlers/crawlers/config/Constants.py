@@ -18,21 +18,23 @@ import os.path
 
 import pathlib
 
-print('\n--DEBUG: __file__:    ', __file__)
+ROOT_DIR = os.path.join(os.path.dirname(os.path.join(os.path.dirname(__file__))))
+# A is the parent directory of the directory where program resides.
+print('\n-- DEBUG: __ROOT_DIR_file__:    ', ROOT_DIR)
 
 class Constants:
 
-    LINK_PATH : str = "/opt/airflow/src/news_comments_crawlers/crawlers/news_links/links_"
+    LINK_PATH : str = ROOT_DIR+"/news_links/links_"
 
-    RAW_PATH : str = "/opt/airflow/src/news_comments_crawlers/crawlers/output/raw/"
+    RAW_PATH : str = ROOT_DIR+"/output/raw/"
     
-    DF_PATH : str = "/opt/airflow/src/news_comments_crawlers/crawlers/output/df/"
+    DF_PATH : str = ROOT_DIR+"/output/df/"
     
-    OUT_FOLDER_PATH : str = "/opt/airflow/src/news_comments_crawlers/crawlers/out/"
+    OUT_FOLDER_PATH : str = ROOT_DIR+"/out/"
     
     TODAY = str(datetime.now().date())
     
-    LOG_FILE_PATH = OUT_FOLDER_PATH + TODAY + '.txt'
+    LOG_FILE_PATH = ROOT_DIR+'/log/' + TODAY + '.txt'
     
     #_ACCEPTED_LINKS = ['/singapore/','/world/','/southeast-asia/','/business/','/economic/']
 
@@ -64,10 +66,10 @@ class Constants:
         _adapter = HTTPAdapter(max_retries=_retry)
         SESSION.mount('http://', _adapter)
         SESSION.mount('https://', _adapter)
-        print('\n-- Session Object : Good to go.')
+        print('\n-- DEBUG: Session Object Good to go.')
     except Exception as e:
         print(e)
-        print('\n-- Session Object : Failed to create.')
+        print('\n-- DEBUG: Session Object Failed to create.')
         
     try:
         TODAY_DIR = OUT_FOLDER_PATH + TODAY
@@ -89,9 +91,9 @@ class Constants:
             os.mkdir(JSON_DATA_DIR)
             os.mkdir(DF_DATA_DIR)
 
-        print('\n-- Folders: Good to go.')
+        print('\n-- DEBUG: Folders: Good to go.')
 
     except Exception as e:
-        print('\n-- Log Folder: Failed to create.')
+        print('\n-- DEBUG: Folder: Failed to create.')
         print(e)
         

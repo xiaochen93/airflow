@@ -1,0 +1,10 @@
+
+
+-- Platform: CNA
+	-- No of. articles scraped: 51
+
+-- Platform: CNA
+	-- No of. articles scraped: 51
+
+-- Platform: CNA
+	-- No of. articles scraped: 51

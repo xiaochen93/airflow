@@ -28,7 +28,31 @@ from config.Constants import Constants as CONS
 
 import os
 
-print(os.listdir())
+pre_text_patterns= [r'Mediacorp News Group © 2022', 
+                r'\s*（早报讯）',
+                r'\s*Bisnis.com, ',
+                r'(\[|\【).+(\]|\】)',
+                r'本文为作者观点，不代表本网站立场', 
+                r'请点击.+系列报道，阅读更多文章。',
+                r'\s{1,}回复',
+                r'Copyright © ANTARA 2021',
+                r'Baca juga: .+',
+                r'^.+\(ANTARA\)\s*\-\s*',
+                r'^.+\s发表于\s[\d\-\s\:]+',
+               ]
+
+def clean(text,patterns=[]):
+    #2. removing additional whitespace
+    text = re.sub('\s+', ' ', text) # padding
+    #1. subtracting text pattern in regular expression
+    for pattern in patterns:
+        text = re.sub(pattern, "", text.strip())
+    #text = re.sub('([.,!?()])', r' \1 ', text) # padding
+    #text = re.sub(r'[^\w\s]','', text) 
+    #word_list = word_tokenize(text)
+    #stem_text = [lemmatizer.lemmatize(text) for text in word_list if not text.isdigit() if not text.lower() in self.stop_words]
+    #final_text = " ".join(stem_text)
+    return (text.strip())
 
 class Preprocessor:
     
@@ -45,15 +69,47 @@ class Preprocessor:
         
         df['org'] = self.org
         
-        df['source'] = self.source
+        df['source_id'] = self.source
+
+        df['translated'] = False if self.lang != 'EN' else True
         
+        return df
+    
+    def prepare(self, func=lambda x: x):
+        try:
+            df = self.df.dropna(subset = ['org_content'])
+            
+            # update the published_datetime into datetime object
+            df['published_datetime'] = df.apply(lambda row: func(row['published_datetime'],row['crawled_datetime']), axis=1)
+
+            df['published_datetime'] = df['published_datetime'].apply(lambda x: str(x))
+
+            # drop the crawling_datetime column
+            df = df.drop('crawled_datetime', axis=1)     
+
+            # translate title and content ?
+            if self.lang  == 'EN':
+                df['content'] = df['org_content']
+                df['title'] = df['org_title']
+            else:
+                df['content'] = ''
+                df['title'] = ''
+            
+            # clean the original text
+            df['content'] = df['content'].apply(lambda x: clean(x, pre_text_patterns))           
+            df['content'] = df['content'].apply(lambda x: clean(x, pre_text_patterns))
+
+        except Exception as e:
+            print(e)
+            raise
+
         return df
     
     def preprocess(self, func=lambda x: x):
         try:
             df = self.df.dropna(subset = ['org_content'])
             df['publish_datetime'] = df.apply(lambda row: func(row['publish_datetime'],row['date_crawler']), axis=1)
-            df = df[(df['publish_datetime'] >= CONS.BEGIN_FROM) & (df['publish_datetime'] <= CONS.END_AT)]
+            #df = df[(df['publish_datetime'] >= CONS.BEGIN_FROM) & (df['publish_datetime'] <= CONS.END_AT)]
         
         except Exception as e:
             print(e)
@@ -63,17 +119,7 @@ class Preprocessor:
             
         return df
 
-def clean(text):
-    text = re.sub("[\(\[].*?[\)\]]", "", text)
-    text = re.sub('([.,!?()])', r' \1 ', text) # padding
-    text = re.sub('\s{2,}', ' ', text) # padding
-    text = text.lower()
-    text = re.sub(r'[^\w\s]','', text) 
-    #word_list = word_tokenize(text)
-    #stem_text = [lemmatizer.lemmatize(text) for text in word_list if not text.isdigit() if not text.lower() in self.stop_words]
-    #final_text = " ".join(stem_text)
-    return text
-    
+
     
 def drop_na(df):
     df = df.applymap(lambda x: np.nan if x=="" else x)
