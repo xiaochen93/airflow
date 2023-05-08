@@ -18,19 +18,19 @@ default_args = {
 		'owner': 'xiaochen',
 		'start_date': datetime(2023, 4, 6),
 		'retries': 3,
-		'retry_delay': timedelta(minutes=5)
+		'retry_delay': timedelta(hours=3)
 }
 
 #initializing the dag object
-exe_web_crawlers_dag = DAG('execute_24hr_data_scrape',
+exe_web_crawlers_dag = DAG('cna_24hr_web_dag',
 		default_args=default_args,
 		description='The dag object to execute a series of web crawlers for data/comments collection .',
 		schedule_interval= '0 12 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
 		catchup=False,
-		tags=['news articles','24hrs']
+		tags=['cna','news articles','24hrs']
 )
 
-
+ 
 task_1 = BashOperator(
     task_id="id_1",
     bash_command="echo Hello World !!!! My name is xxxxx !",

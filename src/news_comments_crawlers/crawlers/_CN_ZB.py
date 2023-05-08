@@ -5,58 +5,100 @@ Created on Wed Apr 13 10:47:45 2022
 @author: liux5
 """
 
-from bs4 import BeautifulSoup
 import time
-from datetime import datetime
-from Constants import Constants as CONS
+from config.Preprocessor import Preprocessor
+from config.Constants import Constants as CONS
+from config.db_functions import *
 from Functions import *
-from ArticlesGrabber import getNewsByCSS
-from config.Preprocessor import Preprocessor 
+from ArticlesGrabber import *
 import re
 import pandas as pd
-#8WORLD WEB CRAWLER FOR BACK TRANSLATION
+import json
+import argparse
+import pickle
+from datetime import datetime, timedelta
 
-USE_CACHE = True
+# 2023-05-07 update parameters for zaobao web crawler
 
-NUM_URLS_TO_SCRAPE = -1 #change to -1 for all URLs to be scraped per sitemap page
+NOW = datetime.today().now()
 
-DEFAULT_WEBSITE = 'https://www.zaobao.com.sg/'
+AGO = NOW - timedelta(hours=24)
 
-DEFAULT_DOMAIN = 'www.zaobao.com.sg'
+NOW = NOW.strftime('%Y-%m-%d %H:%M:%S')
 
-SITEMAP = 'https://www.zaobao.com.sg/sitemap.xml'
+AGO = AGO.strftime('%Y-%m-%d %H:%M:%S')
 
-CONS.WEBSITE = DEFAULT_WEBSITE
+CONS = CONS
 
-CONS.DOMAIN = DEFAULT_DOMAIN
+parser = argparse.ArgumentParser(description="Parameters to execute a web crawler")
 
-CONS.SITEMAP = SITEMAP
+parser.add_argument(
+        '--name',
+        type=str,
+        help="The name of a news/social media channel",
+        required=True
+)
 
-NAME = 'ZB'
+#add parameter start-datetime
+parser.add_argument(
+        '--start_datetime',
+        type=lambda dt: pd.to_datetime(dt, format="%Y-%m-%d %H:%M:%S"),
+        default=str(AGO),
+        help="The start datetime in format YYYY-mm-dd hh:mm:ss "
+)
 
-LANG = 'CN'
+#add parameter start-datetime
+parser.add_argument(
+        '--end_datetime',
+        type=lambda dt: pd.to_datetime(dt, format="%Y-%m-%d %H:%M:%S"),
+        default=str(NOW),
+        help="The end datetime in format YYYY-mm-dd hh:mm:ss "
+)
 
-S_ID = 3
+parser.add_argument(
+     '--use_cache',
+     type=bool,
+     default=True,
+     help="Set true if you want to crawl articles from previous scraped news links."
+)
+
+args = parser.parse_args()
+
+#CNA WEB CRAWLER FOR BACK TRANSLATION
+
+USE_CACHE = args.use_cache
+# SITEMAP_NUM_PAGES = 55 #MAX 55, change for debugging
+
+BEGIN_FROM = args.start_datetime
+
+END_AT = args.end_datetime
+
+NAME = args.name
+
+# The file name that contains scrapped article/comment in json format
+DATA_JSON_FILEPATH = CONS.JSON_DATA_DIR + '{}_{}_{}.json'.format(NAME,END_AT.date(),END_AT.hour)
+
+# The file name that contains scrapped article/comment in dataframe object
+DATA_DF_FILEPATH = CONS.DF_DATA_DIR + '{}_{}_{}.pickle'.format(NAME,END_AT.date(),END_AT.hour)
+
+# The file name that contains links of article/comment(s)
+LINK_FILEPATH = CONS.LINK_DIR + '{}_{}_{}.txt'.format(NAME,END_AT.date(),END_AT.hour)
 
 HEADERS = CONS.HEADERS
 
 BLACKLISTED_LINKS = CONS.BLACKLISTED_LINKS
 
-BEGIN_FROM = CONS.BEGIN_FROM
-
-END_AT = CONS.END_AT
-
-JSON_FILEPATH = CONS.RAW_PATH + '{}_{}_{}.txt'.format(NAME,BEGIN_FROM.date(),END_AT.date())
-
-DF_FILEPATH = CONS.DF_PATH + '{}_{}_{}.pickle'.format(NAME,BEGIN_FROM.date(),END_AT.date())
-
-CACHE_FILEPATH = CONS.LINKS_PATH + '{}_{}_{}.txt'.format(NAME, BEGIN_FROM.date(),END_AT.date())
+DEFAULT_WEBSITE = 'https://www.zaobao.com.sg/'
 
 CONS.WEBSITE = DEFAULT_WEBSITE
 
 s = CONS.SESSION
 
-s.headers.update(HEADERS)
+LANG = 'CN'
+
+S_ID = 3
+
+URLS = ['https://www.zaobao.com.sg/realtime/singapore', 'https://www.zaobao.com.sg/realtime/china', 'https://www.zaobao.com.sg/realtime/world', 'https://www.zaobao.com.sg/realtime/finance']
 
 css_paths = {
     'title': 'div[class*="article-title"]',
@@ -65,65 +107,86 @@ css_paths = {
     'article': 'div[class*="article-content-rawhtml"]'
     }
 
+def _parse_datetime(relative_time_str):
+    # Define a dictionary mapping Mandarin keywords to timedelta units
+    time_units = {"分钟": "minutes", "小时": "hours", "天": "days"}
 
+    # Extract the numerical value and time unit from the relative time string
+    match = re.search(r"(\d+) ?(.+?)前", relative_time_str)
+    if match is not None:
+        num, unit = match.groups()
+        # Map the time unit to a timedelta unit
+        unit = time_units.get(unit)
+        # Create a timedelta object and subtract it from the current datetime
+        delta = timedelta(**{unit: int(num)})
+        _dt = datetime.now() - delta
+    else:
+        # datetime string is 04/05/2023
+        _dt = pd.to_datetime(relative_time_str, format='%d/%m/%Y')
+
+    return _dt 
 
 def gather_urls(save_to_cache = False):
     
-    article_list, datetime_list, priority_list = [], [], []
-    
-    SITEMAP_LINKS = BeautifulSoup(s.get(SITEMAP).text,'lxml').find_all('loc')
-    
-    SITEMAP_NUM_PAGES = len(SITEMAP_LINKS)
-    
-    START = max(0, math.floor(SITEMAP_NUM_PAGES*0.8))
-    
-    for sitemap_page in range(START, SITEMAP_NUM_PAGES):
-        # get the page url for the sitemap page
-        page_url = c_restore_url(CONS,SITEMAP_LINKS[sitemap_page].get_text())
-        
-        # get the content of the sitemap page
-        page_content = s.get(page_url).text
-        
-        soup = BeautifulSoup(page_content, 'xml') #Parse LXML file
-    
-        i = 0
-        
-        for url_element in tqdm(soup.find_all('url')):
-            #1. get the link for the news articles
-            try:
-                link = url_element.select('loc')[0].get_text()
-            except:
-                print('\n-- No link was found, skip the link.')
-                i = i + 1
-                continue
-            #2. get the datetime for the newslink else: scrape everything
-            try:
-                _date = url_element.select('lastmod')[0].get_text()
-                _date = _date.split('T')[0] # get the news's date
-                _date = datetime.strptime(_date, '%Y-%m-%d')
-            except:
-                _date = CONS.END_AT
-                #print('\n-- DEBUG: No of record ',self.no_records,flush=True) 
-          
-            # check if to skip a link : link must be lowercase
-            if c_determine_to_skip(CONS, link, _date):
-                i = i + 1
-                continue
-            else: 
-                article_list.append(link)
-                datetime_list.append(_date)
+    article_list, STOP, COUNTER = [], 25, 0
 
-        print('\n--DEBUG',sitemap_page,'/',SITEMAP_NUM_PAGES,' sitepage has skipped:', i, 'of records.',end="\r", flush=True)
+    for URL in URLS:
+
+        init_URL = URL
+
+        # Search the conceivable news articles on each sub page
+        while True:
+            soup = BeautifulSoup(s.get(URL).text, "html.parser")
+
+            # STEP: find the css path that a news post is wrapped
+            WEB_CARD_ELEMENTS= soup.select('div[class="col-12 col-lg-4"]')
+
+            print(f'\n--DEBUG: No.of web card elements {len(WEB_CARD_ELEMENTS)}')
+
+            for CARD_ELEMENT in WEB_CARD_ELEMENTS[:-1]:
+                #print(CARD_ELEMENT)
+                try:
+                    # STEP: find the css path that contain the news link
+                    link = CARD_ELEMENT.select('div[class*="article-type-content"] > a[class="article-type-link"]')[0]
+                    link = DEFAULT_WEBSITE + str(link['href'])[1:]
+                    #print('\n--DEBUG: Link - ',link)
+                except Exception as e:
+                    print(f'\n\t--DEBUG: URL - {URL}')
+                    print(f'\n\t--DEBUG: No valid link is scraped, break. {e}')
+                    break
+
+                try:
+                    #STEP 3: find the css path that contain the datetime object
+                    link_datetime = CARD_ELEMENT.select('div[class*="article-type-meta"] > span')[0].get_text()
+                    link_datetime = _parse_datetime(link_datetime)
+                    #print(f'\n\tDEBUG: datetime - {link_datetime}')
+                except Exception as e:
+                    print(f'\n\t--DEBUG: No datetime is presented.  {e}')
+                    break
+
+                # STEP 4: determine the datetime of the link is in range + and -
+                if link_datetime >= BEGIN_FROM and link_datetime <= END_AT:
+                    article_list.append(link)
+                else:
+                    COUNTER += 1
+            # STEP 5: go to the next page.
+            print(f'DEBUG: STOP {STOP} COUNTER {COUNTER}')
+            if COUNTER < STOP:
+                next_link = soup.find("a", {"class": "pagination-link pagination-link-next"})
+                URL = init_URL +  next_link['href']
+                #print(f'\n--DEBUG: The next page is {URL}')
+            else:
+                break
 
     if save_to_cache:
-        with open(CACHE_FILEPATH, 'w', encoding='utf-8') as cache_file:
+        with open(LINK_FILEPATH, 'w', encoding='utf-8') as cache_file:
             for link in article_list:
                 cache_file.write(link + '\n')
-            print(f'Saved URLs into {CACHE_FILEPATH}')
+            print(f'Saved URLs into {LINK_FILEPATH}')
 
     return article_list
 
-def extract_datetime_zaobao(raw_date_string, crawler_datetime):
+def _extract_datetime(raw_date_string, crawler_datetime):
     try:
         date_publish = datetime.today()
         
@@ -139,18 +202,18 @@ def extract_datetime_zaobao(raw_date_string, crawler_datetime):
 
 def main():
     
-    link_list = c_scrape_links(USE_CACHE, CACHE_FILEPATH, gather_urls)
-    
-    articles = c_scrape_articles(USE_CACHE, JSON_FILEPATH, {'data':link_list, 'param':css_paths, 'func':getNewsByCSS})
-    
+    link_list = c_scrape_links(USE_CACHE, LINK_FILEPATH, gather_urls)
+
+    articles = c_scrape_articles(USE_CACHE, DATA_JSON_FILEPATH, {'data':link_list, 'param':css_paths, 'func':getNewsByCSS})
+
+    articles_df = Preprocessor({'data':articles,'lang':LANG,'org':1,'source': S_ID}).prepare(func=_extract_datetime)
+
     #save the raw json file
-    with open(JSON_FILEPATH, 'w', encoding='utf-8') as output_file:
-        json.dump(articles , output_file ,indent = 2, ensure_ascii=False, default=str)    
-    
-    articles_df = Preprocessor({'data':articles,'lang':LANG,'org':1, 'source': S_ID}).preprocess(func=extract_datetime_zaobao)
-    
+    with open(DATA_JSON_FILEPATH, 'w', encoding='utf-8') as output_file:
+        json.dump(articles , output_file ,indent = 2, ensure_ascii=False, default=str)
+
     #save the dataframe object
-    with open(DF_FILEPATH, 'wb') as output_file:
+    with open(DATA_DF_FILEPATH, 'wb') as output_file:
         pickle.dump(articles_df, output_file, protocol=pickle.HIGHEST_PROTOCOL)
 
     #save and write the data statistics - append mode
@@ -158,10 +221,51 @@ def main():
         output_file.write('\n')
         output_file.write('\n-- Platform: '+ NAME)
         output_file.write('\n\t-- No of. articles scraped: {}'.format(articles_df.shape[0]))
-      
 
+    #save data into the database
+    for idx, row in articles_df.iterrows():
+        row = row.to_dict()
+        insert_news_db(row)
+
+def main():
+    
+    link_list = c_scrape_links(USE_CACHE, LINK_FILEPATH, gather_urls)
+
+    articles = c_scrape_articles(USE_CACHE, DATA_JSON_FILEPATH, {'data':link_list, 'param':css_paths, 'func':getNewsByCSS})
+
+    articles_df = Preprocessor({'data':articles,'lang':LANG,'org':1,'source': S_ID}).prepare(func=_extract_datetime)
+
+    #save the raw json file
+    with open(DATA_JSON_FILEPATH, 'w', encoding='utf-8') as output_file:
+        json.dump(articles , output_file ,indent = 2, ensure_ascii=False, default=str)
+
+    #save the dataframe object
+    with open(DATA_DF_FILEPATH, 'wb') as output_file:
+        pickle.dump(articles_df, output_file, protocol=pickle.HIGHEST_PROTOCOL)
+
+    #save and write the data statistics - append mode
+    with open(CONS.LOG_FILE_PATH, "a", encoding='utf-8') as output_file:
+        output_file.write('\n')
+        output_file.write('\n-- Platform: '+ NAME)
+        output_file.write('\n\t-- No of. articles scraped: {}'.format(articles_df.shape[0]))
+
+    #save data into the database
+    try:
+        for idx, row in articles_df.iterrows():
+            row = row.to_dict()
+            insert_news_db(row)
+        print(f'\n--DEBUG: {articles_df.shape[0]} has been written into database.')
+    except Exception as e:
+        print(f'\n--DEBUG: API error {e}')
+      
 if __name__ == '__main__':
     t1 = time.perf_counter()
+    print('\n--DEBUG: Platform - ', args.name)
+    print('\n--DEBUG: Start-time - ', args.start_datetime)
+    print('\n--DEBUG: End-time - ', args.end_datetime)
+    print('\n--DEBUG: Link Path -', LINK_FILEPATH)
+    print('\n--DEBUG: JSON Data Path -', DATA_JSON_FILEPATH)
+    print('\n--DEBUG: DF Data Path -', DATA_DF_FILEPATH)
     main()
     t2 = time.perf_counter()
     print(f'Program took {t2-t1} seconds to complete')
