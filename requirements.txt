@@ -1,2 +1,5 @@
 nltk
 seaborn
+html5lib
+aiohttp
+asyncio

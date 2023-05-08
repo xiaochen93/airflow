@@ -23,24 +23,25 @@ default_args = {
 }
 
 #initializing the dag object
-exe_web_crawlers_dag = DAG('cna_24hr_web_dag',
+exe_web_crawlers_dag = DAG('berita_24hr_web_dag',
 		default_args=default_args,
 		description='The dag object to execute a series of web crawlers for data/comments collection .',
 		schedule_interval= '0 12 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
 		catchup=False,
-		tags=['cna','news articles','24hrs']
+		tags=['berita mediacorp','news articles','24hrs']
 )
 
- 
+
+
 task_1 = BashOperator(
     task_id="id_1",
-    bash_command="echo Hello World !!!! My name is xxxxx !",
+    bash_command="echo Hello World !!!! This is berita dag",
     dag = exe_web_crawlers_dag
 )
 
 task_2 = BashOperator(
     task_id = "id_2",
-    bash_command = "python /opt/airflow/src/news_comments_crawlers/crawlers/_EN_CNA.py --name CNA",
+    bash_command = "python /opt/airflow/src/news_comments_crawlers/crawlers/_BM_BERITA.py --name BERITA",
     execution_timeout=timedelta(minutes=15),
     dag = exe_web_crawlers_dag
 )

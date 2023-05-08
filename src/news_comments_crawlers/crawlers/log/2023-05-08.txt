@@ -11,3 +11,12 @@
 
 -- Platform: ZAOBAO
 	-- No of. articles scraped: 56
+
+-- Platform: BERITA
+	-- No of. articles scraped: 40
+
+-- Platform: BERITA
+	-- No of. articles scraped: 40
+
+-- Platform: BERITA
+	-- No of. articles scraped: 40

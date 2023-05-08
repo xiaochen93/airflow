@@ -170,7 +170,7 @@ def gather_urls(save_to_cache = False):
                 else:
                     COUNTER += 1
             # STEP 5: go to the next page.
-            print(f'DEBUG: STOP {STOP} COUNTER {COUNTER}')
+            print(f'\n--DEBUG: STOP {STOP} COUNTER {COUNTER}')
             if COUNTER < STOP:
                 next_link = soup.find("a", {"class": "pagination-link pagination-link-next"})
                 URL = init_URL +  next_link['href']
