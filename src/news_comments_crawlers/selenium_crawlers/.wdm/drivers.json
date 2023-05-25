@@ -1,0 +1,6 @@
+{
+    "linux64_chromedriver_latest_for_": {
+        "timestamp": "24/05/2023",
+        "binary_path": "/opt/airflow/src/news_comments_crawlers/selenium_crawlers/.wdm/drivers/chromedriver/linux64/113.0.5672.63/chromedriver"
+    }
+}
