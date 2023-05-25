@@ -83,6 +83,15 @@ x-airflow-common:
       condition: service_healthy
 
 services:
+
+  selenium:
+    container_name: remote_chromedriver
+    image: seleniarm/standalone-chromium:latest
+    ports:
+      - 4444:4444
+      - 7900:7900
+    restart: always
+
   postgres:
     image: postgres:13
     environment:
@@ -237,4 +246,5 @@ services:
       - airflow
 
 volumes:
-  postgres-db-volume:
+   postgres-db-volume:
+   ownloads:

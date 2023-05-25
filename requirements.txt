@@ -2,4 +2,8 @@ nltk
 seaborn
 html5lib
 aiohttp
-asyncio
+selenium
+webdriver_manager
+newspaper3k
+googlesearch-python
+praw

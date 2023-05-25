@@ -13,17 +13,22 @@ from airflow.operators.bash_operator import BashOperator
 
 import os
 
+import pytz
+
+# Get the Beijing time zone
+beijing_timezone = pytz.timezone('Asia/Shanghai')
+
 # initializing the default arguments
 default_args = {
 		'owner': 'xiaochen',
-		'start_date': datetime(2023, 4, 6),
-		'retries': 3,
-		'retry_delay': timedelta(minutes=45),
+		'start_date': datetime(2023, 4, 6, 12, 15, tzinfo=beijing_timezone),
+		'retries': 10,
+		'retry_delay': timedelta(minutes=5),
         'retry_exceeded_task_duration': True,
 }
 
 #initializing the dag object
-exe_web_crawlers_dag = DAG('berita_24hr_web_dag',
+exe_web_crawlers_dag = DAG('BM_berita_24hr_web_dag',
 		default_args=default_args,
 		description='The dag object to execute a series of web crawlers for data/comments collection .',
 		schedule_interval= '0 12 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'

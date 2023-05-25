@@ -1,0 +1,22 @@
+
+
+-- Platform: BERITA
+	-- No of. articles scraped: 39
+
+-- Platform: BERITA
+	-- No of. articles scraped: 39
+
+-- Platform: BERITA
+	-- No of. articles scraped: 39
+
+-- Platform: BERITA
+	-- No of. articles scraped: 39
+
+-- Platform: BERITA
+	-- No of. articles scraped: 39
+
+-- Platform: BERITA
+	-- No of. articles scraped: 39
+
+-- Platform: BERITA
+	-- No of. articles scraped: 39

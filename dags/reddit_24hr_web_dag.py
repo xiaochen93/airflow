@@ -21,33 +21,33 @@ beijing_timezone = pytz.timezone('Asia/Shanghai')
 # initializing the default arguments
 default_args = {
 		'owner': 'xiaochen',
-		'start_date': datetime(2023, 4, 6, 12,0, tzinfo=beijing_timezone),
+		'start_date': datetime(2023, 5, 4, 12, 0, tzinfo=beijing_timezone),
 		'retries': 10,
 		'retry_delay': timedelta(minutes=5),
         'retry_exceeded_task_duration': True,
 }
 
 #initializing the dag object
-exe_web_crawlers_dag = DAG('CN_zaobao_24hr_web_dag',
+exe_web_crawlers_dag = DAG('EN_reddit_24hr_web_dag',
 		default_args=default_args,
 		description='The dag object to execute a series of web crawlers for data/comments collection .',
 		schedule_interval= '0 12 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
 		catchup=False,
-		tags=['Zaobao','news articles','24hrs']
+		tags=['EN','comments','24hrs', '7 days']
 )
 
 
 
 task_1 = BashOperator(
     task_id="id_1",
-    bash_command="echo Hello World !!!! This is zaobao dag",
+    bash_command="echo Hello World !!!! This is reddit dag",
     
     dag = exe_web_crawlers_dag
 )
 
 task_2 = BashOperator(
     task_id = "id_2",
-    bash_command = "python /opt/airflow/src/news_comments_crawlers/crawlers/_CN_ZB.py --name ZAOBAO",
+    bash_command = "python /opt/airflow/src/news_comments_crawlers/selenium_crawlers/REDDIT24.py",
     execution_timeout=timedelta(minutes=15),
     dag = exe_web_crawlers_dag
 )
