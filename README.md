@@ -1,4 +1,7 @@
 # airflow
+2023-5-29:
+configured selenium max browser session and re-try overriding parameters.
+
 2023-5-24:
 deployed REDDIT24 web crawler to server, need to convert notebook to .py 
     - scrape news post that made in last 24 hours only.

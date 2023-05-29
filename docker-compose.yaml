@@ -89,6 +89,11 @@ services:
     image: seleniarm/standalone-chromium:latest
     privileged: True
     shm_size: 2g
+    environment:
+      - START_XVFB=false
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+      - SE_NODE_MAX_SESSIONS=6
+      - JAVA_OPTS=-XX:ActiveProcessorCount=6
     ports:
       - 4444:4444
       - 7900:7900
