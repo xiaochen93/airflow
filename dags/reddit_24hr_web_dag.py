@@ -25,6 +25,8 @@ default_args = {
 		'retries': 10,
 		'retry_delay': timedelta(minutes=5),
         'retry_exceeded_task_duration': True,
+        'execution_timeout': timedelta(minutes=50),
+        'dagrun_timeout ' : timedelta(minutes=50)
 }
 
 #initializing the dag object

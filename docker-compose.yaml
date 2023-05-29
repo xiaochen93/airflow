@@ -87,6 +87,8 @@ services:
   selenium:
     container_name: remote_chromedriver
     image: seleniarm/standalone-chromium:latest
+    privileged: True
+    shm_size: 2g
     ports:
       - 4444:4444
       - 7900:7900
