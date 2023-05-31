@@ -1,4 +1,7 @@
 # airflow
+2023-5-31:
+configured timeout to 1 hour and execution time to 1 hour for all dags
+
 2023-5-29:
 configured selenium max browser session and re-try overriding parameters.
 
