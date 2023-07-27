@@ -23,6 +23,8 @@ start_date = datetime.now(beijing_timezone)
 # Calculate tomorrow's date
 start_date = start_date - timedelta(days=1)
 
+timeout = timedelta(minutes=120)
+
 # initializing the default arguments
 default_args = {
 		'owner': 'xiaochen',
