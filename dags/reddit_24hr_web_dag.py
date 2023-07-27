@@ -18,6 +18,16 @@ import pytz
 # Get the Beijing time zone
 beijing_timezone = pytz.timezone('Asia/Shanghai')
 
+<<<<<<< HEAD
+=======
+start_date = datetime.now(beijing_timezone)
+
+# Calculate tomorrow's date
+start_date = start_date - timedelta(days=1)
+
+timeout = timedelta(minutes=120)
+
+>>>>>>> development
 # initializing the default arguments
 default_args = {
 		'owner': 'xiaochen',
