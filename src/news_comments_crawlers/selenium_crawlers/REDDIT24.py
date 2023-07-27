@@ -1,17 +1,10 @@
 from Functions import *
 
+import argparse
+
 import warnings
 
 warnings.filterwarnings("ignore")
-
-def get_datetime(days=1, hours=1):
-    from datetime import datetime
-    today = datetime.now().replace(microsecond=0)
-    import datetime
-    one_day = datetime.timedelta(days=days)
-    one_hour = datetime.timedelta(hours=hours)
-    last24hours = today - one_day - one_hour
-    return today, last24hours
 
 today, last24hours=get_datetime()
 
@@ -21,11 +14,29 @@ INSERT_API = 'http://10.2.56.213:8086/insert'
 
 PING_API = 'http://10.2.56.213:8086/ping'
 
+QUERY_API = 'http://10.2.56.213:8086/query'
+
 source_id = 16
 
 table = 'dsta_db.test'
 
 latest=True
+
+parser = argparse.ArgumentParser(description="Parameters to execute a web crawler")
+
+parser.add_argument(
+        '--remote',
+        type=str,
+        help="True if running on docker else False",
+        required=True
+)
+
+parser.add_argument(
+        '--interval',
+        type=str,
+        help="True if running on docker else False",
+        default="past 24 hours"
+)
 
 def getRedditPostItems(driver, url,label):
     out= []
@@ -238,77 +249,92 @@ def getRedditCommentItems(driver, c_url):
 # with open('data/reddit-23-.json', 'w', encoding='utf-8') as output_file:
 #     json.dump(items , output_file ,indent = 2)
 if __name__ == '__main__':
+
     t1 = time.perf_counter()
+    args = parser.parse_args()
+    remote = eval(args.remote)
+    interval = args.interval
 
     try:
         check_API_conn(PING_API)
     except Exception as e:
         print('\n-- DEBUG: API connection is failed .')
 
-    driver = selenium_init(headless=True)
-    # step 1 - get news post
+    # Get existing URLs from the DB
     try:
-        items = getRedditPostItems(driver, url, "past 24 hours")
+        out = select_existing_items(QUERY_API, today, '', source_id, table=table, items=['article_id', 'URL', 'source_id'])
+        URLs = set([each['URL'].split('|')[-1] for each in out])
+    except Exception as e:
+        URLs = set()
+        print('\n-- DEBUG: Selection of URLs error with ', e)
+    print(f'\n-- DEBUG: No. of Existing URLs {len(URLs)} .')
+    driver = selenium_init(headless=True, remote=remote)
+
+    # Get news post from the main forum page
+    try:
+        items = getRedditPostItems(driver, url, interval)
         if latest: # filter out news articles that are posted before the execution datetime of yesterday (existing post)
             o_length = len(items)
             items = [item for item in items if pd.to_datetime(item['published_datetime'], format='%Y-%m-%dT%H:%M:%S+00:00') >= last24hours]
-            print(f'\n--DEBUG: {len(items)} posts have been made in the past 24 hours, total {o_length}')
+            print(f'\n--DEBUG: {len(items)} posts have been made in the past 24 hours at {last24hours}, total {o_length}')
     except:
         print('\n -- DEBUG: Errors occured when collecting news/posts on reddit.')
         raise
 
-    # step 2 - insert data into database
+    # Insert data into database
     try:
+        insert_count = 0
         for item in items:
-            data = {'org_title': item['title'],
-                'title': item['title'],
-                'org_content': item['content'],
-                'url': item['url'] + '|' + item['cmt_url'],
-                'content': item['content'],
-                'translated':1,
-                'lang': 'EN',
-                'source_id': source_id,
-                'published_datetime': item['published_datetime']
-            }
-            try:
-                response = requests.post(INSERT_API,json={'table':'dsta_db.test', 'data': data })
-            except:
-                print(f'\n--DEBUG: 1 post is failed to be added {str(item[url])}')
-        print(f'\n--DEBUG: DB successful.')
+            if not (item['cmt_url'].strip() in URLs):
+                data = {'org_title': item['title'],
+                    'title': item['title'],
+                    'org_content': item['content'],
+                    'url': item['url'] + '|' + item['cmt_url'],
+                    'content': item['content'],
+                    'translated':1,
+                    'lang': 'EN',
+                    'source_id': source_id,
+                    'published_datetime': item['published_datetime']
+                }
+                try:
+                    response = requests.post(INSERT_API,json={'table':'dsta_db.test', 'data': data })
+                except:
+                    print(f'\n--DEBUG: 1 post is failed to be added {str(item[url])}')
+                insert_count = insert_count + 1
+        print(f'\n--DEBUG: DB successful for {insert_count} articles.')
     except Exception as e:
         print(f'\n--DEBUG: Error occured for insertion {e}')
 
-    # step 3 - select news post that are posted in the latest 2 weeks include today
+    # Select news post that are posted in the latest 2 weeks include today
     try:
-        QUERY_API = 'http://10.2.56.213:8086/query'
-        response = requests.post(QUERY_API, json={'query':"SELECT article_id, url from dsta_db.test where source_id=16;"})
-        json_payload = (json.loads(response.text))
-    except:
-        print('\n--DEBUG: selection is bug .')
+        items = select_existing_items(QUERY_API, today, '', source_id, table=table, items=['article_id', 'url', 'source_id'])
+    except Exception as e:
+        items = []
+        print('\n-- DEBUG: Selection of URLs error with ', e)
     
     # step 4 - scrape news comments for a news post
     try:
-        items = json_payload['result']
         for item in items:
             article_id = item['article_id']
             cmt_url = item['url'].split('|')[-1]
             try:
                 comments = getRedditCommentItems(driver, cmt_url)
                 print(f'\n--DEBUG: {len(comments)} no. of comments has been collected for {article_id}')
-                #if latest:
-                #    comments = [comment for comment in comments if pd.to_datetime(comment['cmt_published_datetime'], format='%Y-%m-%dT%H:%M:%S+00:00') >= last24hours]
-                item['comments'] = comments
-                time.sleep(1)
-                print(f'\n--DEBUG: {len(comments)} no. of comments has been added for {article_id}')
+                if latest:
+                    try:
+                        # select the cmt_id for the existing post
+                        cmt_id_items = select_existing_items(QUERY_API, today, '', source_id, dt='cmt_published_datetime', table='dsta_db.test_24hr_comments', items=['cmt_id'])
+                        cmt_id_items = set([item['cmt_id'].strip() for item in cmt_id_items])
+                        comments = [comment for comment in comments if not (comment['cmt_id'] in cmt_id_items)]
+                        item['comments'] = comments
+                        print(f'\n\t--DEBUG: {len(comments)} no. of comments (new) will be added to for {article_id}')
+                    except:
+                        
+                        pass
             except Exception as e:
                 print('\n', item['url'], e)
     except Exception as e:
         print('\n--DEBUG: error with json payload object, no json is fetched', e)
-    
-    if latest:
-        for item in items:
-            comments = [comment for comment in item['comments'] if pd.to_datetime(comment['cmt_published_datetime'], format='%Y-%m-%dT%H:%M:%S+00:00') >= last24hours]
-            item['comments'] = comments
     
     # step 5 - insert new comments into the db
     try:
@@ -333,12 +359,12 @@ if __name__ == '__main__':
                 try:
                     response = requests.post(INSERT_API,json={'table':'dsta_db.test_24hr_comments', 'data': data })
                     if response.status_code != 200:
-                        print(response)
-                        print(response.text)
-                        print(data)
+                        #print('\n\t--DEBUG:',response)
+                        #print('\n\t--DEBUG:',response.text)
+                        #print('\n\t--DEBUG:',data)
                         raise
                 except Exception as e:
-                    print(f'\n--DEBUG: comment insertion failed {e}')
+                    print(f'\n--DEBUG: comment insertion failed {e} .')
         
         print(f'\n--DEBUG: DB successful for comments insertion .')
 
