@@ -1,7 +1,4 @@
 # airflow
-2023-5-31:
-configured timeout to 1 hour and execution time to 1 hour for all dags
-
 2023-5-29:
 configured selenium max browser session and re-try overriding parameters.
 
@@ -27,6 +24,7 @@ deploy the cna web crawler to server (version 2) without pagination
 # Future:
 1. implement pagination on CNA web crawlers.
 2. deploy the translation engine as the 3rd task for non-English language web crawlers.
+3. do not add duplicated content while running the crawler on the daily basis.
 
 
 # STEPs after git pull on production environment.
@@ -40,3 +38,6 @@ deploy the cna web crawler to server (version 2) without pagination
 docker build . -f Dockerfile --pull --tag extending_airflow_img:latest
 
 docker-compose up -d --no-deps --build airflow-webserver airflow-scheduler
+
+# git process
+git add .

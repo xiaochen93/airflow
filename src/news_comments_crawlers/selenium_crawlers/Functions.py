@@ -247,7 +247,16 @@ def clickToGo(driver, xpath):
         #print('\n-- No element {} found --'.format(xpath))
         raise
 
-def selenium_init(headless=True):
+def goNextPage(driver, xpath):
+    try:
+        button = driver.find_element("xpath",xpath)
+        button.click()
+        time.sleep(1)
+    except:
+        #print('\n-- No element {} found --'.format(xpath))
+        raise
+
+def selenium_init(headless=True, remote=True):
     #initalise crawler option(s)
     options = webdriver.ChromeOptions()
     options.add_experimental_option("detach", True)
@@ -258,16 +267,20 @@ def selenium_init(headless=True):
   
     ROOT_DIR = os.path.join(os.path.dirname(os.path.join(os.path.dirname(__file__))))
     print('\n-- DEBUG: ROOT DIR - ', ROOT_DIR)
-    #chrome = ChromeDriverManager(path=ROOT_DIR).install()
-    #service = Service(chrome)
-    #driver = webdriver.Chrome(service=service, options=options)
-    #driver = webdriver.Chrome(executable_path=(str(ROOT_DIR)+"/chromedriver"), options=options)
-    try:
-        name = "remote_chromedriver"
-        driver = webdriver.Remote(command_executor=f"http://{name}:4444",options=options)
-    except Exception as e:
-        print("\n-- DEBUG: Driver error -", e)
-        raise
+    if not remote:
+        print('\n-- DEBUG: Using local chrome driver .')
+        chrome = ChromeDriverManager(path=ROOT_DIR).install()
+        service = Service(chrome)
+        driver = webdriver.Chrome(service=service, options=options)
+        #driver = webdriver.Chrome(executable_path=(str(ROOT_DIR)+"/chromedriver"), options=options)
+    else:
+        print('\n-- DEBUG: Using remote chrome driver, make sure docker standalone browser is on .')
+        try:
+            name = "remote_chromedriver"
+            driver = webdriver.Remote(command_executor=f"http://{name}:4444",options=options)
+        except Exception as e:
+            print("\n-- DEBUG: Driver error -", e)
+            raise
     
     return driver
 
@@ -312,3 +325,39 @@ def check_API_conn(PING_API):
         print(f"\n-- DEBUG: API is alive. Message: {message}")
     else:
         print("\n-- DEBUG: Failed to reach the API")
+
+def get_datetime(days=1, hours=1):
+    from datetime import datetime
+    today = datetime.now().replace(microsecond=0)
+    import datetime
+    one_day = datetime.timedelta(days=days)
+    one_hour = datetime.timedelta(hours=hours)
+    last24hours = today - one_day - one_hour
+    return today, last24hours
+
+def execute_query(QUERY_API, query=''):
+    try:
+        response = requests.post(QUERY_API, json={'query':query})
+        json_payload = (json.loads(response.text))
+        items = json_payload['result']  
+    
+    except Exception as e:
+        print(f'\n-- DEBUG: selection error {e}')
+        items = []
+
+    return items
+
+def select_existing_items(QUERY_API, today, pre_datetime, source_id, table='dsta_db.test',dt='published_datetime', items=['article_id, URL']):
+    try:
+        from datetime import timedelta
+        one_day = timedelta(days=1)
+        query = query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt} <= '{today.date() + one_day}' AND {dt} >= '{today.date() + one_day}' - INTERVAL 2 WEEK) AND source_id={source_id};"
+        response = requests.post(QUERY_API, json={'query':query})
+        json_payload = (json.loads(response.text))
+        out = json_payload['result'] 
+    
+    except Exception as e:
+        print(f'\n--DEBUG: selection error {e}.')
+        out = []
+
+    return out
