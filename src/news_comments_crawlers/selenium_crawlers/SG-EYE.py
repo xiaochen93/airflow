@@ -245,8 +245,9 @@ if __name__ == '__main__':
                     
                     try:
                         c_p_id = post.find_element("xpath", xpath_p_id).get_property('href')
+                        match = re.search(pattern_p_id, c_p_id, re.IGNORECASE)
                         
-                        if match := re.search(pattern_p_id, c_p_id, re.IGNORECASE):
+                        if match:
                             c_p_id = match.group(1)
                         
                     except Exception as e:
