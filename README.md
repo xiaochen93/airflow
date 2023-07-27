@@ -3,7 +3,6 @@
 Integrated SG-Eye into the platform
 Solved the bug for scraing duplicated post, filtering URL for the post and cmt_id for the comment. (tested)
 
-
 2023-06-14:
 improved SQL query for comments and posts selection. It is now select the latest two weeks of posts (news articles) on the forum.
 improved function for API access - selecting existing dataframe
@@ -35,6 +34,7 @@ deploy the cna web crawler to server (version 2) without pagination
 1. implement pagination on CNA web crawlers.
 2. deploy the translation engine as the 3rd task for non-English language web crawlers.
 3. do not add duplicated content while running the crawler on the daily basis.
+4. select data based on time range.
 
 
 # STEPs after git pull on production environment.
