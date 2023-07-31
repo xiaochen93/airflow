@@ -59,7 +59,6 @@ exe_web_crawlers_dag = DAG('CN_zaobao_24hr_web_dag',
 task_1 = BashOperator(
     task_id="id_1",
     bash_command="echo Hello World !!!! This is zaobao dag",
-    
     dag = exe_web_crawlers_dag
 )
 
