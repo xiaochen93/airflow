@@ -1,4 +1,7 @@
 # airflow
+2023-07-27
+Configured the automated start-date to tommorrow, otherwise the dags will not be triggered.
+
 2023-07-26
 Integrated SG-Eye into the platform
 Solved the bug for scraing duplicated post, filtering URL for the post and cmt_id for the comment. (tested)
