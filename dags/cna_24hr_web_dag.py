@@ -25,9 +25,9 @@ start_date = datetime.now(beijing_timezone)
 
 # Create a new datetime object for tomorrow at 12 PM
 start_date = datetime(
-    start_date.year,
-    start_date.month,
-    start_date.day,
+    2023,
+    8,
+    1,
     12,
     0,
     0,
