@@ -24,21 +24,29 @@ beijing_timezone = pytz.timezone('Asia/Shanghai')
 start_date = datetime.now(beijing_timezone)
 
 # Calculate tomorrow's date
-start_date = start_date - timedelta(days=2)
+#start_date = start_date + timedelta(days=1)
 
-timeout = timedelta(minutes=15)
+# Create a new datetime object for tomorrow at 12 PM
+start_date = datetime(
+    2023,
+    8,
+    1,
+    12,
+    0,
+    0,
+    tzinfo=beijing_timezone)
 
 # initializing the default arguments
 default_args = {
 		'owner': 'xiaochen',
 		'start_date': start_date,
 		'retries': 10,
-		'retry_delay': timeout,
+		'retry_delay': timedelta(minutes=5),
         'retry_exceeded_task_duration': True,
 }
 
 #initializing the dag object
-exe_web_crawlers_dag = DAG('CN_zaobao_24hr_web_dag_v2',
+exe_web_crawlers_dag = DAG('CN_zaobao_24hr_web_dag',
 		default_args=default_args,
 		description='The dag object to execute a series of web crawlers for data/comments collection .',
 		schedule_interval= '0 12 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
@@ -57,7 +65,7 @@ task_1 = BashOperator(
 task_2 = BashOperator(
     task_id = "id_2",
     bash_command = "python /opt/airflow/src/news_comments_crawlers/crawlers/_CN_ZB.py --name ZAOBAO",
-    execution_timeout=timeout,
+    execution_timeout=timedelta(minutes=15),
     dag = exe_web_crawlers_dag
 )
 
