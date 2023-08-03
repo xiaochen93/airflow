@@ -16,7 +16,7 @@ import os
 import pytz
 
 # Get the Beijing time zone
-beijing_timezone = pytz.timezone('Asia/Beijing')
+beijing_timezone = pytz.timezone('Asia/Shanghai')
 
 start_date = datetime.now(beijing_timezone)
 
