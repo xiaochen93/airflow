@@ -28,7 +28,7 @@ start_date = datetime(
     start_date.year,
     start_date.month,
     start_date.day,
-    12,
+    1,
     0,
     0,
     tzinfo=beijing_timezone)
