@@ -33,6 +33,8 @@ start_date = datetime(
     0,
     tzinfo=beijing_timezone)
 
+print(start_date)
+
 timeout = timedelta(minutes=15)
 
 # initializing the default arguments
