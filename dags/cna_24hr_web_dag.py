@@ -21,13 +21,13 @@ beijing_timezone = pytz.timezone('Asia/Shanghai')
 start_date = datetime.now(beijing_timezone)
 
 # Calculate tomorrow's date
-#start_date = start_date + timedelta(days=1)
+start_date = start_date - timedelta(days=1)
 
 # Create a new datetime object for tomorrow at 12 PM
 start_date = datetime(
-    2023,
-    8,
-    1,
+    start_date.year,
+    start_date.month,
+    start_date.day,
     12,
     0,
     0,
@@ -45,11 +45,11 @@ default_args = {
 }
 
 #initializing the dag object
-exe_web_crawlers_dag = DAG('EN_cna_24hr_web_dag',
+exe_web_crawlers_dag = DAG('EN_cna_24hr_web_dag_v2',
 		default_args=default_args,
 		description='The dag object to execute a series of web crawlers for data/comments collection .',
 		schedule_interval= '0 12 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
-		catchup=False,
+		catchup=True,
 		tags=['cna','news articles','24hrs']
 )
 
