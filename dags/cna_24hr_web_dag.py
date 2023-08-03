@@ -21,17 +21,7 @@ beijing_timezone = pytz.timezone('Asia/Shanghai')
 start_date = datetime.now(beijing_timezone)
 
 # Calculate tomorrow's date
-#start_date = start_date + timedelta(days=1)
-
-# Create a new datetime object for tomorrow at 12 PM
-start_date = datetime(
-    2023,
-    8,
-    1,
-    12,
-    0,
-    0,
-    tzinfo=beijing_timezone)
+start_date = start_date - timedelta(days=1)
 
 # initializing the default arguments
 default_args = {
