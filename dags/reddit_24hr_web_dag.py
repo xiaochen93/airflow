@@ -50,7 +50,7 @@ default_args = {
 exe_web_crawlers_dag = DAG('EN_reddit_24hr_web_dag',
 		default_args=default_args,
 		description='The dag object to execute a series of web crawlers for data/comments collection .',
-		schedule_interval= timedelta(minutes=1400), #schedule interval to execute the task '* * * * *' '0 */12 * * *'
+		schedule_interval= timedelta(minutes=1440), #schedule interval to execute the task '* * * * *' '0 */12 * * *'
 		catchup=False,
 		tags=['EN','comments','24hrs', '7 days']
 )
