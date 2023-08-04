@@ -24,7 +24,7 @@ start_date = datetime.now(beijing_timezone)
 start_date = start_date - timedelta(days=1)
 
 # Create a new datetime object for tomorrow at 12 PM
-start_date = datetime(
+_start_date = datetime(
     2023,
     8,
     1,
@@ -38,7 +38,7 @@ timeout = timedelta(minutes=15)
 # initializing the default arguments
 default_args = {
 		'owner': 'xiaochen',
-		'start_date': start_date,
+		'start_date': _start_date,
 		'retries': 10,
 		'retry_delay': timeout,
         'retry_exceeded_task_duration': True,
