@@ -36,7 +36,7 @@ _start_date = datetime(
 # initializing the default arguments
 default_args = {
 		'owner': 'xiaochen',
-		'start_date': _start_date,
+		'start_date': datetime(start_date.year,start_date.month,start_date.day,12,30,0,tzinfo=beijing_timezone),
 		'retries': 10,
 		'retry_delay': timedelta(minutes=5),
         'retry_exceeded_task_duration': True,
