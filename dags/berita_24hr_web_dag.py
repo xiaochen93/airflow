@@ -18,7 +18,6 @@ import pytz
 # Get the Beijing time zone
 beijing_timezone = pytz.timezone('Asia/Shanghai')
 
-# Calculate tomorrow's date
 start_date = datetime.now(beijing_timezone)
 
 # Calculate tomorrow's date
@@ -26,13 +25,14 @@ start_date = start_date - timedelta(days=1)
 
 # Create a new datetime object for tomorrow at 12 PM
 _start_date = datetime(
-    start_date.year,
-    start_date.month,
-    start_date.day,
+    2023,
+    8,
+    1,
     12,
     30,
     0,
     tzinfo=beijing_timezone)
+
 timeout = timedelta(minutes=15)
 
 # initializing the default arguments
@@ -48,7 +48,7 @@ default_args = {
 exe_web_crawlers_dag = DAG('BM_berita_24hr_web_dag_v2',
 		default_args=default_args,
 		description='The dag object to execute a series of web crawlers for data/comments collection .',
-		schedule_interval= '0 12 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
+		schedule_interval= timedelta(minutes=1400), #schedule interval to execute the task '* * * * *' '0 */12 * * *'
 		catchup=True,
 		tags=['berita mediacorp','news articles','24hrs']
 )

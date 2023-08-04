@@ -25,9 +25,9 @@ start_date = start_date - timedelta(days=1)
 
 # Create a new datetime object for tomorrow at 12 PM
 _start_date = datetime(
-    start_date.year,
-    start_date.month,
-    start_date.day,
+    2023,
+    8,
+    1,
     12,
     30,
     0,
@@ -36,7 +36,7 @@ _start_date = datetime(
 # initializing the default arguments
 default_args = {
 		'owner': 'xiaochen',
-		'start_date': datetime(start_date.year,start_date.month,start_date.day,12,30,0,tzinfo=beijing_timezone),
+		'start_date': _start_date,
 		'retries': 10,
 		'retry_delay': timedelta(minutes=5),
         'retry_exceeded_task_duration': True,
@@ -46,7 +46,7 @@ default_args = {
 exe_web_crawlers_dag = DAG('CN_zaobao_24hr_web_dag',
 		default_args=default_args,
 		description='The dag object to execute a series of web crawlers for data/comments collection .',
-		schedule_interval= '0 12 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
+		schedule_interval= timedelta(minutes=1400), #schedule interval to execute the task '* * * * *' '0 */12 * * *'
 		catchup=False,
 		tags=['Zaobao','news articles','24hrs']
 )
