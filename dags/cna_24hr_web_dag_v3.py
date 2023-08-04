@@ -29,7 +29,7 @@ start_date = datetime(
     8,
     1,
     11,
-    30,
+    55,
     0,
     tzinfo=beijing_timezone)
 
