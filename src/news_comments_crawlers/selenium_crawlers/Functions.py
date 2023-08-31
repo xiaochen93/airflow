@@ -49,6 +49,13 @@ tests_extract_domain = [
     'https://www.independent.co.uk/news/singapore-malaysia-kuala-lumpur-facebook-lawyers-b2017147.html',
     'https://independent.co.uk/news/singapore-malaysia-kuala-lumpur-facebook-lawyers-b2017147.html'
 ]
+
+INSERT_API = 'http://10.2.56.213:8086/insert'
+
+PING_API = 'http://10.2.56.213:8086/ping'
+
+QUERY_API = 'http://10.2.56.213:8086/query'
+
 def extract_domain(url):
     #pattern = r'(?<=\/|\.)(\w+)(?=\.)'
     pattern = r'(www\.|\..+\b)'
@@ -183,6 +190,7 @@ def getNewsContentByGoogle(title):
 
             if not content != "" or count > 10:
                 break    
+            time.sleep(1)
     except:
         pass
     
@@ -237,6 +245,17 @@ def getChildElement(node, xpath):
         
     return child_node
 
+def clickMany(driver,lst_xpath):
+    for each in lst_xpath:
+        clickOne(driver, each)
+
+def clickOne(driver, xpath):
+    try:
+        expanders = driver.find_elements("xpath", xpath)
+        for each in expanders:
+            each.click()
+    except:
+        pass
 
 def clickToGo(driver, xpath):
     try:
@@ -256,7 +275,9 @@ def goNextPage(driver, xpath):
         #print('\n-- No element {} found --'.format(xpath))
         raise
 
-def selenium_init(headless=True, remote=True):
+def selenium_init(headless=True, remote=True, strict=True):
+    _ROOT_DIR = os.path.join(os.path.dirname(os.path.join(os.path.dirname(__file__)))) #news_comments_crawlers
+    _RES_PATH = _ROOT_DIR + '\selenium_crawlers\resources'
     #initalise crawler option(s)
     options = webdriver.ChromeOptions()
     options.add_experimental_option("detach", True)
@@ -264,15 +285,21 @@ def selenium_init(headless=True, remote=True):
     options.add_argument('--profile-directory=Default') 
     if headless:
         options.add_argument('--headless')
-  
-    ROOT_DIR = os.path.join(os.path.dirname(os.path.join(os.path.dirname(__file__))))
-    print('\n-- DEBUG: ROOT DIR - ', ROOT_DIR)
+
+    if strict:
+        options.add_experimental_option("excludeSwitches", ["disable-popup-blocking"])
+        options.add_argument('--disable-notifications')
+
+    print('\n-- DEBUG: ROOT DIR - ', _ROOT_DIR)
     if not remote:
         print('\n-- DEBUG: Using local chrome driver .')
-        chrome = ChromeDriverManager(path=ROOT_DIR).install()
-        service = Service(chrome)
-        driver = webdriver.Chrome(service=service, options=options)
-        #driver = webdriver.Chrome(executable_path=(str(ROOT_DIR)+"/chromedriver"), options=options)
+        try:
+            chrome = ChromeDriverManager(path=_ROOT_DIR).install()
+            service = Service(chrome)
+            driver = webdriver.Chrome(service=service, options=options)
+        except:
+            print("\n-- DEBUG: Something wrong with auto-driver, using local copy instead.")
+            driver = webdriver.Chrome()
     else:
         print('\n-- DEBUG: Using remote chrome driver, make sure docker standalone browser is on .')
         try:
@@ -288,7 +315,7 @@ def getWebElementAttribute(item, xpath, name):
     try:
         text = item.find_element("xpath", xpath).get_property(name)
     except Exception as e:
-        print('\n--',e)
+        print('\n-- DEBUG: No element is found .')
         text = ''
     return text
 
@@ -296,9 +323,15 @@ def getWebElementText(item, xpath):
     try:
         text = item.find_element("xpath", xpath).text
     except Exception as e:
-        print('\n--',e)
+        print('\n-- DEBUG: No element is found .')
         text = ''
     return text
+
+def check_clsified(text):
+    digit_pattern = r'\d'  # Regular expression pattern for a digit
+    digit_count = len(re.findall(digit_pattern, text))
+    
+    return digit_count >= 6
 
 def save_pickle_object(obj, filename):
     with open(filename, 'wb') as outp:  # Overwrites any existing file.
@@ -347,17 +380,39 @@ def execute_query(QUERY_API, query=''):
 
     return items
 
+# get the existing URLs from the DB
+def getExistingURLs(today, type='comments', noOfDays=6, QUERY_API=QUERY_API, table='dsta_db.test', pid='article_id', dt_label='published_datetime',URL_label='URL', sid=None):
+    from datetime import timedelta
+    items, one_day=[pid, 'source_id', 'URL'], timedelta(days=1)
+    query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt_label} <= '{today.date() + one_day}' AND {dt_label} >= '{today.date() + one_day}' - INTERVAL {noOfDays} DAY) AND source_id={sid};"
+    out_items = fetch_db_response(query)
+    URL_index = -1 if type == 'comments' else 0
+    URLs = set([item['URL'].split('|')[URL_index] for item in out_items])
+    return URLs
+
+def fetch_db_response(query):
+    try:
+        response = requests.post(QUERY_API, json={'query':query})
+        json_payload = (json.loads(response.text))
+        out = json_payload['result']
+    except Exception as e:
+        print(f'\n-- DEBUG: Request error occurs {e}, return [] object .')
+        out = []
+    return out
+
 def select_existing_items(QUERY_API, today, pre_datetime, source_id, table='dsta_db.test',dt='published_datetime', items=['article_id, URL']):
     try:
         from datetime import timedelta
         one_day = timedelta(days=1)
-        query = query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt} <= '{today.date() + one_day}' AND {dt} >= '{today.date() + one_day}' - INTERVAL {6} DAY) AND source_id={source_id};"
+        # datetime <= todaty.date() + one day -> here onwards
+        # datetime >= today.date() + n days -> posted before No.of days.
+        query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt} <= '{today.date() + one_day}' AND {dt} >= '{today.date() + one_day}' - INTERVAL {6} DAY) AND source_id={source_id};"
         response = requests.post(QUERY_API, json={'query':query})
         json_payload = (json.loads(response.text))
         out = json_payload['result'] 
     
     except Exception as e:
-        print(f'\n--DEBUG: selection error {e}.')
+        print(f'\n-- DEBUG: selection error {e}.')
         out = []
 
     return out
