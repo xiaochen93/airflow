@@ -327,7 +327,7 @@ def getWebElementText(item, xpath):
         text = ''
     return text
 
-def check_clsified(text):
+def check_spams(text):
     digit_pattern = r'\d'  # Regular expression pattern for a digit
     digit_count = len(re.findall(digit_pattern, text))
     
@@ -351,7 +351,6 @@ def write_csv(data):
 
 def check_API_conn(PING_API):
     ping_response = requests.get(PING_API)
-
     if ping_response.status_code == 200:
         data = ping_response.json()
         message = data["message"]

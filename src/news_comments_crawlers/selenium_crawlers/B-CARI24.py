@@ -12,7 +12,7 @@ from selenium.webdriver.common.by import By
 
 warnings.filterwarnings("ignore")
 
-right_now, last24hours=get_datetime()
+now, last24hours=get_datetime()
 
 INSERT_API = 'http://10.2.56.213:8086/insert'
 
@@ -38,16 +38,14 @@ class ForumWebCrawler:
         self.driver = selenium_init(headless=False,remote=False)
         self.driver.get(self.starting_page_url)
         self.links = []
+        self.comments = []
         self.links_threshold = object['links_threshold']
         self.links_count = 0
         self.begin_dt = object['begin_datetime']
         self.end_dt = object['end_datetime']
-        self.default_dt = datetime.strptime("1999-12-31", "%Y-%m-%d")
-        self.existing_URLs = getExistingURLs(self.end_dt,sid=16)
-        print(self.existing_URLs)
-    
-    def js_interact(self, parameters):
-        pass
+        self.default_dt = datetime.now()
+        self.existing_URLs = getExistingURLs(self.end_dt,sid=17)
+        print(f'\n-- DEBUG: Existing urls are {self.existing_URLs}')
 
     '''
     Input: 
@@ -60,7 +58,7 @@ class ForumWebCrawler:
         map_fn: mapping function to return a scrapped item
     
     '''
-    def scrape_post_url(self, Xparam, collect_fn=lambda x: x):
+    def _scrape_post_url(self, Xparam, collect_fn=lambda x: x):
         SEARCHING = True
         while SEARCHING:
             _search_begin = time.perf_counter()
@@ -70,12 +68,11 @@ class ForumWebCrawler:
             while not page_loaded:
                 print('Page is not loaded, ')
             print("\n-- DEBUG: Page loaded successfully!",end='\r')
-
             #1. close pop-up ads
             self.bypass_ads(Xparam['XP_CLOSE_ADS'],i=1)
+
             post_items = getPostListings(self.driver, Xparam['XP_POST_LISTING'])
             print(f'\n-- DEBUG: Total {len(post_items)} no. of elements on the table .')
-
             #3. loop and get each post item from the table
             many_posts = [collect_fn(post, Xparam) for post in post_items]
             #4. update the item accordingly
@@ -93,6 +90,10 @@ class ForumWebCrawler:
             except Exception as e:
                 print('\nDEBUG: An error occur has occured .')
                 time.sleep(Xparam['wait']) #give program a pause to reset
+            
+            time.sleep(1)
+            self.bypass_ads(Xparam['XP_CLOSE_ADS'])
+
     '''
     Input: 
         Xparam: The dictionary as above, containing the xpath for post elements.
@@ -101,20 +102,52 @@ class ForumWebCrawler:
                 The output is '' by default.
     
     '''
-    def scrape_post_article(self, Xparam, collect_fn=lambda x: x):
+    def _scrape_post_content(self, Xparam, collect_fn=lambda x: x):
+        del_idxes = []
         for idx, item in enumerate(self.links):
+            # get the original article_content
             org_content = collect_fn(driver=self.driver, xpath_content=Xparam['XP_POST_ART'], url=item['url'])
-            if org_content == '' or len(org_content) < 20:
-                org_content = getNewsContentByGoogle(item['title'])
             
-            if org_content == '' or len(org_content) < 20:
-                org_content = "To be confirmed"
+            if (org_content == '' or len(org_content) < 20 or org_content is None):
+                del_idxes.append(idx)
+            else:
+                # Split the content into lines
+                lines = org_content.split('\n')
+                # Remove the first four lines (noise)
+                lines = lines[4:]
+                # Join the remaining lines back together
+                org_content = '\n'.join(lines)
+                item['org_content'] = org_content
+                if "cmt_url" in item.keys():
+                    item['url'] = item['url'] + '|' + item['cmt_url']
+                    del item['cmt_url']
+                if "published_datetime" in item.keys() and item['published_datetime'] != '':
+                    item['published_datetime'] = item['published_datetime'].strftime("%Y-%m-%d %H:%M:%S")
+                item['translated'] = 0
+                item['lang'] = "BM"
+                item['source_id'] = self.source_id
 
-            item['org_content'] = org_content
-            
-            self.links[idx] = item
+                self.links[idx] = item
+        
+        # delete the post item with empty content
+        for del_idx in del_idxes:
+            self.links.pop(del_idx)
 
-    
+    def scrape_post(self, Xparam, url_col_fn=lambda x: x, p_content_col_fn=lambda x: x):
+        self._scrape_post_url(Xparam, collect_fn=_collect_url_fn)
+        print(f'\n-- DEBUG: total no. of {len(self.links)} links has been collected. ')
+        self._scrape_post_content(Xparam, collect_fn=_collect_art_fn)
+
+    def insert_to_db(self,label=''):
+        items = self.links if label == 'post' else self.comments
+
+        for idx, item in enumerate(self.links):
+            try:
+                response = requests.post(INSERT_API,json={'table':'dsta_db.test', 'data': item })
+            except Exception as e:
+                print(f'\n--DEBUG: 1 post is failed to be added {item["url"]}')
+                print(e)
+
     def bypass_ads(self,XP_ads,i=5):
         time.sleep(1)
         self.driver.execute_script("""
@@ -135,16 +168,16 @@ class ForumWebCrawler:
 
     def update_links(self, item, dt_label='published_datetime'):
         #print(item[dt_label], self.begin_dt, self.end_dt, (item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt))
-        if (item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt):
+        if (item[dt_label]=="" or item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt):
             self.links_count = self.links_count + 1 #accumulate  
-        elif check_clsified(item['title']): # the title of a post/article is mandatory.
+        elif check_spams(item['org_title']): # the title of a post/article is mandatory.
             pass #do nothing
         elif item['url']=='' or (item['url'] in self.existing_URLs): # url already exists or empty
             pass
         else:
             self.links.append(item)
 
-
+# customized function for collecting post url
 def _collect_url_fn(post, Xparam):
 
     post_title = getWebElementText(post, Xparam['XP_POST_TITLE'])
@@ -161,10 +194,11 @@ def _collect_url_fn(post, Xparam):
     return {
         'category': post_cate,
         'url': post_url,
-        'title': post_title,
-        'published_datetime':post_datetime
+        'org_title': post_title,
+        'published_datetime':post_datetime,
     }
 
+# customized function for collecting news articles
 def _collect_art_fn(driver=None, xpath_content='', url=''):
     driver.get(str(url))
     try:
@@ -180,13 +214,14 @@ B_CARI_object = {
     'lang': 'BM',
     'links_threshold':10,
     'begin_datetime': last24hours,
-    'end_datetime': right_now,
-    'POST_Xparam':{
+    'end_datetime': now,
+    'main_Xparam':{
         'wait': 8,
         #'XP_CLOSE_ADS': "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]",
         'XP_CLOSE_ADS': ["//div[contains(@class,'button-common close-button')]//span", 
                          "//div[contains(@class, 'iz_osn_card_1')]//span[contains(@class, 'close')]", 
-                         "//div[contains(@id, 'dismiss-button')]/div"],
+                         "//div[contains(@id, 'dismiss-button')]/div",
+                         "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]"],
         'XP_POST_LISTING': "//table[contains(@id, 'threadlisttableid')]//tbody[contains(@id, 'normalthread')]",
         'XP_POST_NEXT_BTN': "//div[contains(@id, 'pgt')]//div[contains(@class,'pg')]/a[text()='Next']",
         'XP_POST_URL': ".//descendant-or-self::tr//th//a[contains(@class, 's xst')]",
@@ -197,12 +232,13 @@ B_CARI_object = {
         'POST_DATETIME_FMT': "%d-%m-%Y %I:%M %p"
     }
 }
+
 if __name__ == '__main__':
     B_CARI = ForumWebCrawler(B_CARI_object)
 
-    B_CARI.scrape_post_url(B_CARI_object['POST_Xparam'],collect_fn=_collect_url_fn)
+    B_CARI.scrape_post(B_CARI_object['main_Xparam'], url_col_fn=_collect_url_fn, p_content_col_fn=_collect_art_fn)
 
-    B_CARI.scrape_post_article(B_CARI_object['POST_Xparam'], collect_fn=_collect_art_fn)
+    B_CARI.insert_to_db(label='post')
 
-    for each in B_CARI.links:
-        print('\n-- DEBUG: ',each)
+    #for each in B_CARI.links:
+        #print('\n-- DEBUG: ',each)
