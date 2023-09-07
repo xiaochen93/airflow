@@ -283,6 +283,7 @@ def selenium_init(headless=True, remote=True, strict=True):
     options.add_experimental_option("detach", True)
     options.add_argument('--no-sandbox')
     options.add_argument('--profile-directory=Default') 
+
     if headless:
         options.add_argument('--headless')
 
@@ -308,7 +309,9 @@ def selenium_init(headless=True, remote=True, strict=True):
         except Exception as e:
             print("\n-- DEBUG: Driver error -", e)
             raise
-    
+    # add driver setting
+    driver.set_page_load_timeout(60)
+
     return driver
 
 def getWebElementAttribute(item, xpath, name):
@@ -374,10 +377,17 @@ def execute_query(QUERY_API, query=''):
         items = json_payload['result']  
     
     except Exception as e:
-        print(f'\n-- DEBUG: selection error {e}')
+        print(f'\n-- DEBUG: execute_query with error - {e}')
         items = []
 
     return items
+
+# get the existing comments by post id
+def getCommentIDsByArticleID(art_id='', table=''):
+    query = f'SELECT cmt_id FROM {table} WHERE cmt_article_id={art_id};'
+    out_items = execute_query(query)
+
+    return out_items
 
 # get the existing URLs from the DB
 def getExistingURLs(today, type='comments', noOfDays=6, QUERY_API=QUERY_API, table='dsta_db.test', pid='article_id', dt_label='published_datetime',URL_label='URL', sid=None):
@@ -385,9 +395,30 @@ def getExistingURLs(today, type='comments', noOfDays=6, QUERY_API=QUERY_API, tab
     items, one_day=[pid, 'source_id', 'URL'], timedelta(days=1)
     query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt_label} <= '{today.date() + one_day}' AND {dt_label} >= '{today.date() + one_day}' - INTERVAL {noOfDays} DAY) AND source_id={sid};"
     out_items = fetch_db_response(query)
-    URL_index = -1 if type == 'comments' else 0
-    URLs = set([item['URL'].split('|')[URL_index] for item in out_items])
+    if out_items != []:
+        URL_index = -1 if type == 'comments' else 0
+        URLs = set([item['URL'].split('|')[URL_index] for item in out_items])
+    else:
+        URLs = []
     return URLs
+
+def getExistingPostItems(today, type='comments', noOfDays=6, QUERY_API=QUERY_API, table='dsta_db.test', pid='article_id', dt_label='published_datetime',URL_label='URL', sid=None):
+    from datetime import timedelta
+    items, one_day=[pid, 'source_id', 'URL'], timedelta(days=1)
+    query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt_label} <= '{today.date() + one_day}' AND {dt_label} >= '{today.date() + one_day}' - INTERVAL {noOfDays} DAY) AND source_id={sid};"
+    out_items = fetch_db_response(query) # remove duplicate and size
+    return out_items    
+
+def remove_duplicates_comments(cmts_for_one_post,existing_ids=[]):
+    temp_df = pd.DataFrame(cmts_for_one_post)
+    temp_df = temp_df.drop_duplicates()
+
+    if 'cmt_id' in temp_df.columns and (existing_ids != [] or existing_ids != None):
+        temp_df = temp_df[~temp_df['cmt_id'].isin(existing_ids)]
+
+    non_duplicates = temp_df.to_dict('records')
+
+    return non_duplicates
 
 def fetch_db_response(query):
     try:
