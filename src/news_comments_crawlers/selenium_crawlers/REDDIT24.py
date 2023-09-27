@@ -198,7 +198,7 @@ def getCommentsList(items,p_id=""):
                 'cmt_content': c_text,
                 'cmt_org_content': c_text,
                 'cmt_published_datetime': c_datetime,
-                'translated': 1,
+                'translated': 0,
                 'lang': 'EN',
                 'source_id': 16
         }
@@ -291,7 +291,7 @@ if __name__ == '__main__':
                     'org_content': item['content'],
                     'url': item['url'] + '|' + item['cmt_url'],
                     'content': item['content'],
-                    'translated':1,
+                    'translated': 0,
                     'lang': 'EN',
                     'source_id': source_id,
                     'published_datetime': item['published_datetime']

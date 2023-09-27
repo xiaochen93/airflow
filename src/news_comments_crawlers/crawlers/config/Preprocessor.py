@@ -71,7 +71,7 @@ class Preprocessor:
         
         df['source_id'] = self.source
 
-        df['translated'] = False if self.lang != 'EN' else True
+        df['translated'] = False
         
         return df
     

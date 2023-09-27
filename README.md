@@ -1,4 +1,12 @@
 # airflow
+2023-09-27
+Configured the default attribute of translated to be "0". Every crawled document would require additional processing.
+- English - CNA, REDDIT
+- Chinese - Zaobao, SG-EYE
+- Malay   - Berita, B-CARI
+
+Updated the dag of B-Cari to every 24 hours not 12 hours.
+
 2023-07-27
 Configured the automated start-date to tommorrow, otherwise the dags will not be triggered.
 
