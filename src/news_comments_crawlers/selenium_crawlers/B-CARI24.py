@@ -248,11 +248,11 @@ class ForumWebCrawler:
             
             # remove duplicates and existing cmt_items
             # Convert the list of dictionaries to a DataFrame
-            cmt_ids = getCommentIDsByArticleID(art_id=post_id, table='dsta_db.test')
+            cmt_ids = getCommentIDsByArticleID(art_id=post_id, table='dsta_db.test_24hr_comments')
             cmts_for_one_post = remove_duplicates_comments(cmts_for_one_post, existing_ids=cmt_ids)
             print(f'\n-- DEBUG: {len(cmts_for_one_post)} no. of comments will be added to post {post_id}')
             self.comments.extend(cmts_for_one_post)
-            print('Total scrape')
+            print(f'\n\t--DEBUG: Total scrape {len(self.comments)} comments for the post')
         
         self.insert_to_db(label='comments')
 
@@ -319,8 +319,20 @@ def _collect_art_fn(driver=None, xpath_content='', url=''):
         org_content = ''
 
     return org_content
+
+
+parser = argparse.ArgumentParser(description="Parameters to execute a web crawler")
+
+parser.add_argument(
+        '--remote',
+        type=str,
+        help="True if running on docker else False",
+        required=True
+)
     
 if __name__ == '__main__':
+    args = parser.parse_args()
+    remote = eval(args.remote)
 
     B_CARI_object = {
         'starting_page_url': "https://b.cari.com.my/forum.php?mod=forumdisplay&fid=154&page=1",
@@ -330,7 +342,7 @@ if __name__ == '__main__':
         'begin_datetime': last24hours,
         'end_datetime': now,
         'headless':True,
-        'remote': True,
+        'remote': remote,
         'noOfDays':4,
         'main_Xparam':{
             'wait': 8,

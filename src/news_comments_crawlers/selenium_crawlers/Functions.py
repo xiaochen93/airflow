@@ -280,16 +280,15 @@ def selenium_init(headless=True, remote=True, strict=True):
     _RES_PATH = _ROOT_DIR + '\selenium_crawlers\resources'
     #initalise crawler option(s)
     options = webdriver.ChromeOptions()
-    options.add_experimental_option("detach", True)
+    #options.add_experimental_option("detach", True)
     options.add_argument('--no-sandbox')
     options.add_argument('--profile-directory=Default') 
 
     if headless:
         options.add_argument('--headless')
-
-    if strict:
-        options.add_experimental_option("excludeSwitches", ["disable-popup-blocking"])
         options.add_argument('--disable-notifications')
+    #if strict:
+    #    options.add_experimental_option("excludeSwitches", ["disable-popup-blocking"])
 
     print('\n-- DEBUG: ROOT DIR - ', _ROOT_DIR)
     if not remote:
@@ -310,7 +309,7 @@ def selenium_init(headless=True, remote=True, strict=True):
             print("\n-- DEBUG: Driver error -", e)
             raise
     # add driver setting
-    driver.set_page_load_timeout(60)
+    driver.set_page_load_timeout(180)
 
     return driver
 
