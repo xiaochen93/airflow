@@ -1,4 +1,7 @@
 # airflow
+2023-09-28
+Updated the dag activation time and make them running sequentially.
+
 2023-09-27
 Configured the default attribute of translated to be "0". Every crawled document would require additional processing.
 - English - CNA, REDDIT
