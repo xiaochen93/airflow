@@ -56,6 +56,8 @@ exe_web_crawlers_dag = DAG('CN_zaobao_24hr_web_dag',
 task_1 = BashOperator(
     task_id="id_1",
     bash_command="echo Hello World !!!! This is zaobao dag",
+    retries=4,
+    retry_delay=timedelta(minutes=3),
     dag = exe_web_crawlers_dag
 )
 
@@ -63,6 +65,8 @@ task_2 = BashOperator(
     task_id = "id_2",
     bash_command = "python /opt/airflow/src/news_comments_crawlers/crawlers/_CN_ZB.py --name ZAOBAO",
     execution_timeout=timedelta(minutes=15),
+    retries=4,
+    retry_delay=timedelta(minutes=3),
     dag = exe_web_crawlers_dag
 )
 

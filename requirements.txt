@@ -7,3 +7,4 @@ webdriver_manager
 newspaper3k
 googlesearch-python
 praw
+pendulum
