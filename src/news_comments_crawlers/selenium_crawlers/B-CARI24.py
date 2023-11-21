@@ -341,7 +341,7 @@ if __name__ == '__main__':
         'links_threshold':10,
         'begin_datetime': last24hours,
         'end_datetime': now,
-        'headless':True,
+        'headless':False,
         'remote': remote,
         'noOfDays':4,
         'main_Xparam':{
