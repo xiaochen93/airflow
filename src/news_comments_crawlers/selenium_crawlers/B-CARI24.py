@@ -89,8 +89,8 @@ class ForumWebCrawler:
             except Exception as e:
                 print('\nDEBUG: An error occur has occured .')
                 time.sleep(Xparam['wait']) #give program a pause to reset
-            
-            time.sleep(1)
+            #2023-11-21 increase the timeout to 5 seconds
+            time.sleep(5)
             self.bypass_ads(Xparam['XP_CLOSE_ADS'])
 
     '''
