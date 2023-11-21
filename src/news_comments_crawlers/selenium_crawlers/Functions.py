@@ -441,7 +441,6 @@ def select_existing_items(QUERY_API, today, pre_datetime, source_id, table='dsta
         print(f"\n\t-- DEBUG: query - {query}")
         response = requests.post(QUERY_API, json={'query':query})
         json_payload = (json.loads(response.text))
-        print(json_payload)
         out = json_payload['result'] 
     
     except Exception as e:
