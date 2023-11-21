@@ -286,9 +286,11 @@ def selenium_init(headless=True, remote=True, strict=True):
 
     if headless:
         options.add_argument('--headless')
-        options.add_argument('--disable-notifications')
-    #if strict:
-    #    options.add_experimental_option("excludeSwitches", ["disable-popup-blocking"])
+    
+    #disable notifications
+    prefs = {"profile.default_content_setting_values.notifications" : 2}
+    options.add_argument('--disable-notifications')
+    options.add_experimental_option("prefs",prefs)
 
     print('\n-- DEBUG: ROOT DIR - ', _ROOT_DIR)
     if not remote:
@@ -308,6 +310,7 @@ def selenium_init(headless=True, remote=True, strict=True):
         except Exception as e:
             print("\n-- DEBUG: Driver error -", e)
             raise
+    
     # add driver setting
     driver.set_page_load_timeout(180)
 
