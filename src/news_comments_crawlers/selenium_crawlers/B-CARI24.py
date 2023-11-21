@@ -338,7 +338,7 @@ if __name__ == '__main__':
         'starting_page_url': "https://b.cari.com.my/forum.php?mod=forumdisplay&fid=154&page=1",
         'source_id': 17,
         'lang': 'BM',
-        'links_threshold':10,
+        'links_threshold':50,
         'begin_datetime': last24hours,
         'end_datetime': now,
         'headless':False,

@@ -223,33 +223,6 @@ def main():
         output_file.write('\n\t-- No of. articles scraped: {}'.format(articles_df.shape[0]))
 
     #save data into the database
-    for idx, row in articles_df.iterrows():
-        row = row.to_dict()
-        insert_news_db(row)
-
-def main():
-    
-    link_list = c_scrape_links(USE_CACHE, LINK_FILEPATH, gather_urls)
-
-    articles = c_scrape_articles(USE_CACHE, DATA_JSON_FILEPATH, {'data':link_list, 'param':css_paths, 'func':getNewsByCSS})
-
-    articles_df = Preprocessor({'data':articles,'lang':LANG,'org':1,'source': S_ID}).prepare(func=_extract_datetime)
-
-    #save the raw json file
-    with open(DATA_JSON_FILEPATH, 'w', encoding='utf-8') as output_file:
-        json.dump(articles , output_file ,indent = 2, ensure_ascii=False, default=str)
-
-    #save the dataframe object
-    with open(DATA_DF_FILEPATH, 'wb') as output_file:
-        pickle.dump(articles_df, output_file, protocol=pickle.HIGHEST_PROTOCOL)
-
-    #save and write the data statistics - append mode
-    with open(CONS.LOG_FILE_PATH, "a", encoding='utf-8') as output_file:
-        output_file.write('\n')
-        output_file.write('\n-- Platform: '+ NAME)
-        output_file.write('\n\t-- No of. articles scraped: {}'.format(articles_df.shape[0]))
-
-    #save data into the database
     try:
         for idx, row in articles_df.iterrows():
             row = row.to_dict()
