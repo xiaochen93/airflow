@@ -437,16 +437,17 @@ def select_existing_items(QUERY_API, today, pre_datetime, source_id, table='dsta
         one_day = timedelta(days=1)
         # datetime <= todaty.date() + one day -> here onwards
         # datetime >= today.date() + n days -> posted before No.of days.
-        query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt} <= '{today.date() + one_day}' AND {dt} >= '{today.date() + one_day}' - INTERVAL {5} DAY) AND source_id={source_id};"
+        query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt} <= '{today.date() + one_day}' AND {dt} >= '{today.date() + one_day}' - INTERVAL {6} DAY) AND source_id={source_id};"
         print(f"\n\t-- DEBUG: query - {query}")
         response = requests.post(QUERY_API, json={'query':query})
         json_payload = (json.loads(response.text))
+        print(json_payload)
         out = json_payload['result'] 
     
     except Exception as e:
         print(f'\n\t-- DEBUG: error message - {e}.')
-        print(f'\n\t-- DEBUG: out - {out}.')
-        print(f"\n\t-- DEBUG: query - {query}")
+        response = requests.post(QUERY_API, json={'query':query})
+        print(f"\n\t-- DEBUG: error message from API {response.text}")
         print(f"\n\t-- DEBUG: returning empty list instead.")
         out = []
 
