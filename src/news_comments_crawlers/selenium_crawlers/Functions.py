@@ -438,6 +438,7 @@ def select_existing_items(QUERY_API, today, pre_datetime, source_id, table='dsta
         # datetime <= todaty.date() + one day -> here onwards
         # datetime >= today.date() + n days -> posted before No.of days.
         query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt} <= '{today.date() + one_day}' AND {dt} >= '{today.date() + one_day}' - INTERVAL {5} DAY) AND source_id={source_id};"
+        print(f"\n\t-- DEBUG: query - {query}")
         response = requests.post(QUERY_API, json={'query':query})
         json_payload = (json.loads(response.text))
         out = json_payload['result'] 

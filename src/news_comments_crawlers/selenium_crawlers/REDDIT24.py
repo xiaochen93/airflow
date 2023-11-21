@@ -38,7 +38,7 @@ parser.add_argument(
         default="past 24 hours"
 )
 
-def getRedditPostItems(driver, url,label):
+def getRedditPostItems(driver, url, label):
     out= []
     driver.get(url)
     time.sleep(1)
@@ -264,10 +264,11 @@ if __name__ == '__main__':
     try:
         out = select_existing_items(QUERY_API, today, '', source_id, table=table, items=['article_id', 'URL', 'source_id'])
         URLs = set([each['URL'].split('|')[-1] for each in out])
+        print(f'\n-- DEBUG: No. of Existing URLs {len(URLs)} .')
     except Exception as e:
         URLs = set()
         print('\n-- DEBUG: Selection of URLs error with ', e)
-    print(f'\n-- DEBUG: No. of Existing URLs {len(URLs)} .')
+
     driver = selenium_init(headless=True, remote=remote)
 
     # Get news post from the main forum page
