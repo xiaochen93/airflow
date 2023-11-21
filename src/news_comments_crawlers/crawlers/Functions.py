@@ -38,7 +38,7 @@ def c_scrape_links(USE_CACHE, CACHE_FILEPATH, gather_urls):
             with open(CACHE_FILEPATH, 'r', encoding='utf-8') as cache_file:
                 article_list = [line.strip() for line in cache_file]
         else:
-            print('\n--DEBUG: Cache file does not exist... creating now')
+            print('\n--DEBUG: Links file does not exist... creating now')
             article_list = gather_urls(save_to_cache=True)
     else:
         print('\n--DEBUG: New scraping request for links.') 
@@ -54,12 +54,12 @@ def c_scrape_articles(USE_CACHE, JSON_PATH, obj):
                 #print(JSON_PATH)
                 json_data = json.load(JSON_FILE,  strict=False)
         else:
-            print('\n--DEBUG: Cache file does not exist... creating now')
-            json_data = _scrape_articles(data=obj['data'], param=obj['param'],func=obj['func'])
+            print('\n-- DEBUG: Articles does not exist... creating now')
+            json_data = _scrape_articles_linear(data=obj['data'], param=obj['param'],func=obj['func'])
     
     else:
             print('\n--DEBUG: New scraping request for articles.') 
-            json_data = _scrape_articles(data=obj['data'], param=obj['param'],func=obj['func'])
+            json_data = _scrape_articles_linear(data=obj['data'], param=obj['param'],func=obj['func'])
    
        #save the raw json file
     with open(JSON_PATH, 'w', encoding='utf-8') as output_file:
@@ -67,8 +67,15 @@ def c_scrape_articles(USE_CACHE, JSON_PATH, obj):
    
     return json_data
 
+def _scrape_articles_linear(data=[], param={},func=None):
+    results = []
+    for each in data:
+        article = func(each, param)
+        results.append(article)
+    
+    return results
 
-def _scrape_articles(data=[], param={},func=None):
+def _scrape_articles_concurrent(data=[], param={},func=None):
     
     NUM_URLS_TO_SCRAPE = -1
     
@@ -88,7 +95,7 @@ def _scrape_articles(data=[], param={},func=None):
     gc.collect() #?
     
     return results
-    
+     
 def save_pickle_object(obj, filename):
     with open(filename, 'wb') as outp:  # Overwrites any existing file.
         pickle.dump(obj, outp, pickle.HIGHEST_PROTOCOL)
