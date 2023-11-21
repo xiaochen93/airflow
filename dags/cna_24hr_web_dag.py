@@ -45,7 +45,7 @@ default_args = {
 }
 
 #initializing the dag object
-exe_web_crawlers_dag = DAG('EN_cna_24hr_web_dag_1',
+exe_web_crawlers_dag = DAG('EN_cna_24hr_web_dag',
 		default_args=default_args,
 		description='The dag object to execute a series of web crawlers for data/comments collection .',
 		schedule_interval= '5 12 * * *', #'0 12 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
