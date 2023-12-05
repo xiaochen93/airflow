@@ -276,7 +276,7 @@ class ForumWebCrawler:
 
     def update_links(self, item, dt_label='published_datetime'):
         #print(item[dt_label], self.begin_dt, self.end_dt, (item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt))
-        if (item[dt_label]=="" or item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt):
+        if (item[dt_label]=="" or isinstance(item[dt_label], str) or item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt):
             self.links_count = self.links_count + 1 #accumulate  
         elif check_spams(item['org_title']): # the title of a post/article is mandatory.
             pass #do nothing
