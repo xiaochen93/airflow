@@ -33,6 +33,7 @@ The forum object follows the sequence of
 '''
 class ForumWebCrawler:
     def __init__(self, object):
+        self.object = object
         self.starting_page_url= object['starting_page_url']
         self.source_id = object['source_id']
         self.driver = selenium_init(headless=object['headless'],remote=object['remote'])
@@ -51,7 +52,13 @@ class ForumWebCrawler:
     def _init_page(self):
         try:
             self.driver.implicitly_wait(60)
-            self.driver.get(str(self.starting_page_url))
+            self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
+            self.driver.get("https://b.cari.com.my/portal.php", timeout=30)
+            self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
+
+            self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
+            self.driver.get(str(self.starting_page_url), timeout=30)
+            self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
         except:
             print('\n-- DEBUG: Driver initalisation error .')
             pass
