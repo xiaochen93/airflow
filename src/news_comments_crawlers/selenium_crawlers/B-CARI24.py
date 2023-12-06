@@ -81,8 +81,15 @@ class ForumWebCrawler:
         
         #2023-11-21: disable notifications
         prefs = {"profile.default_content_setting_values.notifications" : 2}
+        
         options.add_argument('--disable-notifications')
         options.add_experimental_option("prefs",prefs)
+        options.add_experimental_option(
+            "prefs", {"profile.managed_default_content_settings.images": 2}
+        )
+
+        #2023-12-06: disable image and video
+        options.add_argument('--blink-settings=imagesEnabled=false')
 
         print('\n-- DEBUG: ROOT DIR - ', _ROOT_DIR)
         if not remote:
