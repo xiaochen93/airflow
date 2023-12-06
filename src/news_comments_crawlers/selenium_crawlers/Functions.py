@@ -281,16 +281,17 @@ def selenium_init(headless=True, remote=True, strict=True):
     
     #2023-11-21: initalise crawler option(s)
     options = webdriver.ChromeOptions()
-    options.add_argument('--no-sandbox')
-    options.add_argument('--profile-directory=Default') 
+    #options.add_argument('--no-sandbox')
+    #options.add_argument('--profile-directory=Default') 
 
     if headless:
         options.add_argument('--headless')
     
     #2023-11-21: disable notifications
-    prefs = {"profile.default_content_setting_values.notifications" : 2}
-    options.add_argument('--disable-notifications')
-    options.add_experimental_option("prefs",prefs)
+    #prefs = {"profile.default_content_setting_values.notifications" : 2}
+    #options.add_argument('--disable-notifications')
+    #options.add_experimental_option("prefs",prefs)
+
     print('\n-- DEBUG: ROOT DIR - ', _ROOT_DIR)
     if not remote:
         print('\n-- DEBUG: Using local chrome driver .')

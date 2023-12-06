@@ -335,7 +335,7 @@ if __name__ == '__main__':
     remote = eval(args.remote)
 
     B_CARI_object = {
-        'starting_page_url': "https://b.cari.com.my/forum.php?mod=forumdisplay&fid=154&page=1",
+        'starting_page_url': "https://b.cari.com.my/forum.php?mod=forumdisplay&fid=154",
         'source_id': 17,
         'lang': 'BM',
         'links_threshold':50,
