@@ -50,7 +50,7 @@ default_args = {
 exe_web_crawlers_dag = DAG('BM_B-Cari_24hr_web_dag',
 		default_args=default_args,
 		description='The dag object to execute a series of web crawlers for data/comments collection .',
-		schedule_interval= '0 11 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
+		schedule_interval= '0 13 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
 		catchup=False,
 		tags=['BM','comments','24hrs', '4 days']
 )
@@ -63,7 +63,7 @@ task_1 = BashOperator(
 
 task_2 = BashOperator(
     task_id = "id_2",
-    bash_command = "python /opt/airflow/src/news_comments_crawlers/selenium_crawlers/B-CARI24.py --remote=True",
+    bash_command = "python /opt/airflow/src/news_comments_crawlers/selenium_crawlers/B-CARI24.py --remote=True --headless=False",
     execution_timeout=timeout,
     dag = exe_web_crawlers_dag
 )

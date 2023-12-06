@@ -1,10 +1,17 @@
 # airflow
+2023-12-05
+Update the Kasku web crawler for data on BI forum.
+- implemented xpath for scrapping post url & title.
+- implemented web crawlers for URLs and main post on discussion
+- separated the workflow from the web crawler.
+
 2023-11-21
 Update the following items on py code and airflow dag:
 - consistent the naming for each dag, no numeric prefix in the names.
 - increase the timeout to 300 secodns for selenium driver.
 - add new setting for disable notifications for selenium driver.
 - update zaobao main as duplicated main is provided to trigger memory overflow.
+- update selection query due to update of sqlachlemy package, the previous accessing method is deprecated.
 
 2023-09-28
 Updated the dag activation time and make them running sequentially.
