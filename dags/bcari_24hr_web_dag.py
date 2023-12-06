@@ -63,7 +63,7 @@ task_1 = BashOperator(
 
 task_2 = BashOperator(
     task_id = "id_2",
-    bash_command = "python /opt/airflow/src/news_comments_crawlers/selenium_crawlers/B-CARI24.py --remote=True --headless=False",
+    bash_command = "python /opt/airflow/src/news_comments_crawlers/selenium_crawlers/B-CARI24.py --remote=True --headless=True",
     execution_timeout=timeout,
     dag = exe_web_crawlers_dag
 )
