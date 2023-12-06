@@ -53,11 +53,11 @@ class ForumWebCrawler:
         try:
             self.driver.implicitly_wait(60)
             self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
-            self.driver.get("https://b.cari.com.my/portal.php", timeout=30)
+            self.driver.get("https://b.cari.com.my/portal.php", timeout=60)
             self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
 
             self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
-            self.driver.get(str(self.starting_page_url), timeout=30)
+            self.driver.get(str(self.starting_page_url), timeout=60)
             self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
         except:
             print('\n-- DEBUG: Driver initalisation error .')
