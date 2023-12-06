@@ -36,7 +36,6 @@ class ForumWebCrawler:
         self.starting_page_url= object['starting_page_url']
         self.source_id = object['source_id']
         self.driver = selenium_init(headless=object['headless'],remote=object['remote'])
-        self.driver.get(self.starting_page_url)
         self.links = []
         self.comments = []
         self.links_threshold = object['links_threshold']
@@ -47,6 +46,10 @@ class ForumWebCrawler:
         self.default_dt = datetime.now()
         self.existing_URLs = getExistingURLs(self.end_dt,noOfDays=self.noOfDays,sid=self.source_id)
         print(f'\n-- DEBUG: Existing urls are {len(self.existing_URLs)}')
+        self._init_page()
+
+    def _init_page(self):
+        self.driver.get(str(self.starting_page_url))
 
     '''
     Input: 
