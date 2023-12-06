@@ -345,10 +345,20 @@ parser.add_argument(
         help="True if running on docker else False",
         required=True
 )
+
+parser.add_argument(
+        '--headless',
+        type=str,
+        help="True if running on docker else False",
+        required=True
+)
     
 if __name__ == '__main__':
     args = parser.parse_args()
+
     remote = eval(args.remote)
+
+    headless = eval(args.headless)
 
     B_CARI_object = {
         'starting_page_url': "https://b.cari.com.my/forum.php?mod=forumdisplay&fid=154",
@@ -357,7 +367,7 @@ if __name__ == '__main__':
         'links_threshold':50,
         'begin_datetime': last24hours,
         'end_datetime': now,
-        'headless':False,
+        'headless':headless,
         'remote': remote,
         'noOfDays':4,
         'main_Xparam':{
