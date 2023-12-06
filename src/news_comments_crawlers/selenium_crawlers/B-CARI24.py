@@ -51,17 +51,18 @@ class ForumWebCrawler:
 
     def _init_page(self):
         try:
-            self.driver.implicitly_wait(60)
+            #self.driver.implicitly_wait(60)
             #self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
-            self.driver.get("https://b.cari.com.my/portal.php", timeout=60)
+            self.driver.get("https://b.cari.com.my/portal.php")
             self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
-
+            
             #self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
-            self.driver.get(str(self.starting_page_url), timeout=60)
+            self.driver.get(str(self.starting_page_url))
             self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
-        except:
+        except Exception as e:
             print('\n-- DEBUG: Driver initalisation error .')
-            pass
+            print('\n\t-- DEBUG: Error message is ',e)
+            raise
 
 
     '''

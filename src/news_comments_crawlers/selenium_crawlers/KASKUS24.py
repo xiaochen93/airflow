@@ -131,7 +131,7 @@ if __name__ == '__main__':
                             "//div[contains(@class, 'iz_osn_card_1')]//span[contains(@class, 'close')]", 
                             "//div[contains(@id, 'dismiss-button')]/div",
                             "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]"],
-            'XP_CMT_LISTING': "//tbody/tr/td/div[contains(@id, 'postlist')]/div[not(@class)]",
+            'XP_CMT_LISTING': "//div[contains(@class, 'mt-4 flex w-full')]//section[contains(@class, 'mr-4 min-w-0 flex-auto')]/div[contains(@class,'relative')]/div[not(@class)]//div[contains(@class, 'w-full bg-white dark:bg-grey-7 mb-1')]",
             'XP_CMT_ID': "",
             'XP_CMT_DATETIME':  ".//descendant-or-self::div[@class='pti']/div[contains(@class,'authi')]/em",
             'XP_CMT_CONTENT': " .//descendant-or-self::div[contains(@class, 't_fsz')]/table/tbody/tr/td",
