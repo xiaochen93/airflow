@@ -49,7 +49,13 @@ class ForumWebCrawler:
         self._init_page()
 
     def _init_page(self):
-        self.driver.get(str(self.starting_page_url))
+        try:
+            self.driver.implicitly_wait(60)
+            self.driver.get(str(self.starting_page_url))
+        except:
+            print('\n-- DEBUG: Driver initalisation error .')
+            pass
+
 
     '''
     Input: 
