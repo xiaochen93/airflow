@@ -9,7 +9,9 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 warnings.filterwarnings("ignore")
 
 now, last24hours=get_datetime()
@@ -65,7 +67,7 @@ class ForumWebCrawler:
             self.driver.get(str(self.starting_page_url))
             self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
 
-    def _selenium_init(headless=True, remote=True):
+    def _selenium_init(self, headless=True, remote=True):
         _ROOT_DIR = os.path.join(os.path.dirname(os.path.join(os.path.dirname(__file__)))) #news_comments_crawlers
         _RES_PATH = _ROOT_DIR + '\selenium_crawlers\resources'
         
