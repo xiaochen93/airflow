@@ -36,7 +36,7 @@ class ForumWebCrawler:
         self.object = object
         self.starting_page_url= object['starting_page_url']
         self.source_id = object['source_id']
-        self.driver = selenium_init(headless=object['headless'],remote=object['remote'])
+        self.driver = self._selenium_init(headless=object['headless'],remote=object['remote'])
         self.links = []
         self.comments = []
         self.links_threshold = object['links_threshold']
@@ -55,15 +55,56 @@ class ForumWebCrawler:
             #self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
             self.driver.get("https://b.cari.com.my/portal.php")
             self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
-            
+
             #self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
             self.driver.get(str(self.starting_page_url))
             self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
         except Exception as e:
             print('\n-- DEBUG: Driver initalisation error .')
             print('\n\t-- DEBUG: Error message is ',e)
-            raise
+            self.driver.get(str(self.starting_page_url))
+            self.bypass_ads(self.object['main_Xparam']['XP_CLOSE_ADS'])
 
+    def _selenium_init(headless=True, remote=True):
+        _ROOT_DIR = os.path.join(os.path.dirname(os.path.join(os.path.dirname(__file__)))) #news_comments_crawlers
+        _RES_PATH = _ROOT_DIR + '\selenium_crawlers\resources'
+        
+        #2023-11-21: initalise crawler option(s)
+        options = webdriver.ChromeOptions()
+        options.add_argument('--no-sandbox')
+        options.add_argument('--profile-directory=Default') 
+
+        if headless:
+            options.add_argument('--headless')
+        
+        #2023-11-21: disable notifications
+        prefs = {"profile.default_content_setting_values.notifications" : 2}
+        options.add_argument('--disable-notifications')
+        options.add_experimental_option("prefs",prefs)
+
+        print('\n-- DEBUG: ROOT DIR - ', _ROOT_DIR)
+        if not remote:
+            print('\n-- DEBUG: Using local chrome driver .')
+            try:
+                chrome = ChromeDriverManager(path=_ROOT_DIR).install()
+                service = Service(chrome)
+                driver = webdriver.Chrome(service=service, options=options)
+            except:
+                print("\n-- DEBUG: Something wrong with auto-driver, using local copy instead.")
+                driver = webdriver.Chrome()
+        else:
+            print('\n-- DEBUG: Using remote chrome driver, make sure docker standalone browser is on .')
+            try:
+                name = "remote_chromedriver"
+                driver = webdriver.Remote(command_executor=f"http://{name}:4444",options=options)
+            except Exception as e:
+                print("\n-- DEBUG: Driver error -", e)
+                raise
+        
+        #2023-11-21: adding page timeout to 300 seconds
+        driver.set_page_load_timeout(300)
+
+        return driver
 
     '''
     Input: 
