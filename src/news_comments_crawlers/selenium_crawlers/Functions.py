@@ -395,7 +395,7 @@ def getCommentIDsByArticleID(art_id='', table=''):
 def getExistingURLs(today, type='comments', noOfDays=6, QUERY_API=QUERY_API, table='dsta_db.test', pid='article_id', dt_label='published_datetime',URL_label='URL', sid=None):
     from datetime import timedelta
     items, one_day=[pid, 'source_id', 'URL'], timedelta(days=1)
-    query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt_label} <= '{today.date() + one_day}' AND {dt_label} >= '{today.date() + one_day}' - INTERVAL {noOfDays} DAY) AND source_id={sid};"
+    query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt_label} <= '{today.date() + one_day}' AND {dt_label} >= '{today.date() + one_day}' - INTERVAL {noOfDays} DAY) AND source_id={sid} AND deleted=0;"
     out_items = fetch_db_response(query)
     if out_items != []:
         URL_index = -1 if type == 'comments' else 0
@@ -407,7 +407,7 @@ def getExistingURLs(today, type='comments', noOfDays=6, QUERY_API=QUERY_API, tab
 def getExistingPostItems(today, type='comments', noOfDays=6, QUERY_API=QUERY_API, table='dsta_db.test', pid='article_id', dt_label='published_datetime',URL_label='URL', sid=None):
     from datetime import timedelta
     items, one_day=[pid, 'source_id', 'URL'], timedelta(days=1)
-    query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt_label} <= '{today.date() + one_day}' AND {dt_label} >= '{today.date() + one_day}' - INTERVAL {noOfDays} DAY) AND source_id={sid};"
+    query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt_label} <= '{today.date() + one_day}' AND {dt_label} >= '{today.date() + one_day}' - INTERVAL {noOfDays} DAY) AND source_id={sid} AND deleted=0;"
     out_items = fetch_db_response(query) # remove duplicate and size
     return out_items    
 
@@ -438,7 +438,7 @@ def select_existing_items(QUERY_API, today, pre_datetime, source_id, table='dsta
         one_day = timedelta(days=1)
         # datetime <= todaty.date() + one day -> here onwards
         # datetime >= today.date() + n days -> posted before No.of days.
-        query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt} <= '{today.date() + one_day}' AND {dt} >= '{today.date() + one_day}' - INTERVAL {6} DAY) AND source_id={source_id};"
+        query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt} <= '{today.date() + one_day}' AND {dt} >= '{today.date() + one_day}' - INTERVAL {6} DAY) AND source_id={source_id} AND deleted=0;"
         print(f"\n\t-- DEBUG: query - {query}")
         response = requests.post(QUERY_API, json={'query':query})
         json_payload = (json.loads(response.text))
