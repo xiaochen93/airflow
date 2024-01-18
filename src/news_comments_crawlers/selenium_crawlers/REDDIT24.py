@@ -32,6 +32,13 @@ parser.add_argument(
 )
 
 parser.add_argument(
+        '--headless',
+        type=str,
+        help="True if running on docker else False",
+        default="past 24 hours"
+)
+
+parser.add_argument(
         '--interval',
         type=str,
         help="True if running on docker else False",
@@ -253,6 +260,7 @@ if __name__ == '__main__':
     t1 = time.perf_counter()
     args = parser.parse_args()
     remote = eval(args.remote)
+    headless = eval(args.headless)
     interval = args.interval
 
     try:
@@ -269,7 +277,7 @@ if __name__ == '__main__':
         URLs = set()
         print('\n-- DEBUG: Selection of URLs error with ', e)
 
-    driver = selenium_init(headless=True, remote=remote)
+    driver = selenium_init(headless=headless, remote=remote)
 
     # Get news post from the main forum page
     try:
