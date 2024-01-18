@@ -95,8 +95,6 @@ class ForumWebCrawler:
             time.sleep(1)
             self.bypass_ads(Xparam['XP_CLOSE_ADS'])
 
-
-
     '''
     private function, scrape the inital post/article for that post from a given discussion (post) URL.
 

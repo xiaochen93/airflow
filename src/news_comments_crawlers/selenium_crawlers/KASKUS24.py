@@ -197,13 +197,13 @@ def test_scrape_comments_workflow(cmt_url, driver, Xparam):
         for item in cmt_items:
             test_scrape_comment_items(item, indent=0, cmt_reply_to='', Xparam=Xparam)
             print()
-        break
 
         try:
             #self.bypass_ads(Xparam['XP_CLOSE_ADS'])
+            print("\n--DEBUG: Go to Next Page")
             goNextPage(driver, Xparam['XP_CMT_NEXT']) 
         except Exception as e:
-            #print('\nDEBUG: An error occur has occured clicking next page.')
+            print('\n--DEBUG: An error occur has occured clicking next page.', e)
             SEARCHING = False
             continue
             
@@ -211,8 +211,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     remote = eval(args.remote)
     headless = eval(args.headless)
-    test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024?ref=threadlist-10&med=thread_list"
-
+    test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"
     Kaskus_object = {
         'starting_page_url': "https://www.kaskus.co.id/komunitas/10/berita-dan-politik",
         'source_id': 19,
@@ -257,7 +256,7 @@ if __name__ == '__main__':
             'XP_CMT_CONTENT': ".//descendant-or-self::div[contains(@class, 'htmlContentRenderer_html-content___EjM3 w-full')] | .//descendant-or-self::div[@class='relative mx-4 mt-4 break-words' or @class='w-full px-4' or @class='w-full']//div[contains(@class, 'htmlContentRenderer_html-content_')]",
             'XP_CMT_REPLY_TO': ".//descendant-or-self::div[@class='w-full bg-grey-0 dark:bg-grey-8']",
             'XP_CMT_USER' :".//descendant-or-self::div[@class='flex items-center gap-2']//div[contains(@class, 'htmlContentRenderer')]",
-            'XP_CMT_NEXT' : "//div[@class='flex items-center text-sm']//i[contains(@class, 'icon_')]",
+            'XP_CMT_NEXT' : "(//div[contains(@class, 'flex items-center text-sm')]//i[contains(@class, 'fa-angle-right')])[2]",
             'XP_CMT_CONTENT_DEL': ".//descendant-or-self::div[@class='quote expandable']",
             'XP_CMT_LIKES': "//div[@class='text-xs text-secondary dark:text-secondary-night']",
             'CMT_DATETIME_FMT': ""
