@@ -34,8 +34,8 @@ parser.add_argument(
 parser.add_argument(
         '--headless',
         type=str,
-        help="True if running on docker else False",
-        default="past 24 hours"
+        help="True if no viewing browser activity",
+        default="True"
 )
 
 parser.add_argument(
