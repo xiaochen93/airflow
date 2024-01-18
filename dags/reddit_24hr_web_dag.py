@@ -64,7 +64,7 @@ task_1 = BashOperator(
 
 task_2 = BashOperator(
     task_id = "id_2",
-    bash_command = "python /opt/airflow/src/news_comments_crawlers/selenium_crawlers/REDDIT24.py --remote=True",
+    bash_command = "python /opt/airflow/src/news_comments_crawlers/selenium_crawlers/REDDIT24.py --remote=True --headless=False",
     execution_timeout=timeout,
     dag = exe_web_crawlers_dag
 )
