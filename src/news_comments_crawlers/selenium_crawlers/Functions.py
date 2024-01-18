@@ -283,6 +283,7 @@ def selenium_init(headless=True, remote=True, strict=True):
     options = webdriver.ChromeOptions()
     options.add_argument('--no-sandbox')
     options.add_argument('--profile-directory=Default') 
+    options.add_argument('--blink-settings=imagesEnabled=false')
 
     if headless:
         options.add_argument('--headless')
@@ -299,8 +300,9 @@ def selenium_init(headless=True, remote=True, strict=True):
             chrome = ChromeDriverManager(path=_ROOT_DIR).install()
             service = Service(chrome)
             driver = webdriver.Chrome(service=service, options=options)
-        except:
+        except Exception as e:
             print("\n-- DEBUG: Something wrong with auto-driver, using local copy instead.")
+            print(e)
             driver = webdriver.Chrome()
     else:
         print('\n-- DEBUG: Using remote chrome driver, make sure docker standalone browser is on .')

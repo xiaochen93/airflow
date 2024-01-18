@@ -136,7 +136,7 @@ class ForumWebCrawler:
         for del_idx in del_idxes:
             self.links.pop(del_idx)
     
-    
+
     
     '''
     Insert one record at a time to db via provided API.
@@ -156,8 +156,6 @@ class ForumWebCrawler:
             except Exception as e:
                 print(f'\n--DEBUG: 1 post is failed to be added {item["url"]}')
                 print(e)
-
-
 
     def scrape_comments(self, Xparam):
         db_items = getExistingPostItems(self.end_dt,noOfDays=self.noOfDays,sid=self.source_id)
@@ -268,8 +266,6 @@ class ForumWebCrawler:
         
         self.insert_to_db(label='comments')
 
-
-
     def bypass_ads(self,XP_ads,i=5):
         time.sleep(1)
         self.driver.execute_script("""
@@ -287,8 +283,6 @@ class ForumWebCrawler:
             clickMany(self.driver, XP_ads)
             time.sleep(0.5)  
             i = i - 1
-
-
 
     def update_links(self, item, dt_label='published_datetime'):
         #print(item[dt_label], self.begin_dt, self.end_dt, (item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt))
