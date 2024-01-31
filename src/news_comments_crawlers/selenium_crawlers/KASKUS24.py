@@ -30,20 +30,17 @@ latest=True
 SEARCHING = True
 
 # customized function for collecting post url
-def my_collect_url_fn(post, Xparam):
+def _collect_item_fn(post, Xparam):
     #print('\n-- DEBUG: The post ', post.get_attribute("outerHTML")) #To print out the outter HTML layout for debugging
     #post_title = post.find_element("xpath", Xparam['XP_POST_TITLE'])
     #print('\n-- DEBUG: Post title - ',post_title)
 
     post_title = getWebElementAttribute(post, Xparam['XP_POST_TITLE'], "title")
 
-    #post_cate = getWebElementText(post, Xparam['XP_POST_CATE'])
-
     post_url = getWebElementAttribute(post, Xparam['XP_POST_URL'], "href")
 
     try:
         post_datetime = getWebElementText(post, Xparam['XP_POST_DATETIME'])
-        #print(f'\n-- DEBIG: datetime {post_datetime}')
 
         if "Hari ini" in post_datetime:
             today_date = datetime.now().date().strftime("%d-%m-%Y")
@@ -71,7 +68,7 @@ def my_collect_url_fn(post, Xparam):
     }
 
 # customized function for collecting news articles
-def my_collect_art_fn(driver=None, xpath_content='', url=''):
+def _collect_content_fn(driver=None, xpath_content='', url=''):
     driver.get(str(url))
     try:
         org_content = str(driver.find_element("xpath", xpath_content).text)
@@ -85,14 +82,12 @@ def my_collect_art_fn(driver=None, xpath_content='', url=''):
     return org_content
 
 parser = argparse.ArgumentParser(description="Parameters to execute a web crawler")
-
 parser.add_argument(
         '--remote',
         type=str,
         help="True if running on docker else False",
         required=True
 )
-
 parser.add_argument(
         '--headless',
         type=str,
@@ -100,118 +95,143 @@ parser.add_argument(
         required=True
 )
 
-def test_scrape_comment_items(item, indent=0, cmt_reply_to='', Xparam={}):
-    try:
-        cmt_id = (item.find_element("xpath", Xparam['XP_CMT_ID'])).get_attribute('href') #1. cmt id
-        cmt_id = cmt_id.replace("https://www.kaskus.co.id/show_post/","")
-    except Exception as e:
-        cmt_id = ""
-    print('\n--DEBUG: id: ', cmt_id)
-    
-    # cmt text
-    try:
-        cmt_org_content_text = item.find_element("xpath", Xparam['XP_CMT_CONTENT']).text
-        cmt_org_content_text = re.sub("\s+"," ", cmt_org_content_text)
-    except Exception as e:
-        cmt_org_content_text = ''
-        print(f"\n--DEBUG: error {e}")
+class Kaskus_Crawler(ForumWebCrawler):
 
-    try:
-        cmt_del_content_text = item.find_element("xpath", Xparam['XP_CMT_CONTENT_DEL']).text
-        cmt_del_content_text = re.sub("\s+"," ", cmt_del_content_text)
-    except Exception as e:
-        cmt_del_content_text = ''
-    
-    cmt_org_content_text = cmt_org_content_text.replace(cmt_del_content_text, '')
-    cmt_org_content_text = cmt_org_content_text.replace("Quote:", '')
-    cmt_org_content_text = re.sub(r"@\w+\s","", cmt_org_content_text)
-    
-    print('\n--DEBUG: content: ', cmt_org_content_text[:200],'...')
+    def scrape_comments(self):
 
-    # cmt children
-    try:
-        cmt_children = item.find_elements("xpath", Xparam['XP_CMT_CHILDREN'])
-    except Exception as e:
-        cmt_children = []
+        #test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"
+        posts_in_db = getExistingPostItems(self.end_dt,noOfDays=self.noOfDays,sid=self.source_id)
 
-    print('\n--DEBUG: no.of children: ', len(cmt_children), ' parent id: ', cmt_reply_to)
-    cmt_children = [test_scrape_comment_items(child, indent=idx, cmt_reply_to=id, Xparam=Xparam) for idx, child in enumerate(cmt_children)]
+        for post_item in posts_in_db:
+            url, post_id = post_item['URL'].split('|')[-1], post_item['article_id']
+            comments_this_post = self._test_scrape_cmt_workflow(url,self.driver, self.object['cmt_Xparam'])
+            comments_this_post = [each for each in comments_this_post if self.begin_dt <= each['cmt_published_datetime']] #check for 24 hours
+            print(f"\n-- DEBUG: collected {len(comments_this_post)} no. of comments for post - {post_id} on source_id {self.source_id}")
+            comments_this_post = [self._test_cmt_item_processing(item, post_id=post_id) for item in comments_this_post]
+            self.insert_to_db(comments_this_post, label="comments")
 
-    # cmt user
-    try:
-        cmt_user = item.find_element("xpath",Xparam['XP_CMT_USER'] ).text
-    except Exception as e:
-        cmt_user = ''
-    print('\n--DEBUG: user: ', cmt_user)
-
-    # cmt likes
-    try:
-        cmt_likes = item.find_element("xpath",Xparam['XP_CMT_LIKES'] ).text
-    except Exception as e:
-        cmt_likes = ''
-    print('\n--DEBUG: likes: ', cmt_likes)
-
-    # cmt published datetime
-    try:
-        desired_timezone = pytz.timezone("Asia/Shanghai")
-        cmt_published_datetime = item.find_element("xpath", Xparam['XP_CMT_DATETIME']).get_attribute('datetime')
-        cmt_published_datetime = datetime.utcfromtimestamp(int(cmt_published_datetime)).replace(tzinfo=pytz.utc).astimezone(desired_timezone)
-        cmt_published_datetime = cmt_published_datetime.strftime("%Y-%m-%d %H:%M:%S")
-
-    except Exception as e:
-        cmt_published_datetime = datetime.now()
-        #cmt_published_datetime = (cmt_published_datetime.strftime("%Y-%m-%d %H:%M:%S"))
-    print('\n--DEBUG: datetime: ', cmt_published_datetime)
-
-    return {
-            "cmt_id": cmt_id,
-            "cmt_org_content": cmt_org_content_text,
-            "cmt_published_datetime": cmt_published_datetime,
-            "cmt_replyTo": cmt_reply_to,
-            "cmt_user" : cmt_user,
-            "cmt_article_id": 'test_post',
-            "lang" : 'BM',
-            "translated": 0,
-            "source_id": ''
-            }
-
-def test_scrape_comments_workflow(cmt_url, driver, Xparam):
-    try:
-        driver.get(cmt_url)
-    except Exception as e:
-        print(f'\n-- DEBUG: driver timeout with error {e} .')
-    
-    SEARCHING = True
-
-    while SEARCHING: # Search for 1 post
-        wait = WebDriverWait(driver, Xparam['wait'])
-        page_loaded = wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-        print(f"\n-- DEBUG: Page loaded successfully! Searching comments for test",end='\r')
-
-        cmt_items = getPostListings(driver, Xparam['XP_CMT_LISTING'])
-        print(f'\n-- DEBUG: Total {len(cmt_items)} no. of elements on the table .')
+    def _test_scrape_cmt_workflow(self, cmt_url, driver, Xparam):
+        all_cmt_items = []
+        try:
+            driver.get(cmt_url)
+        except Exception as e:
+            print(f'\n-- DEBUG: driver timeout with error {e} .')
         
-        clickOne(driver, Xparam['XP_CMT_THREAD'])
+        SEARCHING = True
 
-        #3. loop and get each post item from the table
-        for item in cmt_items:
-            test_scrape_comment_items(item, indent=0, cmt_reply_to='', Xparam=Xparam)
-            print()
+        while SEARCHING: # Search for 1 post
+            wait = WebDriverWait(driver, Xparam['wait'])
+            page_loaded = wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+            print(f"\n-- DEBUG: Page loaded successfully! Searching comments for test",end='\r')
+
+            cmt_items = getPostListings(driver, Xparam['XP_CMT_LISTING'])
+            print(f'\n-- DEBUG: Total {len(cmt_items)} no. of elements on the table .')
+            
+            clickOne(driver, Xparam['XP_CMT_THREAD'])
+
+            #3. loop and get each post item from the table
+            for item in cmt_items:
+                this_cmt_item = self._test_scrape_cmt_items(item, indent=0, cmt_reply_to='', Xparam=Xparam)
+                all_cmt_items.append(this_cmt_item)
+            try:
+                #self.bypass_ads(Xparam['XP_CLOSE_ADS'])
+                print("\n--DEBUG: Go to Next Page")
+                goNextPage(driver, Xparam['XP_CMT_NEXT']) 
+            except Exception as e:
+                print('\n--DEBUG: An error occur has occured clicking next page or no more next page.')
+                SEARCHING = False
+                continue
+        
+        return all_cmt_items
+
+    def _test_scrape_cmt_items(self, item, indent=0, cmt_reply_to='', Xparam={}):
+        try:
+            cmt_id = (item.find_element("xpath", Xparam['XP_CMT_ID'])).get_attribute('href') #1. cmt id
+            cmt_id = cmt_id.replace("https://www.kaskus.co.id/show_post/","")
+        except Exception as e:
+            cmt_id = ""
+        #print('\n--DEBUG: id: ', cmt_id)
+
+        # cmt text
+        try:
+            cmt_org_content_text = item.find_element("xpath", Xparam['XP_CMT_CONTENT']).text
+            cmt_org_content_text = re.sub("\s+"," ", cmt_org_content_text)
+        except Exception as e:
+            cmt_org_content_text = ''
+            #print(f"\n--DEBUG: error {e}")
 
         try:
-            #self.bypass_ads(Xparam['XP_CLOSE_ADS'])
-            print("\n--DEBUG: Go to Next Page")
-            goNextPage(driver, Xparam['XP_CMT_NEXT']) 
+            cmt_del_content_text = item.find_element("xpath", Xparam['XP_CMT_CONTENT_DEL']).text
+            cmt_del_content_text = re.sub("\s+"," ", cmt_del_content_text)
         except Exception as e:
-            print('\n--DEBUG: An error occur has occured clicking next page.', e)
-            SEARCHING = False
-            continue
-            
+            cmt_del_content_text = ''
+
+        cmt_org_content_text = cmt_org_content_text.replace(cmt_del_content_text, '')
+        cmt_org_content_text = cmt_org_content_text.replace("Quote:", '')
+        cmt_org_content_text = re.sub(r"@\w+\s","", cmt_org_content_text)
+
+        #print('\n--DEBUG: content: ', cmt_org_content_text[:200],'...')
+
+        # cmt children
+        try:
+            cmt_children = item.find_elements("xpath", Xparam['XP_CMT_CHILDREN'])
+        except Exception as e:
+            cmt_children = []
+
+        #print('\n--DEBUG: no.of children: ', len(cmt_children), ' parent id: ', cmt_reply_to)
+        cmt_children = [self._test_scrape_cmt_items(child, indent=idx, cmt_reply_to=cmt_id, Xparam=Xparam) for idx, child in enumerate(cmt_children)]
+
+        # cmt user
+        try:
+            cmt_user = item.find_element("xpath",Xparam['XP_CMT_USER'] ).text
+        except Exception as e:
+            cmt_user = ''
+        #print('\n--DEBUG: user: ', cmt_user)
+
+        # cmt likes
+        try:
+            cmt_likes = item.find_element("xpath",Xparam['XP_CMT_LIKES'] ).text
+        except Exception as e:
+            cmt_likes = ''
+        #print('\n--DEBUG: likes: ', cmt_likes)
+
+        # cmt published datetime
+        try:
+            desired_timezone = pytz.timezone("Asia/Shanghai")
+            cmt_published_datetime = item.find_element("xpath", Xparam['XP_CMT_DATETIME']).get_attribute('datetime')
+            cmt_published_datetime = datetime.utcfromtimestamp(int(cmt_published_datetime)).replace(tzinfo=pytz.utc).astimezone(desired_timezone)
+            cmt_published_datetime = cmt_published_datetime.strftime("%Y-%m-%d %H:%M:%S")
+            cmt_published_datetime = datetime.strptime(cmt_published_datetime, "%Y-%m-%d %H:%M:%S")
+        except Exception as e:
+            cmt_published_datetime = datetime.now()
+            #cmt_published_datetime = (cmt_published_datetime.strftime("%Y-%m-%d %H:%M:%S"))
+        #print('\n--DEBUG: datetime: ', cmt_published_datetime)
+
+        return {
+                "cmt_id": cmt_id,
+                "cmt_org_content": cmt_org_content_text,
+                "cmt_published_datetime": cmt_published_datetime,
+                "cmt_replyTo": cmt_reply_to,
+                "cmt_user" : cmt_user
+            }
+
+    def _test_cmt_item_processing(self, item, post_id=None):
+        item['cmt_published_datetime'] = str(item['cmt_published_datetime'].strftime("%Y-%m-%d %H:%M:%S"))
+        item['cmt_id'] = post_id if item['cmt_id'] == "" else item['cmt_id']
+        item['cmt_article_id'] = post_id
+        item['source_id'] = self.source_id
+        item['translated'] = self.translated
+        item['lang'] = self.lang
+
+        return item
+
+
 if __name__ == '__main__':
     args = parser.parse_args()
     remote = eval(args.remote)
     headless = eval(args.headless)
     test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"
+
     Kaskus_object = {
         'starting_page_url': "https://www.kaskus.co.id/komunitas/10/berita-dan-politik",
         'source_id': 19,
@@ -265,11 +285,13 @@ if __name__ == '__main__':
 
     start_time = time.perf_counter()
     
-    Kaskus = ForumWebCrawler(Kaskus_object)
+    Kaskus = Kaskus_Crawler(Kaskus_object)
 
-    #Kaskus.scrape_post(Kaskus_object['main_Xparam'], collect_url_map=my_collect_url_fn, collect_article_map=my_collect_art_fn)
+    print(f'\n\t-- DEBUG: datetime beginning from {last24hours}  datetime end at {now}')
 
-    test_scrape_comments_workflow(test_url, Kaskus.driver, Kaskus_object['cmt_Xparam'])
+    Kaskus.scrape_post(Kaskus_object['main_Xparam'], collect_item_fn=_collect_item_fn, collect_article_map=_collect_content_fn)
+
+    Kaskus.scrape_comments()
 
     end_time = time.perf_counter()
 

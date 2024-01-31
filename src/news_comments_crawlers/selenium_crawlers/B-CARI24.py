@@ -12,6 +12,7 @@ from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+
 warnings.filterwarnings("ignore")
 
 now, last24hours=get_datetime()

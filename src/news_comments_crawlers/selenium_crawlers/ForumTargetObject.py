@@ -16,6 +16,7 @@ The forum object follows the sequence of
 '''
 class ForumWebCrawler:
     def __init__(self, object):
+        self.object = object
         self.starting_page_url= object['starting_page_url']
         self.source_id = object['source_id']
         self.driver = selenium_init(headless=object['headless'],remote=object['remote'])
@@ -29,20 +30,24 @@ class ForumWebCrawler:
         self.noOfDays = object['noOfDays']
         self.default_dt = datetime.now()
         self.existing_URLs = getExistingURLs(self.end_dt,noOfDays=self.noOfDays,sid=self.source_id)
+        self.lang = object['lang']
+        self.translated = 0
         print(f'\n-- DEBUG: Existing urls are {len(self.existing_URLs)}')
         print(f'\n-- DEBUG: Date range is from {self.begin_dt} to {self.end_dt}.')
         print(f'\n\t-- DEBUG: We are looking at {self.noOfDays} no.of days for accumlating comments.')
 
-    def scrape_post(self, Xparam, collect_url_map=lambda x: x, collect_article_map=lambda x: x):
-        self._scrape_post_url(Xparam, collect_fn=collect_url_map)
+    def scrape_post(self, Xparam, collect_item_fn=lambda x: x, collect_article_map=lambda x: x):
+        self._scrape_post_workflow(Xparam, collect_item_fn=collect_item_fn)
         # To-be-Implemented: remove duplicated URLs 
+
+        self.links = [each for each in self.links if self.begin_dt <= each['published_datetime'] <= self.end_dt]
 
         print(f'\n-- DEBUG: Total no. of {len(self.links)} links has been collected. ')
         if len(self.links) > 1:
-            self._scrape_post_content(Xparam, collect_fn=collect_article_map)
+            self._scrape_post_content(Xparam, collect_article=collect_article_map)
         else:
             print(f'\n-- DEBUG: No new post will be added to the db. ')
-        self.insert_to_db(label='post')
+        self.insert_to_db(self.links, label='post')
 
 
 
@@ -61,7 +66,7 @@ class ForumWebCrawler:
         map_fn: mapping function to return a scrapped item
     
     '''
-    def _scrape_post_url(self, Xparam, collect_fn=lambda x: x):
+    def _scrape_post_workflow(self, Xparam, collect_item_fn=lambda x: x):
         SEARCHING = True
         while SEARCHING:
             _search_begin = time.perf_counter()
@@ -75,7 +80,8 @@ class ForumWebCrawler:
             post_items = getPostListings(self.driver, Xparam['XP_POST_LISTING'])
             print(f'\n-- DEBUG: Total {len(post_items)} no. of elements on the table .')
             #3. loop and get each post item from the table
-            many_posts = [collect_fn(post, Xparam) for post in post_items]
+            many_posts = [collect_item_fn(post, Xparam) for post in post_items]
+
             #4. update the item accordingly
             for post in many_posts:
                 self.update_links(post)
@@ -95,6 +101,8 @@ class ForumWebCrawler:
             time.sleep(1)
             self.bypass_ads(Xparam['XP_CLOSE_ADS'])
 
+
+
     '''
     private function, scrape the inital post/article for that post from a given discussion (post) URL.
 
@@ -106,11 +114,11 @@ class ForumWebCrawler:
         map_fn: mapping function to return a scrapped article/original post in its original language. 
                 The output is '' by default.
     '''
-    def _scrape_post_content(self, Xparam, collect_fn=lambda x: x):
+    def _scrape_post_content(self, Xparam, collect_article=lambda x: x):
         del_idxes = []
         for idx, item in enumerate(self.links):
             # get the original article_content
-            org_content = collect_fn(driver=self.driver, xpath_content=Xparam['XP_POST_ART'], url=item['url'])
+            org_content = collect_article(driver=self.driver, xpath_content=Xparam['XP_POST_ART'], url=item['url'])
             time.sleep(Xparam['wait']/2)
             if (org_content == '' or len(org_content) < 20 or org_content is None):
                 del_idxes.append(idx)
@@ -124,8 +132,8 @@ class ForumWebCrawler:
                 else:
                     item['published_datetime'] = str(item['published_datetime'])
                 
-                item['translated'] = 0
-                item['lang'] = "BM"
+                item['translated'] = self.translated
+                item['lang'] = self.lang
                 item['source_id'] = self.source_id
 
                 self.links[idx] = item
@@ -135,7 +143,7 @@ class ForumWebCrawler:
             self.links.pop(del_idx)
     
 
-    
+
     '''
     Insert one record at a time to db via provided API.
 
@@ -145,14 +153,13 @@ class ForumWebCrawler:
         Label: db name e.g. post or comments
     
     '''
-    def insert_to_db(self,label=''):
-        items = self.links if label == 'post' else self.comments
+    def insert_to_db(self, items, label=''):
         t_name = 'dsta_db.test' if label == 'post' else 'dsta_db.test_24hr_comments'
         for idx, item in enumerate(items):
             try:
-                response = requests.post(INSERT_API,json={'table':t_name, 'data': item })
+                response = requests.post(INSERT_API,json={'table':t_name, 'data': item })       
             except Exception as e:
-                print(f'\n--DEBUG: 1 post is failed to be added {item["url"]}')
+                print(f'\n--DEBUG: 1 post is failed to be added {item["url"]} - index {idx}')
                 print(e)
 
     def scrape_comments(self, Xparam):
@@ -264,6 +271,8 @@ class ForumWebCrawler:
         
         self.insert_to_db(label='comments')
 
+
+
     def bypass_ads(self,XP_ads,i=5):
         time.sleep(1)
         self.driver.execute_script("""
@@ -281,6 +290,8 @@ class ForumWebCrawler:
             clickMany(self.driver, XP_ads)
             time.sleep(0.5)  
             i = i - 1
+
+
 
     def update_links(self, item, dt_label='published_datetime'):
         #print(item[dt_label], self.begin_dt, self.end_dt, (item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt))
