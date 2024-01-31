@@ -1,4 +1,11 @@
-# airflow
+# Major Update Airflow (excluding minor maintaince)
+2024-01-31
+Update the Kasku web crawler for collecting BI comments.
+- updated class signature and method signature.
+- updated crawling of comments from a single page.
+- updated the execution work flow for collecting data witin 24 hours.
+- updated the diagram for the web crawlers.
+
 2023-12-05
 Update the Kasku web crawler for data on BI forum.
 - implemented xpath for scrapping post url & title.
