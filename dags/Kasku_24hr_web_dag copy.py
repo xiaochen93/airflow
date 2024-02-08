@@ -27,7 +27,7 @@ start_date = start_date - timedelta(days=1)
 _start_date = datetime(
     2024,
     2,
-    8,
+    7,
     13,
     00,
     0,
@@ -47,7 +47,7 @@ default_args = {
 }
 
 #initializing the dag object
-exe_web_crawlers_dag = DAG('BM_Kaskus_24hr_web_dag',
+exe_web_crawlers_dag = DAG('INDO_Kaskus_24hr_web_dag',
 		default_args=default_args,
 		description='The dag object to execute a series of web crawlers for data/comments collection .',
 		schedule_interval= '30 11 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
