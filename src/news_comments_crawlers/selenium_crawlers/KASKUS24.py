@@ -295,6 +295,8 @@ if __name__ == '__main__':
 
     Kaskus.scrape_post(Kaskus_object['main_Xparam'], collect_item_fn=_collect_item_fn, collect_article_map=_collect_content_fn)
 
+    print("\n-- DEBUG: End of collecting post link and content ***************************************************************")
+
     Kaskus.scrape_comments()
 
     end_time = time.perf_counter()

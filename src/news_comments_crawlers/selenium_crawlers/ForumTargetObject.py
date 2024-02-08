@@ -102,6 +102,7 @@ class ForumWebCrawler:
             self.bypass_ads(Xparam['XP_CLOSE_ADS'])
 
 
+            
 
     '''
     private function, scrape the inital post/article for that post from a given discussion (post) URL.
@@ -119,7 +120,7 @@ class ForumWebCrawler:
         for idx, item in enumerate(self.links):
             # get the original article_content
             org_content = collect_article(driver=self.driver, xpath_content=Xparam['XP_POST_ART'], url=item['url'])
-            time.sleep(Xparam['wait']/2)
+            time.sleep(Xparam['wait'])
             if (org_content == '' or len(org_content) < 20 or org_content is None):
                 del_idxes.append(idx)
                 continue

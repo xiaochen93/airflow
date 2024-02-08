@@ -1,4 +1,12 @@
 # Major Update Airflow (excluding minor maintaince)
+2024-02-08
+Update the Kasku web crawler for collecting BI comments.
+- remove duplicated article links
+- remove duplicated comment by ids
+
+Update the print out message for remove_duplicate_cmt function -> to not print out SQL error .
+
+
 2024-01-31
 Update the Kasku web crawler for collecting BI comments.
 - updated class signature and method signature.

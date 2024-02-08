@@ -282,7 +282,9 @@ def selenium_init(headless=True, remote=True, strict=True):
     #2023-11-21: initalise crawler option(s)
     options = webdriver.ChromeOptions()
     options.add_argument('--no-sandbox')
-    options.add_argument('--profile-directory=Default') 
+    options.add_argument('--profile-directory=Default')
+
+    #2024-02-08 disable images
     options.add_argument('--blink-settings=imagesEnabled=false')
 
     if headless:
@@ -292,6 +294,10 @@ def selenium_init(headless=True, remote=True, strict=True):
     prefs = {"profile.default_content_setting_values.notifications" : 2}
     options.add_argument('--disable-notifications')
     options.add_experimental_option("prefs",prefs)
+    #2024-02-08: disable images
+    options.add_experimental_option(
+    "prefs", {"profile.managed_default_content_settings.images": 2}
+)
 
     print('\n-- DEBUG: ROOT DIR - ', _ROOT_DIR)
     if not remote:
@@ -381,7 +387,7 @@ def execute_query(QUERY_API, query=''):
         items = json_payload['result']  
     
     except Exception as e:
-        print(f'\n-- DEBUG: execute_query with error - {e}')
+        print(f'\n\t-- DEBUG: execute_query with error - {e} Probablly no existing records found with the id given ?')
         items = []
 
     return items
@@ -389,7 +395,10 @@ def execute_query(QUERY_API, query=''):
 # get the existing comments by post id
 def getCommentIDsByArticleID(art_id='', table=''):
     query = f'SELECT cmt_id FROM {table} WHERE cmt_article_id={art_id};'
+
     out_items = execute_query(query)
+    if len(out_items) == 0:
+        print(f"\n\t-- DEBUG: no existing comments found under the article id. ")
 
     return out_items
 
