@@ -105,8 +105,13 @@ class Kaskus_Crawler(ForumWebCrawler):
         for post_item in posts_in_db:
             url, post_id = post_item['URL'].split('|')[-1], post_item['article_id']
             comments_this_post = self._test_scrape_cmt_workflow(url,self.driver, self.object['cmt_Xparam'])
-            comments_this_post = [each for each in comments_this_post if self.begin_dt <= each['cmt_published_datetime']] #check for 24 hours
-            print(f"\n-- DEBUG: collected {len(comments_this_post)} no. of comments for post - {post_id} on source_id {self.source_id}")
+            #comments_this_post = [each for each in comments_this_post if self.begin_dt <= each['cmt_published_datetime']] #check for 24 hours
+            # filter existing comment by ids
+            print(f'\n\t--DEBUG: Total scrape {len(self.comments)} comments for the post')
+            cmt_ids = getCommentIDsByArticleID(art_id=post_id, table='dsta_db.test_24hr_comments')
+            comments_this_post = remove_duplicates_comments(comments_this_post, existing_ids=cmt_ids)
+            print(f'\n-- DEBUG: {len(comments_this_post)} no. of new comments will be added to post {post_id}')
+
             comments_this_post = [self._test_cmt_item_processing(item, post_id=post_id) for item in comments_this_post]
             self.insert_to_db(comments_this_post, label="comments")
 
@@ -224,7 +229,6 @@ class Kaskus_Crawler(ForumWebCrawler):
         item['lang'] = self.lang
 
         return item
-
 
 if __name__ == '__main__':
     args = parser.parse_args()

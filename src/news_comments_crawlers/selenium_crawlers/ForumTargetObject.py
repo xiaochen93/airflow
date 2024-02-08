@@ -122,21 +122,23 @@ class ForumWebCrawler:
             time.sleep(Xparam['wait']/2)
             if (org_content == '' or len(org_content) < 20 or org_content is None):
                 del_idxes.append(idx)
+                continue
+            item['org_content'] = org_content
+            if "cmt_url" in item.keys():
+                item['url'] = item['url'] + '|' + item['cmt_url']
+                del item['cmt_url']
+            if "published_datetime" in item.keys() and item['published_datetime'] != '':
+                item['published_datetime'] = (item['published_datetime'].strftime("%Y-%m-%d %H:%M:%S"))
             else:
-                item['org_content'] = org_content
-                if "cmt_url" in item.keys():
-                    item['url'] = item['url'] + '|' + item['cmt_url']
-                    del item['cmt_url']
-                if "published_datetime" in item.keys() and item['published_datetime'] != '':
-                    item['published_datetime'] = (item['published_datetime'].strftime("%Y-%m-%d %H:%M:%S"))
-                else:
-                    item['published_datetime'] = str(item['published_datetime'])
-                
-                item['translated'] = self.translated
-                item['lang'] = self.lang
-                item['source_id'] = self.source_id
+                item['published_datetime'] = str(item['published_datetime'])
+            
+            item['translated'] = self.translated
+            item['lang'] = self.lang
+            item['source_id'] = self.source_id
 
-                self.links[idx] = item
+            self.links[idx] = item
+            
+
         
         # delete the post item with empty content
         for del_idx in del_idxes:
@@ -155,6 +157,7 @@ class ForumWebCrawler:
     '''
     def insert_to_db(self, items, label=''):
         t_name = 'dsta_db.test' if label == 'post' else 'dsta_db.test_24hr_comments'
+        
         for idx, item in enumerate(items):
             try:
                 response = requests.post(INSERT_API,json={'table':t_name, 'data': item })       
