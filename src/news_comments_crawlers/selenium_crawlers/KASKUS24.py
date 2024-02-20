@@ -104,7 +104,7 @@ class Kaskus_Crawler(ForumWebCrawler):
 
         for post_item in posts_in_db:
             url, post_id = post_item['URL'].split('|')[-1], post_item['article_id']
-            comments_this_post = self._test_scrape_cmt_workflow(url,self.driver, self.object['cmt_Xparam'])
+            comments_this_post = self._test_scrape_cmt_workflow(url,self.driver, self.object['cmt_Xparam'], post_id)
             #comments_this_post = [each for each in comments_this_post if self.begin_dt <= each['cmt_published_datetime']] #check for 24 hours
             # filter existing comment by ids
             print(f'\n\t--DEBUG: Total scrape {len(self.comments)} comments for the post')
@@ -115,7 +115,7 @@ class Kaskus_Crawler(ForumWebCrawler):
             comments_this_post = [self._test_cmt_item_processing(item, post_id=post_id) for item in comments_this_post]
             self.insert_to_db(comments_this_post, label="comments")
 
-    def _test_scrape_cmt_workflow(self, cmt_url, driver, Xparam):
+    def _test_scrape_cmt_workflow(self, cmt_url, driver, Xparam, post_id):
         all_cmt_items = []
         try:
             driver.get(cmt_url)
@@ -127,10 +127,10 @@ class Kaskus_Crawler(ForumWebCrawler):
         while SEARCHING: # Search for 1 post
             wait = WebDriverWait(driver, Xparam['wait'])
             page_loaded = wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-            print(f"\n-- DEBUG: Page loaded successfully! Searching comments for test",end='\r')
+            print(f"\n-- DEBUG: Page loaded successfully! Searching comments  for {post_id}",end='\r')
 
             cmt_items = getPostListings(driver, Xparam['XP_CMT_LISTING'])
-            print(f'\n-- DEBUG: Total {len(cmt_items)} no. of elements on the table .')
+            print(f'\n\t-- DEBUG: Total {len(cmt_items)} no. of elements on the table .')
             
             clickOne(driver, Xparam['XP_CMT_THREAD'])
 
@@ -140,10 +140,10 @@ class Kaskus_Crawler(ForumWebCrawler):
                 all_cmt_items.append(this_cmt_item)
             try:
                 #self.bypass_ads(Xparam['XP_CLOSE_ADS'])
-                print("\n--DEBUG: Go to Next Page")
+                print("\n\t-- DEBUG: Go to Next Page")
                 goNextPage(driver, Xparam['XP_CMT_NEXT']) 
             except Exception as e:
-                print('\n--DEBUG: An error occur has occured clicking next page or no more next page.')
+                print('\n-- DEBUG: An error occur has occured clicking next page or no more next page.')
                 SEARCHING = False
                 continue
         
@@ -240,14 +240,14 @@ if __name__ == '__main__':
         'starting_page_url': "https://www.kaskus.co.id/komunitas/10/berita-dan-politik",
         'source_id': 19,
         'lang': 'BI',
-        'links_threshold':50,
+        'links_threshold':15,
         'begin_datetime': last24hours,
         'end_datetime': now,
         'headless':headless,
         'remote': remote,
         'noOfDays':4,
         'main_Xparam':{
-            'wait': 8,
+            'wait': 4,
             #'XP_CLOSE_ADS': "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]",
             'XP_CLOSE_ADS': ["//div[contains(@class,'button-common close-button')]//span", 
                             "//div[contains(@class, 'iz_osn_card_1')]//span[contains(@class, 'close')]", 
