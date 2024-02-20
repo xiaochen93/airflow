@@ -50,7 +50,7 @@ default_args = {
 exe_web_crawlers_dag = DAG('BI_Kaskus_24hr_web_dag',
 		default_args=default_args,
 		description='The dag object to execute a series of web crawlers for data/comments collection .',
-		schedule_interval= '30 10 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
+		schedule_interval= '30 12 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
 		catchup=False,
 		tags=['BI','comments','24hrs', '4 days']
 )

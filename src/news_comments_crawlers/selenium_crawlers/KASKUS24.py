@@ -102,6 +102,7 @@ class Kaskus_Crawler(ForumWebCrawler):
         #test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"
         posts_in_db = getExistingPostItems(self.end_dt,noOfDays=self.noOfDays,sid=self.source_id)
 
+
         for post_item in posts_in_db:
             url, post_id = post_item['URL'].split('|')[-1], post_item['article_id']
             comments_this_post = self._test_scrape_cmt_workflow(url,self.driver, self.object['cmt_Xparam'], post_id)
@@ -127,7 +128,7 @@ class Kaskus_Crawler(ForumWebCrawler):
         while SEARCHING: # Search for 1 post
             wait = WebDriverWait(driver, Xparam['wait'])
             page_loaded = wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-            print(f"\n-- DEBUG: Page loaded successfully! Searching comments  for {post_id}",end='\r')
+            print(f"\n-- DEBUG: Page loaded successfully! Searching comments for {post_id}",end='\r')
 
             cmt_items = getPostListings(driver, Xparam['XP_CMT_LISTING'])
             print(f'\n\t-- DEBUG: Total {len(cmt_items)} no. of elements on the table .')
@@ -141,11 +142,16 @@ class Kaskus_Crawler(ForumWebCrawler):
             try:
                 #self.bypass_ads(Xparam['XP_CLOSE_ADS'])
                 print("\n\t-- DEBUG: Go to Next Page")
-                goNextPage(driver, Xparam['XP_CMT_NEXT']) 
+                next_page = driver.find_element(By.XPATH, Xparam['XP_CMT_NEXT'])  
+                current_url = driver.current_url                                    
+                goNextPage(driver, Xparam['XP_CMT_NEXT'])
+                if driver.current_url == current_url:
+                    print(current_url, driver.url)
+                    raise
             except Exception as e:
                 print('\n-- DEBUG: An error occur has occured clicking next page or no more next page.')
                 SEARCHING = False
-                continue
+                break
         
         return all_cmt_items
 
@@ -295,7 +301,7 @@ if __name__ == '__main__':
 
     Kaskus.scrape_post(Kaskus_object['main_Xparam'], collect_item_fn=_collect_item_fn, collect_article_map=_collect_content_fn)
 
-    print("\n-- DEBUG: End of collecting post link and content ***************************************************************")
+    print("\n-- *************************************************************** DEBUG: End of collecting post link and content ***************************************************************")
 
     Kaskus.scrape_comments()
 
