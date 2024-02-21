@@ -54,7 +54,7 @@ INSERT_API = 'http://10.2.56.213:8086/insert'
 
 PING_API = 'http://10.2.56.213:8086/ping'
 
-QUERY_API = 'http://10.2.56.213:8086/query'
+QUERY_API = 'https://10.2.56.213:8086/query'
 
 def extract_domain(url):
     #pattern = r'(?<=\/|\.)(\w+)(?=\.)'
@@ -385,18 +385,20 @@ def execute_query(QUERY_API, query=''):
         response = requests.post(QUERY_API, json={'query':query})
         json_payload = (json.loads(response.text))
         items = json_payload['result']  
-    
+
     except Exception as e:
         print(f'\n\t-- DEBUG: execute_query with error - {e} Probablly no existing records found with the id given ?')
         items = []
 
     return items
 
+
 # get the existing comments by post id
 def getCommentIDsByArticleID(art_id='', table=''):
-    query = f'SELECT cmt_id FROM {table} WHERE cmt_article_id={art_id};'
+    query = f'SELECT cmt_id FROM {table} WHERE cmt_article_id={art_id}' + ';'
 
-    out_items = execute_query(query)
+    out_items = execute_query(QUERY_API,query=query)
+
     if len(out_items) == 0:
         print(f"\n\t-- DEBUG: no existing comments found under the article id. ")
 
