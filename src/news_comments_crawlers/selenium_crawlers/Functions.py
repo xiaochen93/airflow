@@ -54,7 +54,7 @@ INSERT_API = 'http://10.2.56.213:8086/insert'
 
 PING_API = 'http://10.2.56.213:8086/ping'
 
-QUERY_API = 'https://10.2.56.213:8086/query'
+QUERY_API = 'http://10.2.56.213:8086/query'
 
 def extract_domain(url):
     #pattern = r'(?<=\/|\.)(\w+)(?=\.)'
