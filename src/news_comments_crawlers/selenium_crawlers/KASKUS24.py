@@ -108,10 +108,10 @@ class Kaskus_Crawler(ForumWebCrawler):
             comments_this_post = self._test_scrape_cmt_workflow(url,self.driver, self.object['cmt_Xparam'], post_id)
             #comments_this_post = [each for each in comments_this_post if self.begin_dt <= each['cmt_published_datetime']] #check for 24 hours
             # filter existing comment by ids
-            print(f'\n\t--DEBUG: Total scrape {len(self.comments)} comments for the post')
+            print(f'\n\t-- DEBUG: Total scrape {len(self.comments)} comments for the post')
             cmt_ids = getCommentIDsByArticleID(art_id=post_id, table='dsta_db.test_24hr_comments')
             comments_this_post = remove_duplicates_comments(comments_this_post, existing_ids=cmt_ids)
-            print(f'\n-- DEBUG: {len(comments_this_post)} no. of new comments will be added to post {post_id}')
+            print(f'\n\t-- DEBUG: {len(comments_this_post)} no. of new comments will be added to post {post_id}')
 
             comments_this_post = [self._test_cmt_item_processing(item, post_id=post_id) for item in comments_this_post]
             self.insert_to_db(comments_this_post, label="comments")
