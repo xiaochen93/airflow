@@ -4,12 +4,11 @@ import argparse
 
 import warnings
 
-from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException
-from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from datetime import timedelta
+
 from ForumTargetObject import ForumWebCrawler
 import pytz
 
@@ -82,6 +81,7 @@ def _collect_content_fn(driver=None, xpath_content='', url=''):
     return org_content
 
 parser = argparse.ArgumentParser(description="Parameters to execute a web crawler")
+
 parser.add_argument(
         '--remote',
         type=str,
@@ -95,13 +95,44 @@ parser.add_argument(
         required=True
 )
 
+parser.add_argument(
+        '--begain_datetime',
+        type=str,
+        help="end datetime - string - 2023-12-31 16:49:00",
+        required=True
+)
+
+parser.add_argument(
+        '--end_datetime',
+        type=str,
+        help="begin datetime - string - 2024-01-01 12:30:00",
+        required=True
+)
+
+parser.add_argument(
+        '--noOfDays',
+        type=str,
+        help="noOfDays - int - ",
+        required=True
+)
+
 class Kaskus_Crawler(ForumWebCrawler):
 
+    def __init__(self, required_parameter):
+        # Call the superclass' __init__ method to initialize the attribute
+        super().__init__(required_parameter)
+        #2024-03-12: no need to check existing URLs
+        self.existing_URLs = []
+        #2024-03-12: no need to check existing URLs
+        #print(f'\n-- DEBUG: Existing urls are {len(self.existing_URLs)}')
+        #print(f'\n-- DEBUG: Date range is from {self.begin_dt} to {self.end_dt}.')
+        #print(f'\n\t-- DEBUG: We are looking at {self.noOfDays} no.of days for accumlating comments.')
+        
     def scrape_comments(self):
 
         #test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"
-        posts_in_db = getExistingPostItems(self.end_dt,noOfDays=self.noOfDays,sid=self.source_id)
-
+        #posts_in_db = getExistingPostItems(self.end_dt,noOfDays=self.noOfDays,sid=self.source_id)
+        posts_in_db = self._fetchPostByTimeRange(table="test", dt_label="published_datetime", end_datetime=self.end_dt, begain_datetime=self.begin_dt, sid=self.source_id)
 
         for post_item in posts_in_db:
             url, post_id = post_item['URL'].split('|')[-1], post_item['article_id']
@@ -109,10 +140,12 @@ class Kaskus_Crawler(ForumWebCrawler):
             #comments_this_post = [each for each in comments_this_post if self.begin_dt <= each['cmt_published_datetime']] #check for 24 hours
             # filter existing comment by ids
             print(f'\n\t-- DEBUG: Total scrape {len(self.comments)} comments for the post')
+            
+            #2024-03-14: change the sequence for updating post(s)
             comments_this_post = [self._test_cmt_item_processing(item, post_id=post_id) for item in comments_this_post]
-            # 2024-03-14: update the sequence of removing duplicate docs after adding cmt_id(s)
             cmt_ids = getCommentIDsByArticleID(art_id=post_id, table='dsta_db.test_24hr_comments')
             comments_this_post = remove_duplicates_comments(comments_this_post, existing_ids=cmt_ids)
+
             print(f'\n\t-- DEBUG: {len(comments_this_post)} no. of new comments will be added to post {post_id}')
             self.insert_to_db(comments_this_post, label="comments")
 
@@ -152,11 +185,10 @@ class Kaskus_Crawler(ForumWebCrawler):
                 print('\n-- DEBUG: An error occur has occured clicking next page or no more next page.')
                 SEARCHING = False
                 break
-        
+        time.sleep(Xparam['wait'])
         return all_cmt_items
 
     def _test_scrape_cmt_items(self, item, indent=0, cmt_reply_to='', Xparam={}):
-        # 2024-03-14: update new cmt_id(s)
         try:
             cmt_id = (item.find_element("xpath", Xparam['XP_CMT_ID'])).get_attribute('href') #1. cmt id
             cmt_id = cmt_id.replace("https://www.kaskus.co.id/show_post/","")
@@ -194,7 +226,7 @@ class Kaskus_Crawler(ForumWebCrawler):
             cmt_children = []
 
         #print('\n--DEBUG: no.of children: ', len(cmt_children), ' parent id: ', cmt_reply_to)
-        cmt_children = [self._test_scrape_cmt_items(child, indent=idx, cmt_reply_to=cmt_id, Xparam=Xparam) for idx, child in enumerate(cmt_children)]
+        cmt_children = [self._test_scrape_cmt_items(child, indent=idx + 1, cmt_reply_to=cmt_id, Xparam=Xparam) for idx, child in enumerate(cmt_children)]
 
         # cmt user
         try:
@@ -222,13 +254,18 @@ class Kaskus_Crawler(ForumWebCrawler):
             #cmt_published_datetime = (cmt_published_datetime.strftime("%Y-%m-%d %H:%M:%S"))
         #print('\n--DEBUG: datetime: ', cmt_published_datetime)
 
-        return {
+        out = {
                 "cmt_id": cmt_id,
                 "cmt_org_content": cmt_org_content_text,
                 "cmt_published_datetime": cmt_published_datetime,
-                "cmt_replyTo": cmt_reply_to,
+                "cmt_replyTo": str(cmt_reply_to),
                 "cmt_user" : cmt_user
             }
+        print(out)
+
+
+
+        return out
 
     def _test_cmt_item_processing(self, item, post_id=None):
         item['cmt_published_datetime'] = str(item['cmt_published_datetime'].strftime("%Y-%m-%d %H:%M:%S"))
@@ -240,24 +277,40 @@ class Kaskus_Crawler(ForumWebCrawler):
 
         return item
 
+    #2024-03-12: select post in db by time range
+    def _fetchPostByTimeRange(self, table="", dt_label="", end_datetime="", begain_datetime="", sid=""):
+        #from datetime import timedelta
+        items=["article_id", 'source_id', 'URL']
+        query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt_label} BETWEEN '{begain_datetime}' AND '{end_datetime}') AND source_id={sid} AND deleted=0;"
+        print(query)
+        out_items = fetch_db_response(query) # remove duplicate and size
+        if out_items == []:
+            raise
+        return out_items
+
 if __name__ == '__main__':
     args = parser.parse_args()
     remote = eval(args.remote)
     headless = eval(args.headless)
-    test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"
 
+    #2024-03-12: begain datetime and end datetime for accumlating posts and comments
+    begain_datetime = datetime.strptime(str(args.begain_datetime), "%Y-%m-%d %H:%M:%S")
+    end_datetime = datetime.strptime(str(args.end_datetime), "%Y-%m-%d %H:%M:%S")
+    noOfDays = int(args.noOfDays)
+
+    test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"
     Kaskus_object = {
-        'starting_page_url': "https://www.kaskus.co.id/komunitas/10/berita-dan-politik",
+        'starting_page_url': "https://www.kaskus.co.id/komunitas/250/berita-luar-negeri?tab=threads&page=290",
         'source_id': 19,
         'lang': 'BI',
         'links_threshold':20,
-        'begin_datetime': last24hours,
-        'end_datetime': now,
+        'begin_datetime': begain_datetime,
+        'end_datetime': end_datetime,
         'headless':headless,
         'remote': remote,
-        'noOfDays':4,
+        'noOfDays':noOfDays,
         'main_Xparam':{
-            'wait': 4,
+            'wait': 5,
             #'XP_CLOSE_ADS': "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]",
             'XP_CLOSE_ADS': ["//div[contains(@class,'button-common close-button')]//span", 
                             "//div[contains(@class, 'iz_osn_card_1')]//span[contains(@class, 'close')]", 
@@ -301,13 +354,18 @@ if __name__ == '__main__':
     
     Kaskus = Kaskus_Crawler(Kaskus_object)
 
-    print(f'\n\t-- DEBUG: datetime beginning from {last24hours}  datetime end at {now}')
+    print(f'\n\t-- DEBUG: datetime beginning from {begain_datetime}  datetime end at {end_datetime}')
 
     Kaskus.scrape_post(Kaskus_object['main_Xparam'], collect_item_fn=_collect_item_fn, collect_article_map=_collect_content_fn)
-
+    
     print("\n-- *************************************************************** DEBUG: End of collecting post link and content ***************************************************************")
-
+    
     Kaskus.scrape_comments()
+    
+    # 2024-03-12: test url
+    #test_url_1 = "https://www.kaskus.co.id/thread/6273c5c08bb3621a526613b5/ketahuan-polandia-ternyata-masih-beli-gas-rusia-lewat-jerman?ref=threadlist-250&med=thread_list"
+    #test_url_2 = "https://www.kaskus.co.id/thread/626b6c05c9317b0534726df2/putin-ancam-serang-nato-dengan-nuklir-isyarat-bakal-perang-dunia-iii?ref=threadlist-250&med=thread_list"
+    #Kaskus._test_scrape_cmt_workflow(test_url_2, Kaskus.driver, Kaskus_object["cmt_Xparam"], "sample")
 
     end_time = time.perf_counter()
 

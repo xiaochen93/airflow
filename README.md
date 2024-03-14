@@ -1,4 +1,11 @@
 # Major Update Airflow (excluding minor maintaince)
+2024-03-14
+Update Kasku web crawler for scraping posts within timeframe.
+
+Update Kasku web crawler for scraping post(s) within 24hours.
+- change the sequence of workflow -> attached attribute(s) -> check for duplicates
+- create a cmt_id for "" post and post that nested under a main post as the forum does not provide this naming.
+
 2024-02-08
 Update the Kasku web crawler for collecting BI comments.
 - remove duplicated article links

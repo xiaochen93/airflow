@@ -303,7 +303,14 @@ class ForumWebCrawler:
         #print(f'\n\t--DEBUG: {item[dt_label]}')
         #print(f'\n--DEBUG: If a post datetime is in range {self.begin_dt} - {self.end_dt} ? ', item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt)
         
-        if (item[dt_label]=="" or isinstance(item[dt_label], str) or item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt):
+        if item[dt_label]=="" or isinstance(item[dt_label], str):
+            #print(f"published datetime - {item[dt_label]}")
+            #print(f"1. is datetime a NULL string or invalid parsing datetime object - True .")
+            self.links_count = self.links_count + 1 #accumulate 
+        elif(item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt):
+            #print(f"published datetime - {item[dt_label]}")
+            #print(f"2. is datetime < begain_datetime ? - {item[dt_label] < self.begin_dt} .")
+            #print(f"3. is datetime > end_datetime ? - {item[dt_label] > self.end_dt} .")
             self.links_count = self.links_count + 1 #accumulate  
         elif check_spams(item['org_title']): # the title of a post/article is mandatory.
             pass #do nothing
