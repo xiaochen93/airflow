@@ -143,8 +143,6 @@ def gather_urls(save_to_cache = False):
 
             print(f'\n--DEBUG: No.of web card elements {len(WEB_CARD_ELEMENTS)}')
 
-            print(soup)
-
             for CARD_ELEMENT in WEB_CARD_ELEMENTS[:-1]:
                 #print(CARD_ELEMENT)
                 try:
@@ -175,8 +173,10 @@ def gather_urls(save_to_cache = False):
             print(f'\n--DEBUG: STOP {STOP} COUNTER {COUNTER}')
             if COUNTER < STOP:
                 next_link = soup.find("a", {"class": "pagination-link pagination-link-next"})
-                
-                URL = init_URL +  next_link['href']
+                try:
+                    URL = init_URL +  next_link['href']
+                except:
+                    break
                 #print(f'\n--DEBUG: The next page is {URL}')
             else:
                 break
