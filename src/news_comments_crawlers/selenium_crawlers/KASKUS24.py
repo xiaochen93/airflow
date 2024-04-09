@@ -111,6 +111,7 @@ class Kaskus_Crawler(ForumWebCrawler):
             #2024-03-14: change the sequence for updating post(s)
             print(f'\n\t-- DEBUG: Total scrape {len(comments_this_post)} comments for the post')
             comments_this_post = [self._test_cmt_item_processing(item, post_id=post_id) for item in comments_this_post]
+            
             cmt_ids = getCommentIDsByArticleID(art_id=post_id, table='dsta_db.test_24hr_comments')
             cmt_ids = set([str(list(each.values())[0]) for each in cmt_ids])
             #print(cmt_ids)
@@ -141,7 +142,10 @@ class Kaskus_Crawler(ForumWebCrawler):
             #3. loop and get each post item from the table
             for item in cmt_items:
                 this_cmt_item = self._test_scrape_cmt_items(item, indent=0, cmt_reply_to='', Xparam=Xparam)
-                all_cmt_items.append(this_cmt_item)
+                if isinstance(this_cmt_item, list):
+                    all_cmt_items.extend(this_cmt_item)
+                else:
+                    all_cmt_items.append(this_cmt_item)
             try:
                 #self.bypass_ads(Xparam['XP_CLOSE_ADS'])
                 print("\n\t-- DEBUG: Go to Next Page")
