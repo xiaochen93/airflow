@@ -13,7 +13,6 @@ Update the Kasku web crawler for collecting BI comments.
 
 Update the print out message for remove_duplicate_cmt function -> to not print out SQL error .
 
-
 2024-01-31
 Update the Kasku web crawler for collecting BI comments.
 - updated class signature and method signature.

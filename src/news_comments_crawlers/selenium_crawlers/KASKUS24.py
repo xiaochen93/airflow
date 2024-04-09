@@ -107,12 +107,15 @@ class Kaskus_Crawler(ForumWebCrawler):
             url, post_id = post_item['URL'].split('|')[-1], post_item['article_id']
             comments_this_post = self._test_scrape_cmt_workflow(url,self.driver, self.object['cmt_Xparam'], post_id)
             #comments_this_post = [each for each in comments_this_post if self.begin_dt <= each['cmt_published_datetime']] #check for 24 hours
-            # filter existing comment by ids
-            print(f'\n\t-- DEBUG: Total scrape {len(self.comments)} comments for the post')
+
+            #2024-03-14: change the sequence for updating post(s)
+            print(f'\n\t-- DEBUG: Total scrape {len(comments_this_post)} comments for the post')
             comments_this_post = [self._test_cmt_item_processing(item, post_id=post_id) for item in comments_this_post]
-            # 2024-03-14: update the sequence of removing duplicate docs after adding cmt_id(s)
             cmt_ids = getCommentIDsByArticleID(art_id=post_id, table='dsta_db.test_24hr_comments')
-            comments_this_post = remove_duplicates_comments(comments_this_post, existing_ids=cmt_ids)
+            cmt_ids = set([str(list(each.values())[0]) for each in cmt_ids])
+            #print(cmt_ids)
+            # filter existing comment by ids    
+            comments_this_post = remove_duplicated_comments_by_ids(cmt_ids=cmt_ids, comments_this_post=comments_this_post)
             print(f'\n\t-- DEBUG: {len(comments_this_post)} no. of new comments will be added to post {post_id}')
             self.insert_to_db(comments_this_post, label="comments")
 
@@ -188,13 +191,14 @@ class Kaskus_Crawler(ForumWebCrawler):
         #print('\n--DEBUG: content: ', cmt_org_content_text[:200],'...')
 
         # cmt children
+        #2023-03-15: update merge children node with the base node for yielding out.
         try:
             cmt_children = item.find_elements("xpath", Xparam['XP_CMT_CHILDREN'])
+            #print('\n--DEBUG: no.of children: ', len(cmt_children), ' parent id: ', cmt_reply_to)
+            cmt_children = [self._test_scrape_cmt_items(child, indent=idx + 1, cmt_reply_to=cmt_id, Xparam=Xparam) for idx, child in enumerate(cmt_children)]
+
         except Exception as e:
             cmt_children = []
-
-        #print('\n--DEBUG: no.of children: ', len(cmt_children), ' parent id: ', cmt_reply_to)
-        cmt_children = [self._test_scrape_cmt_items(child, indent=idx, cmt_reply_to=cmt_id, Xparam=Xparam) for idx, child in enumerate(cmt_children)]
 
         # cmt user
         try:
@@ -222,13 +226,21 @@ class Kaskus_Crawler(ForumWebCrawler):
             #cmt_published_datetime = (cmt_published_datetime.strftime("%Y-%m-%d %H:%M:%S"))
         #print('\n--DEBUG: datetime: ', cmt_published_datetime)
 
-        return {
+        #2024-03-15: merge children node with root node
+        out = {
                 "cmt_id": cmt_id,
                 "cmt_org_content": cmt_org_content_text,
                 "cmt_published_datetime": cmt_published_datetime,
-                "cmt_replyTo": cmt_reply_to,
+                "cmt_replyTo": str(cmt_reply_to),
                 "cmt_user" : cmt_user
             }
+        
+        if len(cmt_children) == 0:
+            return out
+        
+        else:
+            cmt_children.append(out)
+            return cmt_children
 
     def _test_cmt_item_processing(self, item, post_id=None):
         item['cmt_published_datetime'] = str(item['cmt_published_datetime'].strftime("%Y-%m-%d %H:%M:%S"))

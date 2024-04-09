@@ -163,7 +163,10 @@ class ForumWebCrawler:
             try:
                 response = requests.post(INSERT_API,json={'table':t_name, 'data': item })       
             except Exception as e:
-                print(f'\n--DEBUG: 1 post is failed to be added {item["url"]} - index {idx}')
+                if label == 'post':
+                    print(f'\n--DEBUG: 1 post is failed to be added {item["url"]} - index {idx}')
+                else:
+                    print(f'\n--DEBUG: 1 comment is failed to be added {item["cmt_org_content"]} - index {idx}')
                 print(e)
 
     def scrape_comments(self, Xparam):

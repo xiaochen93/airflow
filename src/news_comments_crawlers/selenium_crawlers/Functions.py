@@ -435,6 +435,10 @@ def remove_duplicates_comments(cmts_for_one_post,existing_ids=[]):
 
     return non_duplicates
 
+def remove_duplicated_comments_by_ids(cmt_ids=set(), comments_this_post=[]):
+    comments_this_post = [each for each in comments_this_post if not str(each['cmt_id']) in cmt_ids]
+    return comments_this_post
+
 def fetch_db_response(query):
     try:
         response = requests.post(QUERY_API, json={'query':query})

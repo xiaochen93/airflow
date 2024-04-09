@@ -137,16 +137,18 @@ class Kaskus_Crawler(ForumWebCrawler):
         for post_item in posts_in_db:
             url, post_id = post_item['URL'].split('|')[-1], post_item['article_id']
             comments_this_post = self._test_scrape_cmt_workflow(url,self.driver, self.object['cmt_Xparam'], post_id)
-            #comments_this_post = [each for each in comments_this_post if self.begin_dt <= each['cmt_published_datetime']] #check for 24 hours
-            # filter existing comment by ids
-            print(f'\n\t-- DEBUG: Total scrape {len(self.comments)} comments for the post')
             
             #2024-03-14: change the sequence for updating post(s)
+            print(f'\n\t-- DEBUG: Total scrape {len(comments_this_post)} comments for the post')
             comments_this_post = [self._test_cmt_item_processing(item, post_id=post_id) for item in comments_this_post]
             cmt_ids = getCommentIDsByArticleID(art_id=post_id, table='dsta_db.test_24hr_comments')
-            comments_this_post = remove_duplicates_comments(comments_this_post, existing_ids=cmt_ids)
-
+            cmt_ids = set([str(list(each.values())[0]) for each in cmt_ids])
+            #print(cmt_ids)
+            # filter existing comment by ids    
+            comments_this_post = remove_duplicated_comments_by_ids(cmt_ids=cmt_ids, comments_this_post=comments_this_post)
+            
             print(f'\n\t-- DEBUG: {len(comments_this_post)} no. of new comments will be added to post {post_id}')
+            
             self.insert_to_db(comments_this_post, label="comments")
 
     def _test_scrape_cmt_workflow(self, cmt_url, driver, Xparam, post_id):
@@ -171,7 +173,11 @@ class Kaskus_Crawler(ForumWebCrawler):
             #3. loop and get each post item from the table
             for item in cmt_items:
                 this_cmt_item = self._test_scrape_cmt_items(item, indent=0, cmt_reply_to='', Xparam=Xparam)
-                all_cmt_items.append(this_cmt_item)
+                
+                if isinstance(this_cmt_item, list):
+                    all_cmt_items.extend(this_cmt_item)
+                else:
+                    all_cmt_items.append(this_cmt_item)
             try:
                 #self.bypass_ads(Xparam['XP_CLOSE_ADS'])
                 print("\n\t-- DEBUG: Go to Next Page")
@@ -222,11 +228,11 @@ class Kaskus_Crawler(ForumWebCrawler):
         # cmt children
         try:
             cmt_children = item.find_elements("xpath", Xparam['XP_CMT_CHILDREN'])
+            #print('\n--DEBUG: no.of children: ', len(cmt_children), ' parent id: ', cmt_reply_to)
+            cmt_children = [self._test_scrape_cmt_items(child, indent=idx + 1, cmt_reply_to=cmt_id, Xparam=Xparam) for idx, child in enumerate(cmt_children)]
+
         except Exception as e:
             cmt_children = []
-
-        #print('\n--DEBUG: no.of children: ', len(cmt_children), ' parent id: ', cmt_reply_to)
-        cmt_children = [self._test_scrape_cmt_items(child, indent=idx + 1, cmt_reply_to=cmt_id, Xparam=Xparam) for idx, child in enumerate(cmt_children)]
 
         # cmt user
         try:
@@ -261,11 +267,12 @@ class Kaskus_Crawler(ForumWebCrawler):
                 "cmt_replyTo": str(cmt_reply_to),
                 "cmt_user" : cmt_user
             }
-        print(out)
-
-
-
-        return out
+        
+        if len(cmt_children) == 0:
+            return out
+        else:
+            cmt_children.append(out)
+            return cmt_children
 
     def _test_cmt_item_processing(self, item, post_id=None):
         item['cmt_published_datetime'] = str(item['cmt_published_datetime'].strftime("%Y-%m-%d %H:%M:%S"))
@@ -300,10 +307,15 @@ if __name__ == '__main__':
 
     test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"
     Kaskus_object = {
-        'starting_page_url': "https://www.kaskus.co.id/komunitas/250/berita-luar-negeri?tab=threads&page=290",
+        #285 5-15
+        #325 5-01
+        #377 2-03
+        #242 7-01
+        #265 6-06
+        'starting_page_url': "https://www.kaskus.co.id/komunitas/250/berita-luar-negeri?tab=threads&page=265",
         'source_id': 19,
         'lang': 'BI',
-        'links_threshold':20,
+        'links_threshold':200,
         'begin_datetime': begain_datetime,
         'end_datetime': end_datetime,
         'headless':headless,
