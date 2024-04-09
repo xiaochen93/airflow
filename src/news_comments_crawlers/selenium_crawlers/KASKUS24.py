@@ -142,6 +142,7 @@ class Kaskus_Crawler(ForumWebCrawler):
             #3. loop and get each post item from the table
             for item in cmt_items:
                 this_cmt_item = self._test_scrape_cmt_items(item, indent=0, cmt_reply_to='', Xparam=Xparam)
+                #2024-04-09: append children nodes in the list
                 if isinstance(this_cmt_item, list):
                     all_cmt_items.extend(this_cmt_item)
                 else:
