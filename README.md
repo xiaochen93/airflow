@@ -1,4 +1,7 @@
 # Major Update Airflow (excluding minor maintaince)
+2024-05-01
+Update Kasku web crawler as the HTML layout got updated for scraping links.
+
 2024-03-14
 Update Kasku web crawler for scraping posts within timeframe.
 
