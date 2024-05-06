@@ -4,7 +4,7 @@ import random
 import requests
 import json
 import time
-from tqdm.auto import tqdm
+from tqdm import tqdm
 import argparse
 
 TRANS_API_CN = 'http://10.2.56.190:8290/predictions/zh-en'
@@ -93,7 +93,7 @@ def getDataWithListOfDicts(data_api='', table='', start='', end='',):
     return json_payload
 
 def process_articles(start='',end=''):
-    DATA_ART_API = 'http://10.2.56.213:8086/getDocumentsByTimeframe'
+    DATA_ART_API = 'http://10.2.56.213:8086/getNewsArticlesByTimeframe'
     lst_dicts = getDataWithListOfDicts(data_api=DATA_ART_API, table='dsta_db.test', start=start, end=end)
     print(f"\n-- DEBUG: Total {len(lst_dicts)} no. of documents required processing. ")
 
@@ -103,7 +103,7 @@ def process_articles(start='',end=''):
             dict['org_title'] = clean(dict['org_title'], preprocess_text_patterns)
             # PRE-process org content
             dict['org_content'] = clean(dict['org_content'], preprocess_text_patterns)
-            
+    
     except Exception as e:
         print(f'\n-- DEBUG: PRE processing error occur on {e}')
     
@@ -114,7 +114,6 @@ def process_articles(start='',end=''):
                 temp_content = (requests.post(TRANS_API_CN, json={'data':[dict['org_content']]})).json()['translation'][0]
             
             elif dict['lang'] == 'BM':
-
                 temp_title = requests.post(TRANS_API_BM, json={'data':[dict['org_title']]}).json()['translation'][0]
                 temp_content = requests.post(TRANS_API_BM, json={'data':[dict['org_content']]}).json()['translation'][0]
 
@@ -128,7 +127,7 @@ def process_articles(start='',end=''):
 
             # POST-process org title 
             dict['title'] = clean(temp_title.strip(), postprocess_text_patterns)
-           
+
             # POST-process org content
             dict['content'] = clean(temp_content.strip(), postprocess_text_patterns)
 
@@ -139,28 +138,12 @@ def process_articles(start='',end=''):
                 raise
             else:
                 article_id = dict['article_id']
-
+            
     except Exception as e:
         print(f"\n-- DEBUG: Translation error occur with {e}")
         print(f"\n\t--DEBUG: {dict['org_title']} ")
         print(f"\n\t--DEBUG: {dict['org_content']} ")
         raise
-    
-    # perform the update, do not need to return anything
-    #primary_ids = []
-    #try:
-    #    for dict in tqdm(lst_dicts, desc="\n-- DEBUG: Step 3 - update record to db"):
-    #        out = requests.put(UPDATE_API, json={"table": "dsta_db.test", "data": {"title": dict['title'], "content": dict['content'], "last_modified": str(start), "translated": True}, "where" : f"article_id = {dict['article_id']}" })
-    #        if out.status_code == 500:
-    #            print(out.text)
-    #            raise
-    #        else:
-    #            article_id = dict['article_id']
-
-    #except Exception as e:       
-    #    print(f"\n-- DEBUG: Update Error occur with {e}")
-    
-    #return primary_ids
 
 def process_comments(start='',end=''):
     DATA_CMT_API = 'http://10.2.56.213:8086/getCommentsByTimeframe'
@@ -177,7 +160,7 @@ def process_comments(start='',end=''):
         raise
 
     try:
-        for dict in tqdm(lst_dicts, desc="\n-- DEBUG: Step 2 - get documents translated and processed accordingly", position=1, leave=True):
+        for dict in tqdm(lst_dicts, desc="\n-- DEBUG: Step 2 - get comments translated and processed accordingly", position=1, leave=True):
             if dict['lang'] == 'CN':
                 temp_content = (requests.post(TRANS_API_CN, json={'data':[dict['cmt_org_content']]})).json()['translation'][0]
             
@@ -193,7 +176,7 @@ def process_comments(start='',end=''):
             # POST-process org content
             dict['cmt_content'] = clean(temp_content.strip(), postprocess_text_patterns)
 
-            out = requests.put(UPDATE_API, json={"table": "dsta_db.test_24hr_comments", "data": {"cmt_content": dict['cmt_content'], "last_modified": str(start), "translated": False}, "where" : f"id = {dict['id']}" })
+            out = requests.put(UPDATE_API, json={"table": "dsta_db.test_24hr_comments", "data": {"cmt_content": dict['cmt_content'], "last_modified": str(start), "translated": True}, "where" : f"id = {dict['id']}" })
             if out.status_code == 500:
                 print(out.text)
                 raise
