@@ -132,6 +132,14 @@ def process_articles(start='',end=''):
             # POST-process org content
             dict['content'] = clean(temp_content.strip(), postprocess_text_patterns)
 
+            out = requests.put(UPDATE_API, json={"table": "dsta_db.test", "data": {"title": dict['title'], "content": dict['content'], "last_modified": str(start), "translated": True}, "where" : f"article_id = {dict['article_id']}" })
+            
+            if out.status_code == 500:
+                print(out.text)
+                raise
+            else:
+                article_id = dict['article_id']
+
     except Exception as e:
         print(f"\n-- DEBUG: Translation error occur with {e}")
         print(f"\n\t--DEBUG: {dict['org_title']} ")
@@ -139,20 +147,20 @@ def process_articles(start='',end=''):
         raise
     
     # perform the update, do not need to return anything
-    primary_ids = []
-    try:
-        for dict in tqdm(lst_dicts, desc="\n-- DEBUG: Step 3 - update record to db"):
-            out = requests.put(UPDATE_API, json={"table": "dsta_db.test", "data": {"title": dict['title'], "content": dict['content'], "last_modified": str(start), "translated": True}, "where" : f"article_id = {dict['article_id']}" })
-            if out.status_code == 500:
-                print(out.text)
-                raise
-            else:
-                article_id = dict['article_id']
-                primary_ids.append(article_id)
-    except Exception as e:       
-        print(f"\n-- DEBUG: Update Error occur with {e}")
+    #primary_ids = []
+    #try:
+    #    for dict in tqdm(lst_dicts, desc="\n-- DEBUG: Step 3 - update record to db"):
+    #        out = requests.put(UPDATE_API, json={"table": "dsta_db.test", "data": {"title": dict['title'], "content": dict['content'], "last_modified": str(start), "translated": True}, "where" : f"article_id = {dict['article_id']}" })
+    #        if out.status_code == 500:
+    #            print(out.text)
+    #            raise
+    #        else:
+    #            article_id = dict['article_id']
+
+    #except Exception as e:       
+    #    print(f"\n-- DEBUG: Update Error occur with {e}")
     
-    return primary_ids
+    #return primary_ids
 
 def process_comments(start='',end=''):
     DATA_CMT_API = 'http://10.2.56.213:8086/getCommentsByTimeframe'
@@ -161,7 +169,6 @@ def process_comments(start='',end=''):
     try:
         for dict in tqdm(lst_dicts, desc="\n-- DEBUG: Step 1 - deep cleaning the original documents: ", position=0, leave=True):
             # PRE-process org content 
-            print("\n-- DEBUG: comments - ", dict['cmt_org_content'])
             dict['cmt_org_content'] = clean(dict['cmt_org_content'], preprocess_text_patterns)
             
             
@@ -186,24 +193,25 @@ def process_comments(start='',end=''):
             # POST-process org content
             dict['cmt_content'] = clean(temp_content.strip(), postprocess_text_patterns)
 
-    except Exception as e:
-        print(f"\n-- DEBUG: Translation error occur with {e}")
-        print(f"\n\t--DEBUG: {dict['cmt_org_content']} ")
-        raise
-
-    # perform the update, do not need to return anything
-    primary_ids = []
-    try:
-        for dict in tqdm(lst_dicts, desc="\n-- DEBUG: Step 3 - update record to db", position=2, leave=True):
             out = requests.put(UPDATE_API, json={"table": "dsta_db.test_24hr_comments", "data": {"cmt_content": dict['cmt_content'], "last_modified": str(start), "translated": False}, "where" : f"id = {dict['id']}" })
             if out.status_code == 500:
                 print(out.text)
                 raise
             else:
                 cmt_id = dict['id']
-                primary_ids.append(cmt_id)
-    except Exception as e:       
-        print(f"\n-- DEBUG: Update Error occur with {e}")
+
+    except Exception as e:
+        print(f"\n-- DEBUG: Translation error occur with {e}")
+        print(f"\n\t--DEBUG: {dict['cmt_org_content']} ")
+        raise
+
+    # perform the update, do not need to return anything
+    #primary_ids = []
+    #try:
+    #    for dict in tqdm(lst_dicts, desc="\n-- DEBUG: Step 3 - update record to db", position=2, leave=True):
+
+    #except Exception as e:       
+    #    print(f"\n-- DEBUG: Update Error occur with {e}")
 
 parser = argparse.ArgumentParser(description="Parameters to execute a web crawler")
 # default datetime
