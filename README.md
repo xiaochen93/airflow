@@ -1,6 +1,15 @@
 # Major Update Airflow (excluding minor maintaince)
+2024-05-10
+Update data processing tools if translated input is too large for storing.
+Update data processing tools for error handling.
+
+2024-05-07
+Update REDDIT and SG-EYE
+
+
 2024-05-03
-Build translation and data processing tools 
+Build translation and data processing tools
+python data_processing.py --begain_datetime="2024-03-01 00:00:00" --end_datetime="2024-03-01 02:00:00"
 
 2024-05-01
 Update Kasku web crawler as the HTML layout got updated for scraping links.

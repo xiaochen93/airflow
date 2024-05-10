@@ -138,7 +138,7 @@ def getRedditPostItems(driver, url, label):
                 #'post_no_of_cmts': no_of_cmts,
                 'content': content,
                 'org_content': content,
-                'translated': 1,
+                'translated': 0,
                 'last_modified': today,
                 'cmt_url': cmt_url
             }

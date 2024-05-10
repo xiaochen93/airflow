@@ -161,25 +161,28 @@ def process_comments(start='',end=''):
 
     try:
         for dict in tqdm(lst_dicts, desc="\n-- DEBUG: Step 2 - get comments translated and processed accordingly", position=1, leave=True):
-            if dict['lang'] == 'CN':
-                temp_content = (requests.post(TRANS_API_CN, json={'data':[dict['cmt_org_content']]})).json()['translation'][0]
-            
-            elif dict['lang'] == 'BM':
-                temp_content = requests.post(TRANS_API_BM, json={'data':[dict['cmt_org_content']]}).json()['translation'][0]
+            try:
+                if dict['lang'] == 'CN':
+                    temp_content = (requests.post(TRANS_API_CN, json={'data':[dict['cmt_org_content']]})).json()['translation'][0]
+                
+                elif dict['lang'] == 'BM':
+                    temp_content = requests.post(TRANS_API_BM, json={'data':[dict['cmt_org_content']]}).json()['translation'][0]
 
-            elif dict['lang'] == 'BI':
-                temp_content = requests.post(TRANS_API_BI, json={'data':[dict['cmt_org_content']]}).json()['translation'][0]
-            
-            else:
-                temp_content = dict['cmt_org_content']
-           
+                elif dict['lang'] == 'BI':
+                    temp_content = requests.post(TRANS_API_BI, json={'data':[dict['cmt_org_content']]}).json()['translation'][0]
+                
+                else:
+                    temp_content = dict['cmt_org_content']
+            except Exception as e:
+                continue
             # POST-process org content
             dict['cmt_content'] = clean(temp_content.strip(), postprocess_text_patterns)
 
             out = requests.put(UPDATE_API, json={"table": "dsta_db.test_24hr_comments", "data": {"cmt_content": dict['cmt_content'], "last_modified": str(start), "translated": True}, "where" : f"id = {dict['id']}" })
             if out.status_code == 500:
-                print(out.text)
-                raise
+                print(f"\n-- Update Error - for comment {dict['id']}")
+                print("\n\n-- ",out.text)
+                pass
             else:
                 cmt_id = dict['id']
 
