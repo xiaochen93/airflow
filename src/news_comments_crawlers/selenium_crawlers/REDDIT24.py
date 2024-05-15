@@ -361,7 +361,7 @@ if __name__ == '__main__':
                         'cmt_content': comment['cmt_content'],
                         'cmt_org_content': comment['cmt_content'],
                         'cmt_published_datetime': comment['cmt_published_datetime'],
-                        'translated': 1,
+                        'translated': 0,
                         'lang': 'EN',
                         'source_id': 16
                 }
