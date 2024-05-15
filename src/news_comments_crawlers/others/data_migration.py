@@ -88,7 +88,7 @@ def migrate_data(limit=500):
             response = requests.post(INSERT_API,json={'table':'dsta_db.comments', 'data': each_comment})
             if response.status_code == 500:
                 print(response.text)
-                raise
+                pass
         # update the test record to deleted = 1 for both test and test_24hr_comments
            
         _ = requests.put(UPDATE_API, json={"table": "dsta_db.test_24hr_comments", "data": {"last_modified": CURRENT_DATE, "translated": True, "deleted": True}, "where" : f"cmt_article_id = {test_article_id}" })
