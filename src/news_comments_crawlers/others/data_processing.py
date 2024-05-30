@@ -62,6 +62,7 @@ emoji_patterns = [
 
 postprocess_text_patterns = postprocess_text_patterns + emoji_patterns
 
+# clean text based on provided pattern
 def clean(text,patterns=[]):
     text = re.sub('\s+', ' ', text) # remove additional padding spaces
 
@@ -70,12 +71,14 @@ def clean(text,patterns=[]):
     
     return (text.strip())
 
+# helper - given a time, fetch a start time by stating hours
 def getStartTimeStr(end="",hours=24):
     end = datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
     time_span = timedelta(hours=hours)
     start = end - time_span
     return start.strftime("%Y-%m-%d %H:%M:%S")
 
+# helper - fetch data from db into a list of records
 def getDataWithListOfDicts(data_api='', table='', start='', end='',):
     t1 = time.perf_counter()
     response = requests.get(data_api,params={'table':table, 'start':start, 'end':end, 'org': True})
@@ -92,6 +95,7 @@ def getDataWithListOfDicts(data_api='', table='', start='', end='',):
 
     return json_payload
 
+# translate and clean news articles
 def process_articles(start='',end=''):
     DATA_ART_API = 'http://10.2.56.213:8086/getNewsArticlesByTimeframe'
     lst_dicts = getDataWithListOfDicts(data_api=DATA_ART_API, table='dsta_db.test', start=start, end=end)
@@ -145,6 +149,7 @@ def process_articles(start='',end=''):
         print(f"\n\t--DEBUG: {dict['org_content']} ")
         raise
 
+# translate and clean comments
 def process_comments(start='',end=''):
     DATA_CMT_API = 'http://10.2.56.213:8086/getCommentsByTimeframe'
     lst_dicts = getDataWithListOfDicts(data_api=DATA_CMT_API, table='dsta_db.test_24hr_comments', start=start, end=end)
@@ -223,7 +228,9 @@ parser.add_argument(
 
 if __name__ == '__main__':
     args = parser.parse_args()
+
     begain_datetime = datetime.strptime(str(args.begain_datetime), "%Y-%m-%d %H:%M:%S")
+    
     end_datetime = datetime.strptime(str(args.end_datetime), "%Y-%m-%d %H:%M:%S")
 
     process_articles(start=begain_datetime, end=end_datetime)

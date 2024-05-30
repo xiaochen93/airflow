@@ -99,6 +99,7 @@ def migrate_data(limit=500):
 parser = argparse.ArgumentParser(description="Parameters to execute a web crawler")
 # default datetime
 CURRENT_DATETIME = datetime.today().strftime("%Y-%m-%d") + ' ' + datetime.today().strftime("%H:%M:%S")
+
 CURRENT_DATE = str(datetime.today().strftime("%Y-%m-%d"))
 
 parser.add_argument(

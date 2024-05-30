@@ -312,7 +312,7 @@ if __name__ == '__main__':
         #377 2-03
         #242 7-01
         #265 6-06
-        'starting_page_url': "https://www.kaskus.co.id/komunitas/250/berita-luar-negeri?tab=threads&page=265",
+        'starting_page_url': "https://www.kaskus.co.id/komunitas/250/berita-luar-negeri?tab=threads&page=138",
         'source_id': 19,
         'lang': 'BI',
         'links_threshold':200,
@@ -322,18 +322,18 @@ if __name__ == '__main__':
         'remote': remote,
         'noOfDays':noOfDays,
         'main_Xparam':{
-            'wait': 5,
+            'wait': 4,
             #'XP_CLOSE_ADS': "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]",
             'XP_CLOSE_ADS': ["//div[contains(@class,'button-common close-button')]//span", 
                             "//div[contains(@class, 'iz_osn_card_1')]//span[contains(@class, 'close')]", 
                             "//div[contains(@id, 'dismiss-button')]/div",
                             "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]"],
             # A list of post on the page
-            'XP_POST_LISTING': "//section//div[contains(@class, 'bg-grey-1 dark:bg-black')]//div[contains(@class,'flex w-full flex-col justify-between bg-white px-4 py-3 dark:bg-grey-7 mb-2') and not(.//span[contains(@class, 'inline-block align-middle')])]",
+            'XP_POST_LISTING': "//section//div[contains(@class, 'bg-grey-1 dark:bg-black')]//div[contains(@class,'flex w-full')]",
             'XP_POST_NEXT_BTN': "//div[contains(@class, 'flex items-center text-sm')]//i[contains(@class, 'fa-angle-right')]",
-            'XP_POST_URL': ".//descendant-or-self::div[contains(@class, 'mb-2 block flex-1 text-lg font-medium visited:text-tertiary dark:visited:text-tertiary-night')]/a[@title]",
-            'XP_POST_TITLE': ".//descendant-or-self::div[contains(@class, 'mb-2 block flex-1 text-lg font-medium visited:text-tertiary dark:visited:text-tertiary-night')]/a[@title]",
-            'XP_POST_DATETIME': ".//descendant-or-self::div[contains(@class, 'ml-1 text-tertiary dark:text-tertiary-night')]",
+            'XP_POST_URL': ".//descendant-or-self::div[contains(@class,'mb-2 block flex-1 text-lg font-medium')]/a[@title]",
+            'XP_POST_TITLE': ".//descendant-or-self::div[contains(@class,'mb-2 block flex-1 text-lg font-medium')]/a[@title]",
+            'XP_POST_DATETIME': ".//descendant-or-self::div[contains(@class,'mb-2 flex items-center justify-between text-xs')]//div[contains(@class, 'ml-1 text-tertiary dark:text-tertiary-night')]",
             #'XP_POST_CATE': ".//descendant-or-self::tr//th//div[contains(@class, 'fd_list_main')]//em",
             # The first post of the discussion
             'XP_POST_ART': "//section[contains(@class, 'mr-4 min-w-0 flex-auto')]//div[contains(@class, 'w-full bg-white dark:bg-grey-7 mb-2')]//div[contains(@class, 'relative mx-4 mt-4 break-words')]",

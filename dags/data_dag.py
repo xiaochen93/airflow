@@ -1,0 +1,78 @@
+#datetime
+from datetime import timedelta, datetime, date
+
+# The DAG object
+from airflow import DAG
+
+# Operators
+from airflow.operators.dummy_operator import DummyOperator
+
+from airflow.operators.python_operator import PythonOperator
+
+from airflow.operators.bash_operator import BashOperator
+
+import os
+
+import pytz
+
+# Get the Beijing time zone
+beijing_timezone = pytz.timezone('Asia/Shanghai')
+
+start_date = datetime.now(beijing_timezone)
+
+
+# Calculate tomorrow's date
+start_date = start_date + timedelta(days=1)
+
+# Create a new datetime object for tomorrow at 12 PM
+_start_date = datetime(
+    2023,
+    8,
+    1,
+    10,
+    0,
+    0,
+    tzinfo=beijing_timezone)
+
+timeout = timedelta(minutes=180)
+
+# initializing the default arguments
+default_args = {
+		'owner': 'xiaochen',
+		'start_date': _start_date,
+		'retries': 10,
+		'retry_delay': timedelta(minutes=5),
+        'retry_exceeded_task_duration': True,
+        'execution_timeout': timeout,
+        'dagrun_timeout ' : timeout
+}
+
+#initializing the dag object
+exe_web_crawlers_dag = DAG('DATA_Handling_dag',
+		default_args=default_args,
+		description='The dag object to execute: 1. data translation -> 2. data processing -> 3. data migration .',
+		schedule_interval= '0 13 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
+		catchup=False,
+		tags=['translation','cleaning','migration', '24hrs' 'temp -> avaliable']
+)
+
+CURRENT_DATETIME = datetime.today(beijing_timezone).strftime("%Y-%m-%d") + ' 23:59:59'
+PREVIOUS_DATETIME = (datetime.today(beijing_timezone) - timedelta(days=90)).strftime("%Y-%m-%d") + ' 00:00:00'
+
+task_1_script = f'python /opt/airflow/src/news_comments_crawlers/others/data_processing.py --begain_datetime="{PREVIOUS_DATETIME}" --end_datetime="{CURRENT_DATETIME}" '
+task_1 = BashOperator(
+    task_id = "id_1 - data processing & translation (within 90 days)",
+    bash_command = task_1_script,
+    execution_timeout=timeout,
+    dag = exe_web_crawlers_dag
+)
+
+task_2_script = f'python /opt/airflow/src/news_comments_crawlers/others/data_migration.py --limit=1000" '
+task_2 = BashOperator(
+    task_id = "id_2 - data migration & format consolidation",
+    bash_command = task_2_script,
+    execution_timeout=timeout,
+    dag = exe_web_crawlers_dag
+)
+
+task_1.set_downstream(task_2)

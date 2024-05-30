@@ -1,4 +1,7 @@
 # Major Update Airflow (excluding minor maintaince)
+2024-05-29
+Update the Kaskus_v2 crawler, trying to get data from 2022-06-01 to 2022-12-31
+
 2024-05-14
 Update the data processing tools for data migration.
 
