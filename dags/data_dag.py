@@ -18,7 +18,7 @@ import pytz
 # Get the Beijing time zone
 beijing_timezone = pytz.timezone('Asia/Shanghai')
 
-start_date = datetime.now(beijing_timezone)
+start_date = datetime.now(beijing_timezone).date()
 
 
 # Calculate tomorrow's date
@@ -56,8 +56,8 @@ exe_web_crawlers_dag = DAG('DATA_Handling_dag',
 		tags=['translation','cleaning','migration', '24hrs' 'temp -> avaliable']
 )
 
-CURRENT_DATETIME = datetime.today(beijing_timezone).strftime("%Y-%m-%d") + ' 23:59:59'
-PREVIOUS_DATETIME = (datetime.today(beijing_timezone) - timedelta(days=90)).strftime("%Y-%m-%d") + ' 00:00:00'
+CURRENT_DATETIME = datetime.now(beijing_timezone).date().strftime("%Y-%m-%d") + ' 23:59:59'
+PREVIOUS_DATETIME = (datetime.now(beijing_timezone).date() - timedelta(days=90)).strftime("%Y-%m-%d") + ' 00:00:00'
 
 task_1_script = f'python /opt/airflow/src/news_comments_crawlers/others/data_processing.py --begain_datetime="{PREVIOUS_DATETIME}" --end_datetime="{CURRENT_DATETIME}" '
 task_1 = BashOperator(
