@@ -61,7 +61,7 @@ PREVIOUS_DATETIME = (datetime.now(beijing_timezone).date() - timedelta(days=90))
 
 task_1_script = f'python /opt/airflow/src/news_comments_crawlers/others/data_processing.py --begain_datetime="{PREVIOUS_DATETIME}" --end_datetime="{CURRENT_DATETIME}" '
 task_1 = BashOperator(
-    task_id = "id_1 - data processing & translation (within 90 days)",
+    task_id = "id_1_translation_cleaning",
     bash_command = task_1_script,
     execution_timeout=timeout,
     dag = exe_web_crawlers_dag
@@ -69,7 +69,7 @@ task_1 = BashOperator(
 
 task_2_script = f'python /opt/airflow/src/news_comments_crawlers/others/data_migration.py --limit=1000" '
 task_2 = BashOperator(
-    task_id = "id_2 - data migration & format consolidation",
+    task_id = "id_2_data_migration",
     bash_command = task_2_script,
     execution_timeout=timeout,
     dag = exe_web_crawlers_dag
