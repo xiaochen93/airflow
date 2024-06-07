@@ -20,7 +20,6 @@ beijing_timezone = pytz.timezone('Asia/Shanghai')
 
 start_date = datetime.now(beijing_timezone).date()
 
-
 # Calculate tomorrow's date
 start_date = start_date + timedelta(days=1)
 
