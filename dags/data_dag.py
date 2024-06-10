@@ -50,7 +50,7 @@ default_args = {
 exe_web_crawlers_dag = DAG('DATA_Handling_dag',
 		default_args=default_args,
 		description='The dag object to execute: 1. data translation -> 2. data processing -> 3. data migration .',
-		schedule_interval= '0 13 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
+		schedule_interval= '0 16 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
 		catchup=False,
 		tags=['translation','cleaning','migration', '24hrs' 'temp -> avaliable']
 )
