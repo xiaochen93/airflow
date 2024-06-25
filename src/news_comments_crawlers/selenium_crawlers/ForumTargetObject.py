@@ -142,9 +142,11 @@ class ForumWebCrawler:
 
         
         # delete the post item with empty content
-        for del_idx in del_idxes:
-            self.links.pop(del_idx)
-    
+        try:
+            for del_idx in del_idxes:
+                self.links.pop(del_idx)
+        except:
+            print(f"\n-- DEBUG: To be deleted with empty content .{del_idxes}")
 
 
     '''

@@ -112,6 +112,6 @@ parser.add_argument(
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    limit = args.limit
+    limit = int(args.limit)
     #end_datetime = datetime.strptime(str(args.end_datetime), "%Y-%m-%d %H:%M:%S")
     migrate_data(limit=limit)

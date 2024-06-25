@@ -66,7 +66,7 @@ task_1 = BashOperator(
     dag = exe_web_crawlers_dag
 )
 
-task_2_script = f'python /opt/airflow/src/news_comments_crawlers/others/data_migration.py --limit=1000 '
+task_2_script = f'python /opt/airflow/src/news_comments_crawlers/others/data_migration.py --limit=1000'
 task_2 = BashOperator(
     task_id = "id_2_data_migration",
     bash_command = task_2_script,

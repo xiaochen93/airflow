@@ -120,7 +120,8 @@ class Kaskus_Crawler(ForumWebCrawler):
             comments_this_post = remove_duplicated_comments_by_ids(cmt_ids=cmt_ids, comments_this_post=comments_this_post)
             print(f'\n\t-- DEBUG: {len(comments_this_post)} no. of new comments will be added to post {post_id}')
             self.insert_to_db(comments_this_post, label="comments")
-
+            
+            time.sleep(2)
     def _test_scrape_cmt_workflow(self, cmt_url, driver, Xparam, post_id):
         all_cmt_items = []
         try:
@@ -134,7 +135,7 @@ class Kaskus_Crawler(ForumWebCrawler):
             wait = WebDriverWait(driver, Xparam['wait'])
             page_loaded = wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
             print(f"\n-- DEBUG: Page loaded successfully! Searching comments for {post_id}",end='\r')
-
+            time.sleep(Xparam['wait'])
             cmt_items = getPostListings(driver, Xparam['XP_CMT_LISTING'])
             print(f'\n\t-- DEBUG: Total {len(cmt_items)} no. of elements on the table .')
             
@@ -169,6 +170,7 @@ class Kaskus_Crawler(ForumWebCrawler):
         try:
             cmt_id = (item.find_element("xpath", Xparam['XP_CMT_ID'])).get_attribute('href') #1. cmt id
             cmt_id = cmt_id.replace("https://www.kaskus.co.id/show_post/","")
+            
         except Exception as e:
             if cmt_reply_to !="":
                 cmt_id = cmt_reply_to + " -> " + str(indent)
@@ -241,6 +243,8 @@ class Kaskus_Crawler(ForumWebCrawler):
                 "cmt_user" : cmt_user
             }
         
+        #print(out)
+        #print()
         if len(cmt_children) == 0:
             return out
         
@@ -282,18 +286,18 @@ if __name__ == '__main__':
                             "//div[contains(@id, 'dismiss-button')]/div",
                             "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]"],
             # A list of post on the page
-            'XP_POST_LISTING': "//section//div[contains(@class, 'bg-grey-1 dark:bg-black')]//div[contains(@class,'flex w-full')]",
+            'XP_POST_LISTING': "//section//div[contains(@class, 'flex w-full flex-col justify-between bg-surface-primary px-4 py-3 dark:bg-surface-primary-night border-b md:border border-solid border-border dark:border-border-night md:rounded hover:bg-surface-secondary dark:hover:bg-surface-secondary-night group mb-2')]",
             'XP_POST_NEXT_BTN': "//div[contains(@class, 'flex items-center text-sm')]//i[contains(@class, 'fa-angle-right')]",
             'XP_POST_URL': ".//descendant-or-self::div[contains(@class,'mb-2 block flex-1 text-lg font-medium')]/a[@title]",
             'XP_POST_TITLE': ".//descendant-or-self::div[contains(@class,'mb-2 block flex-1 text-lg font-medium')]/a[@title]",
             'XP_POST_DATETIME': ".//descendant-or-self::div[contains(@class,'mb-2 flex items-center justify-between text-xs')]//div[contains(@class, 'ml-1 text-tertiary dark:text-tertiary-night')]",
             #'XP_POST_CATE': ".//descendant-or-self::tr//th//div[contains(@class, 'fd_list_main')]//em",
             # The first post of the discussion
-            'XP_POST_ART': "//section[contains(@class, 'mr-4 min-w-0 flex-auto')]//div[contains(@class, 'w-full bg-white dark:bg-grey-7 mb-2')]//div[contains(@class, 'relative mx-4 mt-4 break-words')]",
+            'XP_POST_ART': "//section//div[contains(@class, 'w-full bg-surface-primary dark:bg-surface-primary-night mb-2')]//div[contains(@class, 'relative mx-4 mt-4 break-words')]",
             'POST_DATETIME_FMT': "%d-%m-%Y %H:%M"
         },
         'cmt_Xparam' :{
-            'wait': 5,
+            'wait': 6,
             'XP_CLOSE_ADS': ["//div[contains(@class,'button-common close-button')]//span", 
                             "//div[contains(@class, 'iz_osn_card_1')]//span[contains(@class, 'close')]", 
                             "//div[contains(@id, 'dismiss-button')]/div",
@@ -301,14 +305,22 @@ if __name__ == '__main__':
                              "//strong[contains(@class, 'mr-4') and contains(text(), 'Lihat')]/following-sibling::i"
                             ],
             'XP_CMT_THREAD': "//strong[contains(@class, 'mr-4') and contains(text(), 'Lihat')]/following-sibling::i",
-            'XP_CMT_LISTING': "//section[@class= 'mr-4 min-w-0 flex-auto']/div[@class='relative']//div[@class='w-full bg-white dark:bg-grey-7 mb-1' or @class='w-full bg-white dark:bg-grey-7 mb-2']",
-            'XP_CMT_CHILDREN':".//descendant::div[@class='flex w-full flex-wrap border-t border-grey-1 pl-6 dark:border-grey-6']",
-            'XP_CMT_ID': ".//descendant-or-self::div[contains(@class, 'relative flex w-full justify-between px-4 py-2') or contains(@class, 'relative mb-2 flex items-center justify-between text-xs')]//div[@class='flex items-center']//a",
-            'XP_CMT_DATETIME':  ".//descendant-or-self::div[@class='flex items-center gap-2']//time",
+            # update: 2024 - 06 - 25 new listing format
+            # checked
+            'XP_CMT_LISTING': "//section//div[contains(@class,'relative')]//div[contains(@class, 'w-full md:rounded bg-surface-primary dark:bg-surface-primary-night border-b md:border border-border border-solid dark:border-border-night  mb-1')]",
+            # checked descendant + self
+            'XP_CMT_CHILDREN':".//descendant::div[contains(@class, 'w-full')]//div[contains(@class, 'flex w-full flex-wrap border-t border-grey-1 pl-6 dark:border-grey-6')]",
+            #checked
+            'XP_CMT_ID': ".//descendant-or-self::div[contains(@class, 'relative flex w-full justify-between px-4 py-2')]//div[contains(@class, 'flex items-center')]/a",
+            #checked
+            'XP_CMT_DATETIME':  ".//descendant-or-self::div[contains(@class, 'relative flex w-full justify-between px-4 py-2')]//time",
+            #checked
             'XP_CMT_CONTENT': ".//descendant-or-self::div[contains(@class, 'htmlContentRenderer_html-content___EjM3 w-full')] | .//descendant-or-self::div[@class='relative mx-4 mt-4 break-words' or @class='w-full px-4' or @class='w-full']//div[contains(@class, 'htmlContentRenderer_html-content_')]",
             'XP_CMT_REPLY_TO': ".//descendant-or-self::div[@class='w-full bg-grey-0 dark:bg-grey-8']",
-            'XP_CMT_USER' :".//descendant-or-self::div[@class='flex items-center gap-2']//div[contains(@class, 'htmlContentRenderer')]",
+            #checked
+            'XP_CMT_USER' :".//descendant-or-self::div[@class='relative flex w-full justify-between px-4 py-2']//div[contains(@class, 'htmlContentRenderer_html-content__ePjqJ font-medium text-secondary dark:text-secondary-night')]",
             'XP_CMT_NEXT' : "(//div[contains(@class, 'flex items-center text-sm')]//i[contains(@class, 'fa-angle-right')])[2]",
+            # deleted
             'XP_CMT_CONTENT_DEL': ".//descendant-or-self::div[@class='quote expandable']",
             'XP_CMT_LIKES': "//div[@class='text-xs text-secondary dark:text-secondary-night']",
             'CMT_DATETIME_FMT': ""
@@ -321,9 +333,13 @@ if __name__ == '__main__':
 
     print(f'\n\t-- DEBUG: datetime beginning from {last24hours}  datetime end at {now}')
 
-    Kaskus.scrape_post(Kaskus_object['main_Xparam'], collect_item_fn=_collect_item_fn, collect_article_map=_collect_content_fn)
+    #Kaskus.scrape_post(Kaskus_object['main_Xparam'], collect_item_fn=_collect_item_fn, collect_article_map=_collect_content_fn)
 
     print("\n-- *************************************************************** DEBUG: End of collecting post link and content ***************************************************************")
+
+    #test_url_2 = "https://www.kaskus.co.id/thread/667a1c9f54bd9e79b806cfeb/menkominfo-pemerintah-tidak-akan-bayar-permintaan-tebusan-8-juta-dollar-peretas-pdn?ref=threadlist-10&med=thread_list"
+    
+    #Kaskus._test_scrape_cmt_workflow(test_url_2, Kaskus.driver, Kaskus_object["cmt_Xparam"], "sample")
 
     Kaskus.scrape_comments()
 
