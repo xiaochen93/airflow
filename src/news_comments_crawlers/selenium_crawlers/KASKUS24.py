@@ -108,11 +108,13 @@ class Kaskus_Crawler(ForumWebCrawler):
             url, post_id = post_item['URL'].split('|')[-1], post_item['article_id']
             comments_this_post = self._test_scrape_cmt_workflow(url,self.driver, self.object['cmt_Xparam'], post_id)
             #comments_this_post = [each for each in comments_this_post if self.begin_dt <= each['cmt_published_datetime']] #check for 24 hours
-
+            print(url)
             #2024-03-14: change the sequence for updating post(s)
             print(f'\n\t-- DEBUG: Total scrape {len(comments_this_post)} comments for the post')
             comments_this_post = [self._test_cmt_item_processing(item, post_id=post_id) for item in comments_this_post]
-            
+            for each in comments_this_post:
+                print("\n-- DEBUG: * ", each)
+
             cmt_ids = getCommentIDsByArticleID(art_id=post_id, table='dsta_db.test_24hr_comments')
             cmt_ids = set([str(list(each.values())[0]) for each in cmt_ids])
             #print(cmt_ids)
@@ -135,7 +137,10 @@ class Kaskus_Crawler(ForumWebCrawler):
             wait = WebDriverWait(driver, Xparam['wait'])
             page_loaded = wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
             print(f"\n-- DEBUG: Page loaded successfully! Searching comments for {post_id}",end='\r')
+
+            # 2024-06-25 add a timer to wait
             time.sleep(Xparam['wait'])
+
             cmt_items = getPostListings(driver, Xparam['XP_CMT_LISTING'])
             print(f'\n\t-- DEBUG: Total {len(cmt_items)} no. of elements on the table .')
             
@@ -315,7 +320,7 @@ if __name__ == '__main__':
             #checked
             'XP_CMT_DATETIME':  ".//descendant-or-self::div[contains(@class, 'relative flex w-full justify-between px-4 py-2')]//time",
             #checked
-            'XP_CMT_CONTENT': ".//descendant-or-self::div[contains(@class, 'htmlContentRenderer_html-content___EjM3 w-full')] | .//descendant-or-self::div[@class='relative mx-4 mt-4 break-words' or @class='w-full px-4' or @class='w-full']//div[contains(@class, 'htmlContentRenderer_html-content_')]",
+            'XP_CMT_CONTENT': ".//descendant-or-self::div[contains(@class, 'htmlContentRenderer_html-content__ePjqJ w-full break-words py-2 text-secondary dark:text-secondary-night') or contains(@class, 'htmlContentRenderer_html-content__ePjqJ w-full break-words px-4 py-1 text-secondary dark:text-secondary-night')]",
             'XP_CMT_REPLY_TO': ".//descendant-or-self::div[@class='w-full bg-grey-0 dark:bg-grey-8']",
             #checked
             'XP_CMT_USER' :".//descendant-or-self::div[@class='relative flex w-full justify-between px-4 py-2']//div[contains(@class, 'htmlContentRenderer_html-content__ePjqJ font-medium text-secondary dark:text-secondary-night')]",
@@ -333,7 +338,7 @@ if __name__ == '__main__':
 
     print(f'\n\t-- DEBUG: datetime beginning from {last24hours}  datetime end at {now}')
 
-    #Kaskus.scrape_post(Kaskus_object['main_Xparam'], collect_item_fn=_collect_item_fn, collect_article_map=_collect_content_fn)
+    Kaskus.scrape_post(Kaskus_object['main_Xparam'], collect_item_fn=_collect_item_fn, collect_article_map=_collect_content_fn)
 
     print("\n-- *************************************************************** DEBUG: End of collecting post link and content ***************************************************************")
 
