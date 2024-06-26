@@ -17,7 +17,7 @@ import json
 import argparse
 import pickle
 from datetime import datetime, timedelta
-
+from newspaper import Article
 # 2023-05-07 update parameters for zaobao web crawler
 
 NOW = datetime.today().now()
@@ -122,7 +122,7 @@ def _parse_datetime(relative_time_str):
         _dt = datetime.now() - delta
     else:
         # datetime string is 04/05/2023
-        _dt = pd.to_datetime(relative_time_str, format='%d/%m/%Y')
+        _dt = pd.to_datetime(relative_time_str, format='%Y%m%d')
 
     return _dt 
 
@@ -131,7 +131,7 @@ def gather_urls(save_to_cache = False):
     article_list, STOP, COUNTER = [], 25, 0
 
     for URL in URLS:
-
+        print(f"\n-- DEBUG: This is URL {URL}")
         init_URL = URL
 
         # Search the conceivable news articles on each sub page
@@ -139,27 +139,29 @@ def gather_urls(save_to_cache = False):
             soup = BeautifulSoup(s.get(URL).text, "html.parser")
 
             # STEP: find the css path that a news post is wrapped
-            WEB_CARD_ELEMENTS= soup.select('div[class="col-12 col-lg-4"]')
+            WEB_CARD_ELEMENTS= soup.select('div[class*="card vertical-article-card on-listing-pages"]')
 
-            print(f'\n--DEBUG: No.of web card elements {len(WEB_CARD_ELEMENTS)}')
+            print(f'\n-- DEBUG: No.of web card elements {len(WEB_CARD_ELEMENTS)}')
 
             for CARD_ELEMENT in WEB_CARD_ELEMENTS[:-1]:
-                #print(CARD_ELEMENT)
+
                 try:
                     # STEP: find the css path that contain the news link
-                    link = CARD_ELEMENT.select('div[class*="article-type-content"] > a[class="article-type-link"]')[0]
+                    link = CARD_ELEMENT.select('a[class*="cursor-pointer touch-auto relative block aspect"]')[0]
                     link = DEFAULT_WEBSITE + str(link['href'])[1:]
-                    #print('\n--DEBUG: Link - ',link)
+                    #print('\n\t-- DEBUG: Link - ',link)
                 except Exception as e:
-                    print(f'\n\t--DEBUG: URL - {URL}')
-                    print(f'\n\t--DEBUG: No valid link is scraped, break. {e}')
+                    print(f'\n\t-- DEBUG: URL - {URL}')
+                    print(f'\n\t-- DEBUG: No valid link is scraped, break. {e}')
                     break
 
                 try:
                     #STEP 3: find the css path that contain the datetime object
-                    link_datetime = CARD_ELEMENT.select('div[class*="article-type-meta"] > span')[0].get_text()
+                    #link_datetime = CARD_ELEMENT.select('div[class*="w-full pt-[16px] !pt-[0px] lg:!pt-[16px]"] > div')[0].get_text()
+                    link_datetime = link.split('story')[-1].split('-')[0]
                     link_datetime = _parse_datetime(link_datetime)
-                    #print(f'\n\tDEBUG: datetime - {link_datetime}')
+                    print(f'\n\t-- DEBUG: datetime - {link_datetime}')
+
                 except Exception as e:
                     print(f'\n\t--DEBUG: No datetime is presented.  {e}')
                     break
@@ -208,7 +210,7 @@ def main():
     link_list = c_scrape_links(USE_CACHE, LINK_FILEPATH, gather_urls)
 
     articles = c_scrape_articles(USE_CACHE, DATA_JSON_FILEPATH, {'data':link_list, 'param':css_paths, 'func':getNewsByCSS})
-
+    
     articles_df = Preprocessor({'data':articles,'lang':LANG,'org':1,'source': S_ID}).prepare(func=_extract_datetime)
 
     #save the raw json file
