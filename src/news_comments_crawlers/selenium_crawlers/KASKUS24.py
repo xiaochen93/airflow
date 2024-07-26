@@ -274,23 +274,15 @@ if __name__ == '__main__':
     test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"
 
     Kaskus_object = {
-        #285 5-15
-        #325 5-01
-        #377 2-03
-        #242 7-01
-        #265 6-06
-        # 
-        # "https://www.kaskus.co.id/komunitas/250/berita-luar-negeri?tab=threads&page=138"
-        
-        'starting_page_url': "https://www.kaskus.co.id/komunitas/10/Berita%20dan%20Politik?tab=threads&page=17",
+        'starting_page_url': "https://www.kaskus.co.id/komunitas/10/berita-dan-politik",
         'source_id': 19,
         'lang': 'BI',
-        'links_threshold':120,
-        'begin_datetime': begain_datetime,
-        'end_datetime': end_datetime,
+        'links_threshold':20,
+        'begin_datetime': last24hours,
+        'end_datetime': now,
         'headless':headless,
         'remote': remote,
-        'noOfDays':noOfDays,
+        'noOfDays':4,
         'main_Xparam':{
             'wait': 4,
             #'XP_CLOSE_ADS': "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]",
@@ -362,7 +354,7 @@ if __name__ == '__main__':
             'CMT_DATETIME_FMT': ""
         }
     }
-    
+
     start_time = time.perf_counter()
     
     Kaskus = Kaskus_Crawler(Kaskus_object)
