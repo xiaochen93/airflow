@@ -21,6 +21,8 @@ DROP_VIEW_NO_OF_NEWS_DATE = '''DROP VIEW IF EXISTS NO_OF_NEWS_DATE;'''
 CREATE_VIEW_NO_OF_NEWS_DATE = '''CREATE VIEW NO_OF_NEWS_DATE as (SELECT DATE(published_datetime) as "date", count(article_id) FROM news WHERE DATE(published_datetime) >= '2022-01-01' GROUP BY DATE(published_datetime));''' 
 
 # drop/create the no. of comments
+DROP_VIEW_NO_OF_COMMENTS_DATE = '''DROP VIEW IF EXISTS NO_OF_COMMENTS_DATE;'''
+CREATE_VIEW_NO_OF_COMMENTS_DATE = '''CREATE VIEW NO_OF_COMMENTS_DATE as (SELECT DATE(cmt_published_datetime) as "date", count(id) FROM comments WHERE DATE(cmt_published_datetime) >= '2022-01-01' GROUP BY DATE(cmt_published_datetime));''' 
 
 def execute_sql_query_task(query="", task_name=""):
     t1 = time.perf_counter()
@@ -43,6 +45,12 @@ if __name__ == '__main__':
     # 1. drop/create the statistics view
     execute_sql_query_task(query=DROP_VIEW_DATA_OVERVIEW, task_name="DROP VIEW DATA_OVERVIEW")
     execute_sql_query_task(query=CREATE_VIEW_DATA_OVERVIEW, task_name="CREATE VIEW DATA_OVERVIEW")
-    # 2. drop/create the no. of records view
+    
+    # 2. drop/create the no. of news view
     execute_sql_query_task(query=DROP_VIEW_NO_OF_NEWS_DATE, task_name="DROP VIEW NO. OF NEWS ARTICLES TIMELINE")
     execute_sql_query_task(query=CREATE_VIEW_NO_OF_NEWS_DATE, task_name="CREATE VIEW NO. OF NEWS ARTICLES TIMELINE")
+    
+    # 3. drop/create the no. of comments view
+    execute_sql_query_task(query=DROP_VIEW_NO_OF_COMMENTS_DATE, task_name="DROP VIEW NO. OF COMMENTS TIMELINE")
+    execute_sql_query_task(query=CREATE_VIEW_NO_OF_COMMENTS_DATE, task_name="CREATE VIEW NO. OF COMMENTS TIMELINE")
+    

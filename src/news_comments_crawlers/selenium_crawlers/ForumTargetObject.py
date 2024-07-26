@@ -97,12 +97,9 @@ class ForumWebCrawler:
             except Exception as e:
                 print('\nDEBUG: An error occur has occured .')
                 time.sleep(Xparam['wait']) #give program a pause to reset
-            
+           
             time.sleep(1)
             self.bypass_ads(Xparam['XP_CLOSE_ADS'])
-
-
-            
 
     '''
     private function, scrape the inital post/article for that post from a given discussion (post) URL.
@@ -119,25 +116,29 @@ class ForumWebCrawler:
         del_idxes = []
         for idx, item in enumerate(self.links):
             # get the original article_content
-            org_content = collect_article(driver=self.driver, xpath_content=Xparam['XP_POST_ART'], url=item['url'])
-            time.sleep(Xparam['wait'])
-            if (org_content == '' or len(org_content) < 20 or org_content is None):
-                del_idxes.append(idx)
-                continue
-            item['org_content'] = org_content
-            if "cmt_url" in item.keys():
-                item['url'] = item['url'] + '|' + item['cmt_url']
-                del item['cmt_url']
-            if "published_datetime" in item.keys() and item['published_datetime'] != '':
-                item['published_datetime'] = (item['published_datetime'].strftime("%Y-%m-%d %H:%M:%S"))
-            else:
-                item['published_datetime'] = str(item['published_datetime'])
-            
-            item['translated'] = self.translated
-            item['lang'] = self.lang
-            item['source_id'] = self.source_id
+            try:
+                org_content = collect_article(driver=self.driver, xpath_content=Xparam['XP_POST_ART'], url=item['url'])
+                time.sleep(Xparam['wait'])
+                if (org_content == '' or len(org_content) < 20 or org_content is None):
+                    del_idxes.append(idx)
+                    continue
+                item['org_content'] = org_content
+                if "cmt_url" in item.keys():
+                    item['url'] = item['url'] + '|' + item['cmt_url']
+                    del item['cmt_url']
+                if "published_datetime" in item.keys() and item['published_datetime'] != '':
+                    item['published_datetime'] = (item['published_datetime'].strftime("%Y-%m-%d %H:%M:%S"))
+                else:
+                    item['published_datetime'] = str(item['published_datetime'])
+                
+                item['translated'] = self.translated
+                item['lang'] = self.lang
+                item['source_id'] = self.source_id
 
-            self.links[idx] = item
+                self.links[idx] = item
+
+            except Exception as e:
+                print("\n\t-- DEBUG: Error with scrapping post, skip this one")
             
 
         

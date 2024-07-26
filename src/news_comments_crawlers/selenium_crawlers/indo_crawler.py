@@ -41,6 +41,8 @@ def _collect_item_fn(post, Xparam):
     try:
         post_datetime = getWebElementText(post, Xparam['XP_POST_DATETIME'])
 
+        print(post_datetime)
+
         if "Hari ini" in post_datetime:
             today_date = datetime.now().date().strftime("%d-%m-%Y")
             today_date = str(today_date)
@@ -58,13 +60,17 @@ def _collect_item_fn(post, Xparam):
 
     except Exception as e:
         post_datetime = ''
-        
-    return {
+
+    item =    {
         'category': "",
         'url': post_url,
         'org_title': post_title,
         'published_datetime':post_datetime,
     }
+    
+    print(f"\n\t\t-- DEBUG: post item {item}")
+
+    return item
 
 # customized function for collecting news articles
 def _collect_content_fn(driver=None, xpath_content='', url=''):
@@ -168,6 +174,9 @@ class Kaskus_Crawler(ForumWebCrawler):
             cmt_items = getPostListings(driver, Xparam['XP_CMT_LISTING'])
             print(f'\n\t-- DEBUG: Total {len(cmt_items)} no. of elements on the table .')
             
+            # 2024-06-25 add a timer to wait
+            time.sleep(Xparam['wait'])
+
             clickOne(driver, Xparam['XP_CMT_THREAD'])
 
             #3. loop and get each post item from the table
@@ -188,10 +197,10 @@ class Kaskus_Crawler(ForumWebCrawler):
                     print(current_url, driver.url)
                     raise
             except Exception as e:
-                print('\n-- DEBUG: An error occur has occured clicking next page or no more next page.')
+                print('\n\t-- DEBUG: An error occur has occured clicking next page or no more next page.')
                 SEARCHING = False
                 break
-        time.sleep(Xparam['wait'])
+        
         return all_cmt_items
 
     def _test_scrape_cmt_items(self, item, indent=0, cmt_reply_to='', Xparam={}):
@@ -268,6 +277,8 @@ class Kaskus_Crawler(ForumWebCrawler):
                 "cmt_user" : cmt_user
             }
         
+        print(f"\n\t\t -- DEBUG: comment item {out}")
+
         if len(cmt_children) == 0:
             return out
         else:
@@ -312,10 +323,13 @@ if __name__ == '__main__':
         #377 2-03
         #242 7-01
         #265 6-06
-        'starting_page_url': "https://www.kaskus.co.id/komunitas/250/berita-luar-negeri?tab=threads&page=138",
+        # 
+        # "https://www.kaskus.co.id/komunitas/250/berita-luar-negeri?tab=threads&page=138"
+        
+        'starting_page_url': "https://www.kaskus.co.id/komunitas/10/Berita%20dan%20Politik?tab=threads&page=17",
         'source_id': 19,
         'lang': 'BI',
-        'links_threshold':200,
+        'links_threshold':120,
         'begin_datetime': begain_datetime,
         'end_datetime': end_datetime,
         'headless':headless,
@@ -329,18 +343,28 @@ if __name__ == '__main__':
                             "//div[contains(@id, 'dismiss-button')]/div",
                             "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]"],
             # A list of post on the page
-            'XP_POST_LISTING': "//section//div[contains(@class, 'bg-grey-1 dark:bg-black')]//div[contains(@class,'flex w-full')]",
+            # 2024-07-17 updated post listing -> 20 elements
+            'XP_POST_LISTING': "//section//div[@class='bg-surface-primary']//div[contains(@class, 'flex w-full flex-col')]",
+
+            # 2024-07-17 checked with no change
             'XP_POST_NEXT_BTN': "//div[contains(@class, 'flex items-center text-sm')]//i[contains(@class, 'fa-angle-right')]",
+
+            # 2024-07-17 checked with no change
             'XP_POST_URL': ".//descendant-or-self::div[contains(@class,'mb-2 block flex-1 text-lg font-medium')]/a[@title]",
+
+            # 2024-07-17 checked with no change
             'XP_POST_TITLE': ".//descendant-or-self::div[contains(@class,'mb-2 block flex-1 text-lg font-medium')]/a[@title]",
-            'XP_POST_DATETIME': ".//descendant-or-self::div[contains(@class,'mb-2 flex items-center justify-between text-xs')]//div[contains(@class, 'ml-1 text-tertiary dark:text-tertiary-night')]",
+
+            # 2024-07-17 update datetime attribute tag
+            'XP_POST_DATETIME': ".//descendant-or-self::div[contains(@class, 'ml-1 text-tertiary')]",
+
             #'XP_POST_CATE': ".//descendant-or-self::tr//th//div[contains(@class, 'fd_list_main')]//em",
             # The first post of the discussion
-            'XP_POST_ART': "//section[contains(@class, 'mr-4 min-w-0 flex-auto')]//div[contains(@class, 'w-full bg-white dark:bg-grey-7 mb-2')]//div[contains(@class, 'relative mx-4 mt-4 break-words')]",
+            'XP_POST_ART': "//div[contains(@class, 'relative mx-4 mt-4 break-words')]",
             'POST_DATETIME_FMT': "%d-%m-%Y %H:%M"
         },
         'cmt_Xparam' :{
-            'wait': 5,
+            'wait': 8,
             'XP_CLOSE_ADS': ["//div[contains(@class,'button-common close-button')]//span", 
                             "//div[contains(@class, 'iz_osn_card_1')]//span[contains(@class, 'close')]", 
                             "//div[contains(@id, 'dismiss-button')]/div",
@@ -348,16 +372,37 @@ if __name__ == '__main__':
                              "//strong[contains(@class, 'mr-4') and contains(text(), 'Lihat')]/following-sibling::i"
                             ],
             'XP_CMT_THREAD': "//strong[contains(@class, 'mr-4') and contains(text(), 'Lihat')]/following-sibling::i",
-            'XP_CMT_LISTING': "//section[@class= 'mr-4 min-w-0 flex-auto']/div[@class='relative']//div[@class='w-full bg-white dark:bg-grey-7 mb-1' or @class='w-full bg-white dark:bg-grey-7 mb-2']",
-            'XP_CMT_CHILDREN':".//descendant::div[@class='flex w-full flex-wrap border-t border-grey-1 pl-6 dark:border-grey-6']",
-            'XP_CMT_ID': ".//descendant-or-self::div[contains(@class, 'relative flex w-full justify-between px-4 py-2') or contains(@class, 'relative mb-2 flex items-center justify-between text-xs')]//div[@class='flex items-center']//a",
-            'XP_CMT_DATETIME':  ".//descendant-or-self::div[@class='flex items-center gap-2']//time",
-            'XP_CMT_CONTENT': ".//descendant-or-self::div[contains(@class, 'htmlContentRenderer_html-content___EjM3 w-full')] | .//descendant-or-self::div[@class='relative mx-4 mt-4 break-words' or @class='w-full px-4' or @class='w-full']//div[contains(@class, 'htmlContentRenderer_html-content_')]",
+
+            # 2024-07-26 update xpath for comments listing, excluding the main post, this is a list containing n comments.
+            'XP_CMT_LISTING': "//section//div[contains(@class,'relative')]//div[contains(@class, 'w-full md:rounded bg-surface-primary')]",
+            
+            # 2024-07-26 update xpath for comment children listing, this is a [...] containing n children comments.
+            'XP_CMT_CHILDREN':".//descendant::div[contains(@class, 'w-full')]//div[contains(@class, 'flex w-full flex-wrap border-t')]",
+            
+            # 2024-07-26 update xpath for comment id, this is a single string item.
+            'XP_CMT_ID': ".//descendant-or-self::div[contains(@class, 'relative flex w-full justify-between px-4 py-2')]//div[contains(@class, 'flex items-center')]/a",
+            
+            # 2024-07-26 update xpath for datetime, this is a datetime item.
+            'XP_CMT_DATETIME':  ".//descendant-or-self::div[contains(@class, 'relative flex w-full justify-between px-4 py-2')]//time",
+            
+            # 2024-07-26 update xpath for comment item, this is a single string that write out the comment.
+            'XP_CMT_CONTENT': ".//descendant-or-self::div[contains(@class, 'htmlContentRenderer_html-content__ePjqJ w-full break-words py-2 text-secondary') or contains(@class, 'htmlContentRenderer_html-content__ePjqJ w-full break-words px-4 py-1')]",
+            
+            # No use
             'XP_CMT_REPLY_TO': ".//descendant-or-self::div[@class='w-full bg-grey-0 dark:bg-grey-8']",
-            'XP_CMT_USER' :".//descendant-or-self::div[@class='flex items-center gap-2']//div[contains(@class, 'htmlContentRenderer')]",
+            
+            # 2024-07-26 update xpath for comment user, this is a single string that write out the user name.
+            'XP_CMT_USER' :".//descendant-or-self::div[@class='relative flex w-full justify-between px-4 py-2']//div[contains(@class, 'htmlContentRenderer_html-content__ePjqJ font-medium text-secondary')]",
+            
+            # 2024-07-26 update xpath for next button, this is a clickable link 
             'XP_CMT_NEXT' : "(//div[contains(@class, 'flex items-center text-sm')]//i[contains(@class, 'fa-angle-right')])[2]",
+            
+            # 2024-07-26 update xpath for grey text that should be removed from the main content
             'XP_CMT_CONTENT_DEL': ".//descendant-or-self::div[@class='quote expandable']",
-            'XP_CMT_LIKES': "//div[@class='text-xs text-secondary dark:text-secondary-night']",
+            
+            # 2024-07-26 update xpath for likes, this is a string that write off no. of likes / scores equivalent.
+            'XP_CMT_LIKES': "//div[@class='text-xs text-secondary']",
+            
             'CMT_DATETIME_FMT': ""
         }
     }
@@ -377,7 +422,7 @@ if __name__ == '__main__':
     # 2024-03-12: test url
     #test_url_1 = "https://www.kaskus.co.id/thread/6273c5c08bb3621a526613b5/ketahuan-polandia-ternyata-masih-beli-gas-rusia-lewat-jerman?ref=threadlist-250&med=thread_list"
     #test_url_2 = "https://www.kaskus.co.id/thread/626b6c05c9317b0534726df2/putin-ancam-serang-nato-dengan-nuklir-isyarat-bakal-perang-dunia-iii?ref=threadlist-250&med=thread_list"
-    #Kaskus._test_scrape_cmt_workflow(test_url_2, Kaskus.driver, Kaskus_object["cmt_Xparam"], "sample")
+    #Kaskus._test_scrape_cmt_workflow(test_url_1, Kaskus.driver, Kaskus_object["cmt_Xparam"], "sample")
 
     end_time = time.perf_counter()
 
