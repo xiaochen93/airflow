@@ -79,38 +79,21 @@ def migrate_data(limit=500):
         response = requests.post(INSERT_API,json={'table':'dsta_db.news', 'data': each_article})
         new_article_id = ast.literal_eval(response.text)['lastrowid']
         
-        for each_comment in associated_comments:
-            del each_comment["id"]
-            # attached the new article_id to every associated comments
-            each_comment["cmt_article_id"] = str(new_article_id)
-            each_comment["cmt_published_datetime_old"] = each_comment["cmt_published_datetime"]
-            each_comment["cmt_published_datetime"] = each_comment["cmt_published_datetime"] + ".001"
-            each_comment["last_modified"] = CURRENT_DATE
-            # insert comment to the comments table
-            response = requests.post(INSERT_API,json={'table':'dsta_db.comments', 'data': each_comment})
-            if response.status_code == 500:
-                print(response.text)
-                pass
-        
-        # 2024-07-31 : if this post is scrapped from comment forum
+        # 2024-07-31 : if this post is scrapped from comment forum, 
         article_datetime = datetime.strptime((each_article["published_datetime_old"].split("."))[0], "%Y-%m-%dT%H:%M:%S")
         current_datetime = datetime.strptime(CURRENT_DATETIME, "%Y-%m-%d %H:%M:%S")
+        
+        datetime_cond = (current_datetime - article_datetime).days <= 3
+
         #print(f"\n-- DEBUG: source id {each_article['source_id']} and date difference {(current_datetime - article_datetime).days}")
         _is_from_forum = int(each_article['source_id']) in [5,16,17,19]
-        _is_within_time_range = (current_datetime - article_datetime).days <= 3
-        
+        _is_within_time_range = datetime_cond
         if _is_from_forum and _is_within_time_range:
             print(f"\n-- DEBUG: article {each_article['title']}")
             print('\n-- DEBUG: ',article_datetime, current_datetime)
             print(f"\n\t-- DEBUG: 1. is the data from comment forum ? {_is_from_forum} - 2.  accumlate ? {_is_within_time_range} - days {(current_datetime - article_datetime).days}")
             print(f'\n\t-- DEBUG: This will not be deleted at the moment.')
-            print()
-            continue
-        else:
-            # update the test record to deleted = 1 for both test and test_24hr_comments
-            _ = requests.put(UPDATE_API, json={"table": "dsta_db.test_24hr_comments", "data": {"last_modified": CURRENT_DATE, "deleted": True}, "where" : f"cmt_article_id = {test_article_id}" })
-            _ = requests.put(UPDATE_API, json={"table": "dsta_db.test", "data": {"last_modified": CURRENT_DATE, "deleted": True}, "where" : f"article_id = {test_article_id}" })
-                    
+        
         #print("old article_id: ", test_article_id, "new article_id: ", new_article_id)
 
 parser = argparse.ArgumentParser(description="Parameters to execute a web crawler")

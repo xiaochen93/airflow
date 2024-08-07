@@ -24,6 +24,10 @@ CREATE_VIEW_NO_OF_NEWS_DATE = '''CREATE VIEW NO_OF_NEWS_DATE as (SELECT DATE(pub
 DROP_VIEW_NO_OF_COMMENTS_DATE = '''DROP VIEW IF EXISTS NO_OF_COMMENTS_DATE;'''
 CREATE_VIEW_NO_OF_COMMENTS_DATE = '''CREATE VIEW NO_OF_COMMENTS_DATE as (SELECT DATE(cmt_published_datetime) as "date", count(id) FROM comments WHERE DATE(cmt_published_datetime) >= '2022-01-01' GROUP BY DATE(cmt_published_datetime));''' 
 
+# mark duplicated records with deleted =1  
+REMOVE_DUPLICATED_NEWS_RECORDS = '''UPDATE news SET deleted=1, last_modified=CURDATE() WHERE (url IS NOT NULL and url != 'Unknown' and url != '' ) and article_id NOT IN (SELECT * FROM (SELECT MAX(article_id) as min_article_id FROM news WHERE (url IS NOT NULL and url != 'Unknown' and url != '' ) GROUP BY url) AS subquery);'''
+REMOVE_DUPLICATED_COMMENTS = '''UPDATE comments SET deleted = 1, last_modified = "2000-01-01" WHERE deleted=0 and cmt_article_id IN (SELECT * FROM (SELECT article_id FROM news WHERE deleted=1) AS subquery);'''
+
 def execute_sql_query_task(query="", task_name=""):
     t1 = time.perf_counter()
     query = re.sub(r"\s+", " ", query)
@@ -42,6 +46,10 @@ def execute_sql_query_task(query="", task_name=""):
 
 
 if __name__ == '__main__':
+    # 4. mark duplicated records deleted
+    execute_sql_query_task(query=REMOVE_DUPLICATED_NEWS_RECORDS, task_name="UPDATE NEWS ARTICLES DELETED=1")
+    execute_sql_query_task(query=REMOVE_DUPLICATED_COMMENTS, task_name="UPDATE NEWS COMMENTS DELETED=1")
+
     # 1. drop/create the statistics view
     execute_sql_query_task(query=DROP_VIEW_DATA_OVERVIEW, task_name="DROP VIEW DATA_OVERVIEW")
     execute_sql_query_task(query=CREATE_VIEW_DATA_OVERVIEW, task_name="CREATE VIEW DATA_OVERVIEW")
@@ -53,4 +61,5 @@ if __name__ == '__main__':
     # 3. drop/create the no. of comments view
     execute_sql_query_task(query=DROP_VIEW_NO_OF_COMMENTS_DATE, task_name="DROP VIEW NO. OF COMMENTS TIMELINE")
     execute_sql_query_task(query=CREATE_VIEW_NO_OF_COMMENTS_DATE, task_name="CREATE VIEW NO. OF COMMENTS TIMELINE")
+    
     
