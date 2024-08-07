@@ -74,4 +74,12 @@ task_2 = BashOperator(
     dag = exe_web_crawlers_dag
 )
 
-task_1.set_downstream(task_2)
+task_3_script = f'python /opt/airflow/src/news_comments_crawlers/others/data_sql_runner.py'
+task_3 = BashOperator(
+    task_id = "id_3_data_migration",
+    bash_command = task_3_script,
+    execution_timeout=timeout,
+    dag = exe_web_crawlers_dag
+)
+
+task_1 >> task_2 >> task_3

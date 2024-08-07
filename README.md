@@ -1,4 +1,8 @@
 # Major Update Airflow (excluding minor maintaince)
+2024-08-07
+Update data migrartion function for accumlating post for at least 3 days.
+Include sql runner into the data handling part for generating dashboard and marking records.
+
 2024-07-26
 Update the Kaskus_v2 crawler due to another major update. 
 
