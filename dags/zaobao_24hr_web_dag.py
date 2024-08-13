@@ -46,7 +46,7 @@ default_args = {
 exe_web_crawlers_dag = DAG('CN_zaobao_24hr_web_dag',
 		default_args=default_args,
 		description='The dag object to execute a series of web crawlers for data/comments collection .',
-		schedule_interval= '10 12 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
+		schedule_interval= '30 2 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
 		catchup=False,
 		tags=['Zaobao','news articles','24hrs']
 )
