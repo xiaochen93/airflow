@@ -43,6 +43,7 @@ def execute_sql_query_task(query="", task_name=""):
         raise
     
     print(message)
+    #print(f"\t\t-- DEBUG: {response.text}")
 
 if __name__ == '__main__':
     # 4. mark duplicated records deleted

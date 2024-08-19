@@ -325,8 +325,9 @@ if __name__ == '__main__':
         #265 6-06
         # 
         # "https://www.kaskus.co.id/komunitas/250/berita-luar-negeri?tab=threads&page=138"
-        
-        'starting_page_url': "https://www.kaskus.co.id/komunitas/10/Berita%20dan%20Politik?tab=threads&page=17",
+        #https://www.kaskus.co.id/komunitas/10/berita-dan-politik
+        #"https://www.kaskus.co.id/komunitas/10/Berita%20dan%20Politik?tab=threads&page=17"
+        'starting_page_url': "https://www.kaskus.co.id/komunitas/10/berita-dan-politik",
         'source_id': 19,
         'lang': 'BI',
         'links_threshold':120,
@@ -338,10 +339,13 @@ if __name__ == '__main__':
         'main_Xparam':{
             'wait': 4,
             #'XP_CLOSE_ADS': "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]",
-            'XP_CLOSE_ADS': ["//div[contains(@class,'button-common close-button')]//span", 
-                            "//div[contains(@class, 'iz_osn_card_1')]//span[contains(@class, 'close')]", 
-                            "//div[contains(@id, 'dismiss-button')]/div",
-                            "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]"],
+            'XP_CLOSE_ADS': [
+                            "//button[contains(text(), 'Lewati')]",
+                            #"//div[contains(@class,'button-common close-button')]//span", 
+                            #"//div[contains(@class, 'iz_osn_card_1')]//span[contains(@class, 'close')]", 
+                            #"//div[contains(@id, 'dismiss-button')]/div",
+                            "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]"
+                            ],
             # A list of post on the page
             # 2024-07-17 updated post listing -> 20 elements
             'XP_POST_LISTING': "//section//div[@class='bg-surface-primary']//div[contains(@class, 'flex w-full flex-col')]",

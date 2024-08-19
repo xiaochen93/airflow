@@ -4,7 +4,7 @@ The forum object follows the sequence of
 
 '''
 from Functions import *
-
+from tqdm import tqdm
 '''
 The forum object follows the sequence of 
 1. initalization -> 
@@ -114,7 +114,7 @@ class ForumWebCrawler:
     '''
     def _scrape_post_content(self, Xparam, collect_article=lambda x: x):
         del_idxes = []
-        for idx, item in enumerate(self.links):
+        for idx, item in tqdm(enumerate(self.links)):
             # get the original article_content
             try:
                 org_content = collect_article(driver=self.driver, xpath_content=Xparam['XP_POST_ART'], url=item['url'])

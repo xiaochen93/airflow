@@ -286,7 +286,10 @@ if __name__ == '__main__':
         'main_Xparam':{
             'wait': 4,
             #'XP_CLOSE_ADS': "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]",
-            'XP_CLOSE_ADS': ["//div[contains(@class,'button-common close-button')]//span", 
+
+            'XP_CLOSE_ADS': [
+                            "//button[contains(text(), 'Lewati')]",
+                            "//div[contains(@class,'button-common close-button')]//span", 
                             "//div[contains(@class, 'iz_osn_card_1')]//span[contains(@class, 'close')]", 
                             "//div[contains(@id, 'dismiss-button')]/div",
                             "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]"],
@@ -313,7 +316,9 @@ if __name__ == '__main__':
         },
         'cmt_Xparam' :{
             'wait': 8,
-            'XP_CLOSE_ADS': ["//div[contains(@class,'button-common close-button')]//span", 
+            'XP_CLOSE_ADS': [
+                            "//button[contains(text(), 'Lewati')]",
+                            "//div[contains(@class,'button-common close-button')]//span", 
                             "//div[contains(@class, 'iz_osn_card_1')]//span[contains(@class, 'close')]", 
                             "//div[contains(@id, 'dismiss-button')]/div",
                             "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]",
