@@ -47,8 +47,8 @@ def execute_sql_query_task(query="", task_name=""):
 
 if __name__ == '__main__':
     # 4. mark duplicated records deleted
-    execute_sql_query_task(query=REMOVE_DUPLICATED_NEWS_RECORDS, task_name="UPDATE NEWS ARTICLES DELETED=1")
-    execute_sql_query_task(query=REMOVE_DUPLICATED_COMMENTS, task_name="UPDATE NEWS COMMENTS DELETED=1")
+    #execute_sql_query_task(query=REMOVE_DUPLICATED_NEWS_RECORDS, task_name="UPDATE NEWS ARTICLES DELETED=1")
+    #execute_sql_query_task(query=REMOVE_DUPLICATED_COMMENTS, task_name="UPDATE NEWS COMMENTS DELETED=1")
 
     # 1. drop/create the statistics view
     execute_sql_query_task(query=DROP_VIEW_DATA_OVERVIEW, task_name="DROP VIEW DATA_OVERVIEW")
