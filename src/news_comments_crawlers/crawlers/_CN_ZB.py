@@ -22,7 +22,7 @@ from newspaper import Article
 
 NOW = datetime.today().now()
 
-AGO = NOW - timedelta(hours=24)
+AGO = NOW - timedelta(hours=48)
 
 NOW = NOW.strftime('%Y-%m-%d %H:%M:%S')
 
@@ -139,7 +139,8 @@ def gather_urls(save_to_cache = False):
             soup = BeautifulSoup(s.get(URL).text, "html.parser")
 
             # STEP: find the css path that a news post is wrapped
-            WEB_CARD_ELEMENTS= soup.select('div[class*="card vertical-article-card on-listing-pages"]')
+            # 2024-08-21: update xpath for new HTML page layout
+            WEB_CARD_ELEMENTS= soup.select('div[class*="card vertical-article-card responsive"]')
 
             print(f'\n-- DEBUG: No.of web card elements {len(WEB_CARD_ELEMENTS)}')
 
@@ -147,7 +148,7 @@ def gather_urls(save_to_cache = False):
 
                 try:
                     # STEP: find the css path that contain the news link
-                    link = CARD_ELEMENT.select('a[class*="cursor-pointer touch-auto relative block aspect"]')[0]
+                    link = CARD_ELEMENT.select('a[class*="cursor-pointer touch-auto"]')[0]
                     link = DEFAULT_WEBSITE + str(link['href'])[1:]
                     #print('\n\t-- DEBUG: Link - ',link)
                 except Exception as e:

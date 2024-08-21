@@ -1,4 +1,10 @@
 # Major Update Airflow (excluding minor maintaince)
+2024-08-21
+Update Zaobao web dag for new HTML tagging name
+
+2024-08-15
+Update Kaskus web dag for transpassing a notification pop up.
+
 2024-08-07
 Update data migrartion function for accumlating post for at least 3 days.
 Include sql runner into the data handling part for generating dashboard and marking records.
