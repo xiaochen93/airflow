@@ -41,7 +41,7 @@ def _collect_item_fn(post, Xparam):
 
     try:
         post_datetime = getWebElementText(post, Xparam['XP_POST_DATETIME'])
-
+        print(f"\n-- DEBUG: raw published_datetime {post_datetime} ")
         if "Hari ini" in post_datetime:
             today_date = datetime.now().date().strftime("%d-%m-%Y")
             today_date = str(today_date)
@@ -59,6 +59,14 @@ def _collect_item_fn(post, Xparam):
 
     except Exception as e:
         post_datetime = ''
+        print(f"\n-- DEBUG: Error occurs with published_datetime {e}")
+
+    print({
+        'category': "",
+        'url': post_url,
+        'org_title': post_title,
+        'published_datetime':post_datetime,
+    })
         
     return {
         'category': "",
@@ -272,7 +280,6 @@ if __name__ == '__main__':
     remote = eval(args.remote)
     headless = eval(args.headless)
     test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"
-
     Kaskus_object = {
         'starting_page_url': "https://www.kaskus.co.id/komunitas/10/berita-dan-politik",
         'source_id': 19,
@@ -306,8 +313,8 @@ if __name__ == '__main__':
             # 2024-07-17 checked with no change
             'XP_POST_TITLE': ".//descendant-or-self::div[contains(@class,'mb-2 block flex-1 text-lg font-medium')]/a[@title]",
 
-            # 2024-07-17 update datetime attribute tag
-            'XP_POST_DATETIME': ".//descendant-or-self::div[contains(@class, 'ml-1 text-tertiary')]",
+            # 2024-08-23 update datetime attribute tag
+            'XP_POST_DATETIME': ".//descendant-or-self::div[contains(@class, 'text-tertiary flex-none')]",
 
             #'XP_POST_CATE': ".//descendant-or-self::tr//th//div[contains(@class, 'fd_list_main')]//em",
             # The first post of the discussion

@@ -86,6 +86,8 @@ class ForumWebCrawler:
             for post in many_posts:
                 self.update_links(post)
             
+            print(f"\n-- DEBUG:Links count {self.links_count} ")
+
             if self.links_count > self.links_threshold:
                 SEARCHING = False
                 continue

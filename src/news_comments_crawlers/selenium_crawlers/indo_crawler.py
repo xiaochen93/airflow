@@ -359,8 +359,8 @@ if __name__ == '__main__':
             # 2024-07-17 checked with no change
             'XP_POST_TITLE': ".//descendant-or-self::div[contains(@class,'mb-2 block flex-1 text-lg font-medium')]/a[@title]",
 
-            # 2024-07-17 update datetime attribute tag
-            'XP_POST_DATETIME': ".//descendant-or-self::div[contains(@class, 'ml-1 text-tertiary')]",
+            # 2024-08-23 update datetime attribute tag
+            'XP_POST_DATETIME': ".//descendant-or-self::div[contains(@class, 'text-tertiary flex-none')]",
 
             #'XP_POST_CATE': ".//descendant-or-self::tr//th//div[contains(@class, 'fd_list_main')]//em",
             # The first post of the discussion
