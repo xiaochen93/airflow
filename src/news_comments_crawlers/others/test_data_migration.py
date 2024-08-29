@@ -83,7 +83,8 @@ def migrate_data(limit=500):
         article_datetime = datetime.strptime((each_article["published_datetime_old"].split("."))[0], "%Y-%m-%dT%H:%M:%S")
         current_datetime = datetime.strptime(CURRENT_DATETIME, "%Y-%m-%d %H:%M:%S")
         
-        datetime_cond = (current_datetime - article_datetime).days <= 3
+        # 2024-08-29 : day begins from 0 so 3 days -> 0, 1, 2
+        datetime_cond = (current_datetime - article_datetime).days < 3
 
         #print(f"\n-- DEBUG: source id {each_article['source_id']} and date difference {(current_datetime - article_datetime).days}")
         _is_from_forum = int(each_article['source_id']) in [5,16,17,19]

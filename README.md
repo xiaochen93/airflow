@@ -1,4 +1,7 @@
 # Major Update Airflow (excluding minor maintaince)
+2024-08-29
+Update DSTA API for “update" related query and update the automation script.
+
 2024-08-21
 Update Zaobao web dag for new HTML tagging name
 
