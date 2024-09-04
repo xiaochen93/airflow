@@ -16,15 +16,23 @@ CURRENT_DATETIME = datetime.today().strftime("%Y-%m-%d") + ' ' + datetime.today(
 
 # drop/create the statistics view
 DROP_VIEW_DATA_OVERVIEW = '''DROP VIEW IF EXISTS DATA_OVERVIEW;'''
-CREATE_VIEW_DATA_OVERVIEW = '''CREATE VIEW DATA_OVERVIEW AS(SELECT a.source_id, sources.source, sources.lang, a.article_count, COALESCE(b.comment_count, NULL) AS comment_count FROM (SELECT source_id, COUNT(article_id) AS article_count FROM news WHERE DATE(published_datetime) >= "2021-01-01" GROUP BY source_id) AS a LEFT JOIN (SELECT source_id, COUNT(id) AS comment_count FROM comments WHERE DATE(cmt_published_datetime) >= "2021-01-01" GROUP BY source_id) AS b ON a.source_id = b.source_id LEFT JOIN sources on a.source_id = sources.source_id ORDER BY comment_count DESC);''' 
+CREATE_VIEW_DATA_OVERVIEW = '''CREATE VIEW DATA_OVERVIEW AS(SELECT a.source_id, sources.source, sources.lang, a.article_count, COALESCE(b.comment_count, NULL) AS comment_count 
+                               FROM (SELECT source_id, COUNT(article_id) AS article_count 
+                                     FROM news WHERE DATE(published_datetime) >= "2021-01-01" GROUP BY source_id) AS a LEFT JOIN (SELECT source_id, COUNT(id) AS comment_count FROM comments WHERE DATE(cmt_published_datetime) >= "2021-01-01" GROUP BY source_id) AS b ON a.source_id = b.source_id LEFT JOIN sources on a.source_id = sources.source_id ORDER BY comment_count DESC);''' 
 
 # drop/create the no. of news articles view
 DROP_VIEW_NO_OF_NEWS_DATE = '''DROP VIEW IF EXISTS NO_OF_NEWS_DATE;'''
-CREATE_VIEW_NO_OF_NEWS_DATE = '''CREATE VIEW NO_OF_NEWS_DATE as (SELECT DATE(published_datetime) as "date", count(article_id) FROM news WHERE DATE(published_datetime) >= '2022-01-01' GROUP BY DATE(published_datetime));''' 
+CREATE_VIEW_NO_OF_NEWS_DATE = '''CREATE VIEW NO_OF_NEWS_DATE as (SELECT DATE(published_datetime) as "date", count(article_id) 
+                                 FROM news 
+                                 WHERE deleted=0 AND DATE(published_datetime) >= '2022-01-01' 
+                                 GROUP BY DATE(published_datetime));''' 
 
 # drop/create the no. of comments
 DROP_VIEW_NO_OF_COMMENTS_DATE = '''DROP VIEW IF EXISTS NO_OF_COMMENTS_DATE;'''
-CREATE_VIEW_NO_OF_COMMENTS_DATE = '''CREATE VIEW NO_OF_COMMENTS_DATE as (SELECT DATE(cmt_published_datetime) as "date", count(id) FROM comments WHERE DATE(cmt_published_datetime) >= '2022-01-01' GROUP BY DATE(cmt_published_datetime));''' 
+CREATE_VIEW_NO_OF_COMMENTS_DATE = '''CREATE VIEW NO_OF_COMMENTS_DATE as (SELECT DATE(cmt_published_datetime) as "date", count(id) 
+                                     FROM comments
+                                     WHERE deleted=0 AND DATE(cmt_published_datetime) >= '2022-01-01' 
+                                     GROUP BY DATE(cmt_published_datetime));''' 
 
 
 # 
