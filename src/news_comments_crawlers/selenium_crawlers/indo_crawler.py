@@ -149,7 +149,7 @@ class Kaskus_Crawler(ForumWebCrawler):
             comments_this_post = [self._test_cmt_item_processing(item, post_id=post_id) for item in comments_this_post]
             cmt_ids = getCommentIDsByArticleID(art_id=post_id, table='dsta_db.test_24hr_comments')
             cmt_ids = set([str(list(each.values())[0]) for each in cmt_ids])
-            #print(cmt_ids)
+            print(f"\n\t-- DEBUG: There are {len(cmt_ids)} existing no. of comments for the post {post_id}" )
             # filter existing comment by ids    
             comments_this_post = remove_duplicated_comments_by_ids(cmt_ids=cmt_ids, comments_this_post=comments_this_post)
             
@@ -330,7 +330,7 @@ if __name__ == '__main__':
         'starting_page_url': "https://www.kaskus.co.id/komunitas/10/berita-dan-politik",
         'source_id': 19,
         'lang': 'BI',
-        'links_threshold':120,
+        'links_threshold':200,
         'begin_datetime': begain_datetime,
         'end_datetime': end_datetime,
         'headless':headless,

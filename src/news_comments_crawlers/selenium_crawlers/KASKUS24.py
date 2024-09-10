@@ -277,14 +277,18 @@ class Kaskus_Crawler(ForumWebCrawler):
 
 if __name__ == '__main__':
     args = parser.parse_args()
+    
     remote = eval(args.remote)
+    
     headless = eval(args.headless)
+    
     test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"
+    
     Kaskus_object = {
         'starting_page_url': "https://www.kaskus.co.id/komunitas/10/berita-dan-politik",
         'source_id': 19,
         'lang': 'BI',
-        'links_threshold':20,
+        'links_threshold':50,
         'begin_datetime': last24hours,
         'end_datetime': now,
         'headless':headless,

@@ -24,7 +24,7 @@ class ForumWebCrawler:
         self.links = []
         self.comments = []
         self.links_threshold = object['links_threshold']
-        self.links_count = 0
+        self.undesire_links_count = 0
         self.begin_dt = object['begin_datetime']
         self.end_dt = object['end_datetime']
         self.noOfDays = object['noOfDays']
@@ -48,7 +48,6 @@ class ForumWebCrawler:
         else:
             print(f'\n-- DEBUG: No new post will be added to the db. ')
         self.insert_to_db(self.links, label='post')
-
 
 
     '''
@@ -86,9 +85,11 @@ class ForumWebCrawler:
             for post in many_posts:
                 self.update_links(post)
             
-            print(f"\n-- DEBUG:Links count {self.links_count} ")
+            print(f"\n-- DEBUG: Unwanted links threshold count {self.undesire_links_count} ")
 
-            if self.links_count > self.links_threshold:
+            print(f"\n-- DEBUG: Collected links  {len(self.links)} ")
+
+            if self.undesire_links_count > self.links_threshold:
                 SEARCHING = False
                 continue
 
@@ -191,6 +192,8 @@ class ForumWebCrawler:
                 page_loaded = wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
                 print(f"\n-- DEBUG: Page loaded successfully! Searching comments for post {post_id}",end='\r')
 
+                print(f"\n-- DEBUG: Trying to by-pass any observant ads. ",end='\r')
+
                 self.bypass_ads(Xparam['XP_CLOSE_ADS'],i=1)  #close pop-up ads
                 cmt_items = getPostListings(self.driver, Xparam['XP_CMT_LISTING'])
                 print(f'\n-- DEBUG: Total {len(cmt_items)} no. of elements on the table .')
@@ -284,7 +287,6 @@ class ForumWebCrawler:
         self.insert_to_db(label='comments')
 
 
-
     def bypass_ads(self,XP_ads,i=5):
         time.sleep(1)
         self.driver.execute_script("""
@@ -303,9 +305,8 @@ class ForumWebCrawler:
             time.sleep(0.5)  
             i = i - 1
 
-
-
     def update_links(self, item, dt_label='published_datetime'):
+
         #print(item[dt_label], self.begin_dt, self.end_dt, (item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt))
         #print('\n--DEBUG: If a post datetime is a string or empty ? ',item[dt_label]=="" or isinstance(item[dt_label], str))
         #print(f'\n\t--DEBUG: {item[dt_label]}')
@@ -314,15 +315,26 @@ class ForumWebCrawler:
         if item[dt_label]=="" or isinstance(item[dt_label], str):
             #print(f"published datetime - {item[dt_label]}")
             #print(f"1. is datetime a NULL string or invalid parsing datetime object - True .")
-            self.links_count = self.links_count + 1 #accumulate 
+            self.undesire_links_count = self.undesire_links_count + 1 #accumulate 
         elif(item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt):
             #print(f"published datetime - {item[dt_label]}")
             #print(f"2. is datetime < begain_datetime ? - {item[dt_label] < self.begin_dt} .")
             #print(f"3. is datetime > end_datetime ? - {item[dt_label] > self.end_dt} .")
-            self.links_count = self.links_count + 1 #accumulate  
+            self.undesire_links_count = self.undesire_links_count + 1 #accumulate  
         elif check_spams(item['org_title']): # the title of a post/article is mandatory.
             pass #do nothing
         elif item['url']=='' or (item['url'] in self.existing_URLs): # url already exists or empty
             pass
         else:
             self.links.append(item)
+
+    #2024-03-12: select post in db by time range
+    def _fetchPostByTimeRange(self, table="", dt_label="", end_datetime="", begain_datetime="", sid=""):
+        #from datetime import timedelta
+        items=["article_id", 'source_id', 'URL']
+        query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt_label} BETWEEN '{begain_datetime}' AND '{end_datetime}') AND source_id={sid} AND deleted=0;"
+        print(query)
+        out_items = fetch_db_response(query) # remove duplicate and size
+        if out_items == []:
+            raise
+        return out_items

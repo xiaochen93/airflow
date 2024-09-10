@@ -324,19 +324,19 @@ def selenium_init(headless=True, remote=True, strict=True):
 
     return driver
 
-def getWebElementAttribute(item, xpath, name):
+def getWebElementAttribute(item, xpath, name, label=""):
     try:
         text = item.find_element("xpath", xpath).get_property(name)
     except Exception as e:
-        print('\n-- DEBUG: No element is found .')
+        print(f'\n-- DEBUG: No element is found for label {label}.')
         text = ''
     return text
 
-def getWebElementText(item, xpath):
+def getWebElementText(item, xpath, label=""):
     try:
         text = item.find_element("xpath", xpath).text
     except Exception as e:
-        print('\n-- DEBUG: No element is found .')
+        print(f'\n-- DEBUG: No element is found for label {label}.')
         text = ''
     return text
 

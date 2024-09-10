@@ -11,6 +11,8 @@ from airflow.operators.python_operator import PythonOperator
 
 from airflow.operators.bash_operator import BashOperator
 
+from functions import *
+
 import os
 
 import pytz

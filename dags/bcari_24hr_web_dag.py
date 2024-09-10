@@ -15,6 +15,8 @@ import os
 
 import pytz
 
+from functions import *
+
 # Get the Beijing time zone
 beijing_timezone = pytz.timezone('Asia/Shanghai')
 
@@ -46,6 +48,9 @@ default_args = {
         'dagrun_timeout ' : timeout
 }
 
+today_datetime, previous_datetime = get_datetime_from_now(days=1)
+
+
 #initializing the dag object
 exe_web_crawlers_dag = DAG('BM_B-Cari_24hr_web_dag',
 		default_args=default_args,
@@ -63,7 +68,7 @@ task_1 = BashOperator(
 
 task_2 = BashOperator(
     task_id = "id_2",
-    bash_command = "python /opt/airflow/src/news_comments_crawlers/selenium_crawlers/B-CARI24.py --remote=True --headless=True",
+    bash_command = f'python /opt/airflow/src/news_comments_crawlers/selenium_crawlers/BM_B-CARI.py --remote=True --headless=True --begain_datetime"{previous_datetime}" --end_datetime="{today_datetime}"',
     execution_timeout=timeout,
     dag = exe_web_crawlers_dag
 )
