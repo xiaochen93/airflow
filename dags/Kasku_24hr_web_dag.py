@@ -67,7 +67,7 @@ task_1 = BashOperator(
 
 task_2 = BashOperator(
     task_id = "id_2",
-    bash_command = "python /opt/airflow/src/news_comments_crawlers/selenium_crawlers/BI-KASKUS24.py --remote=True --headless=True --begain_datetime="{previous_datetime}" --end_datetime="{today_datetime}" --noOfDay=4",
+    bash_command = 'python /opt/airflow/src/news_comments_crawlers/selenium_crawlers/BI-KASKUS24.py --remote=True --headless=True --begain_datetime="{previous_datetime}" --end_datetime="{today_datetime}" --noOfDay=4',
     execution_timeout=timeout,
     dag = exe_web_crawlers_dag
 )
