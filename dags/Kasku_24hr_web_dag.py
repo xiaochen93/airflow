@@ -37,6 +37,8 @@ _start_date = datetime(
 
 timeout = timedelta(minutes=180)
 
+today_datetime, previous_datetime = get_datetime_from_now(days=1)
+
 # initializing the default arguments
 default_args = {
 		'owner': 'xiaochen',
@@ -65,7 +67,7 @@ task_1 = BashOperator(
 
 task_2 = BashOperator(
     task_id = "id_2",
-    bash_command = "python /opt/airflow/src/news_comments_crawlers/selenium_crawlers/KASKUS24.py --remote=True --headless=True",
+    bash_command = "python /opt/airflow/src/news_comments_crawlers/selenium_crawlers/indo_crawler.py --remote=True --headless=True --begain_datetime="{previous_datetime}" --end_datetime="{today_datetime}" --noOfDay=4",
     execution_timeout=timeout,
     dag = exe_web_crawlers_dag
 )
