@@ -60,7 +60,7 @@ REMOVE_DUPLICATED_NEWS_RECORDS = '''
     UPDATE news
     SET deleted = 1, last_modified = CURDATE()
     WHERE (url IS NOT NULL and url != 'Unknown' and url != '')
-    AND news.published_datetime BETWEEN '2024-06-01 00:00:00' AND '2024-12-31 23:59:59'
+    AND news.published_datetime BETWEEN '2024-08-01 00:00:00' AND '2024-12-31 23:59:59'
     AND EXISTS (
     SELECT 1
         FROM VIEW_DUPLICATES
@@ -70,6 +70,41 @@ REMOVE_DUPLICATED_NEWS_RECORDS = '''
     );
 '''
 REMOVE_DUPLICATED_COMMENTS = '''UPDATE comments SET deleted = 1, last_modified = "2000-01-01" WHERE deleted=0 and cmt_article_id IN (SELECT * FROM (SELECT article_id FROM news WHERE deleted=1) AS subquery);'''
+
+# 
+DROP_TEST_VIEW_DUPLICATES = '''DROP VIEW IF EXISTS TEST_VIEW_DUPLICATES;'''
+
+CREATE_TEST_VIEW_DUPLICATES = '''
+    CREATE VIEW TEST_VIEW_DUPLICATES AS (
+        SELECT 
+        max(article_id) as article_id,
+        url,
+        DATE(published_datetime) as "unique_date_index",
+        COUNT(*) AS total_urls,
+        SUM(CASE WHEN deleted = 0 THEN 1 ELSE 0 END) AS no_of_remain,
+        SUM(CASE WHEN deleted = 1 THEN 1 ELSE 0 END) AS no_of_deleted
+        FROM test
+        WHERE (url IS NOT NULL and url != 'Unknown' and url != '')
+        GROUP BY url, DATE(published_datetime)
+        HAVING total_urls > 1
+        ORDER BY DATE(published_datetime) DESC
+    );
+'''
+REMOVE_DUPLICATED_TEST_RECORDS = '''
+        UPDATE test
+        SET deleted = 1, last_modified = CURDATE()
+        WHERE (url IS NOT NULL and url != 'Unknown' and url != '')
+        AND test.published_datetime BETWEEN '2024-08-01 00:00:00' AND '2024-12-31 23:59:59'
+        AND EXISTS (
+        SELECT 1
+            FROM TEST_VIEW_DUPLICATES
+            WHERE test.url = TEST_VIEW_DUPLICATES.url
+            AND DATE(test.published_datetime) = TEST_VIEW_DUPLICATES.unique_date_index
+            AND test.article_id != TEST_VIEW_DUPLICATES.article_id
+        );
+'''
+REMOVE_DUPLICATED_TEST_COMMENTS = '''UPDATE test_24hr_comments SET deleted = 1, last_modified = "2000-01-01" WHERE deleted=0 and cmt_article_id IN (SELECT * FROM (SELECT article_id FROM test WHERE deleted=1) AS subquery);'''
+
 
 def execute_sql_query_task(query="", task_name="", DATA_QUERY_API=DATA_QUERY_API):
     t1 = time.perf_counter()
@@ -92,6 +127,13 @@ def execute_sql_query_task(query="", task_name="", DATA_QUERY_API=DATA_QUERY_API
     #print(f"\t\t-- DEBUG: {response.text}")
 
 if __name__ == '__main__':
+    #5. mark duplicated test records
+    execute_sql_query_task(query=DROP_TEST_VIEW_DUPLICATES, task_name="DROP TEST DUPLICATES")
+    execute_sql_query_task(query=CREATE_TEST_VIEW_DUPLICATES, task_name="CREATE TEST DUPLICATE VIEW")
+
+    execute_sql_query_task(query=REMOVE_DUPLICATED_TEST_RECORDS, task_name="UPDATE TEST ARTICLES DELETED=1",DATA_QUERY_API=UPDATE_QUERY_API)
+    execute_sql_query_task(query=REMOVE_DUPLICATED_TEST_COMMENTS, task_name="UPDATE TEST COMMENTS DELETED=1", DATA_QUERY_API=UPDATE_QUERY_API)
+
     # 4. mark duplicated records deleted
     execute_sql_query_task(query=DROP_VIEW_DUPLICATES, task_name="DROP DUPLICATES")
     execute_sql_query_task(query=CREATE_VIEW_DUPLICATES, task_name="CREATE DUPLICATE VIEW")

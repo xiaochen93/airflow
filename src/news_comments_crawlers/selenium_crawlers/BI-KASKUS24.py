@@ -330,7 +330,7 @@ if __name__ == '__main__':
         'starting_page_url': "https://www.kaskus.co.id/komunitas/10/berita-dan-politik",
         'source_id': 19,
         'lang': 'BI',
-        'links_threshold':200,
+        'links_threshold':300,
         'begin_datetime': begain_datetime,
         'end_datetime': end_datetime,
         'headless':headless,
@@ -340,6 +340,7 @@ if __name__ == '__main__':
             'wait': 4,
             #'XP_CLOSE_ADS': "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]",
             'XP_CLOSE_ADS': [
+                            "//button[contains(text(), 'Terima')]",
                             "//button[contains(text(), 'Lewati')]",
                             #"//div[contains(@class,'button-common close-button')]//span", 
                             #"//div[contains(@class, 'iz_osn_card_1')]//span[contains(@class, 'close')]", 
@@ -369,7 +370,9 @@ if __name__ == '__main__':
         },
         'cmt_Xparam' :{
             'wait': 8,
-            'XP_CLOSE_ADS': ["//div[contains(@class,'button-common close-button')]//span", 
+            'XP_CLOSE_ADS': [
+                            "//button[contains(text(), 'Terima')]", #2024-10-22 update another button for close
+                            "//div[contains(@class,'button-common close-button')]//span", 
                             "//div[contains(@class, 'iz_osn_card_1')]//span[contains(@class, 'close')]", 
                             "//div[contains(@id, 'dismiss-button')]/div",
                             "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]",

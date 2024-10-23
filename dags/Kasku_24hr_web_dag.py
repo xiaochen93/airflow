@@ -35,7 +35,7 @@ _start_date = datetime(
     0,
     tzinfo=beijing_timezone)
 
-timeout = timedelta(minutes=180)
+timeout = timedelta(minutes=360)
 
 today_datetime, previous_datetime = get_datetime_from_now(days=1)
 
