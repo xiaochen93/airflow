@@ -215,7 +215,7 @@ class B_CARI_Crawler(ForumWebCrawler):
                     "cmt_published_datetime": cmt_published_datetime,
                     "cmt_replyTo": cmt_reply_to,
                     "cmt_user" : cmt_user,
-                    "lang" : 'BM',
+                    "lang" : 'CN',
                     "translated": 0,
                     "source_id": self.source_id
                 }
@@ -317,10 +317,10 @@ if __name__ == '__main__':
     noOfDays = int(args.noOfDays)
 
     B_CARI_object = {
-        'starting_page_url': "https://b.cari.com.my/forum.php?mod=forumdisplay&fid=154&filter=author&orderby=dateline",
+        'starting_page_url': "https://c.cari.com.my/forum.php?mod=forumdisplay&fid=564",
         'source_id': 17,
-        'lang': 'BM',
-        'links_threshold':1000,
+        'lang': 'CN',
+        'links_threshold':200,
         'begin_datetime': begain_datetime,
         'end_datetime': end_datetime,
         'headless':headless, # headless true no display false display
@@ -334,7 +334,7 @@ if __name__ == '__main__':
                             "//div[contains(@id, 'dismiss-button')]/div",
                             "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]"],
             'XP_POST_LISTING': "//table[contains(@id, 'threadlisttableid')]//tbody[contains(@id, 'normalthread')]",
-            'XP_POST_NEXT_BTN': "//div[contains(@id, 'pgt')]//div[contains(@class,'pg')]/a[text()='Next']",
+            'XP_POST_NEXT_BTN': "//div[contains(@id, 'pgt')]//div[contains(@class,'pg')]/a[@class='nxt']",
             'XP_POST_URL': ".//descendant-or-self::tr//th//a[contains(@class, 's xst')]",
             'XP_POST_TITLE': ".//descendant-or-self::tr//th//a[contains(@class, 's xst')]",
             'XP_POST_DATETIME': ".//descendant-or-self::tr//th//font//span",
@@ -356,10 +356,9 @@ if __name__ == '__main__':
             'XP_CMT_CONTENT': " .//descendant-or-self::div[contains(@class, 't_fsz')]/table/tbody/tr/td",
             'XP_CMT_REPLY_TO': " .//descendant-or-self::div[contains(@class, 't_fsz')]/table/tbody/tr/td//blockquote",
             'XP_CMT_USER' :".//descendant-or-self::div[@class='pi']/div[contains(@class,'authi')]",
-            'XP_CMT_NEXT' : "//div[contains(@id, 'pgt')]//div[contains(@class,'pg')]/a[text()='Next']",
+            'XP_CMT_NEXT' :  "//div[contains(@id, 'pgt')]//div[contains(@class,'pg')]/a[@class='nxt']",
             'XP_CMT_DEL': ".//descendant-or-self::font[(ancestor::blockquote)]",
             'CMT_DATETIME_FMT': "%d-%m-%Y %I:%M %p"
-
         }
     }
 

@@ -117,7 +117,7 @@ class ForumWebCrawler:
     '''
     def _scrape_post_content(self, Xparam, collect_article=lambda x: x):
         del_idxes = []
-        for idx, item in tqdm(enumerate(self.links)):
+        for idx, item in tqdm(enumerate(self.links),total=len(self.links)):
             # get the original article_content
             try:
                 org_content = collect_article(driver=self.driver, xpath_content=Xparam['XP_POST_ART'], url=item['url'])
@@ -322,8 +322,10 @@ class ForumWebCrawler:
             #print(f"3. is datetime > end_datetime ? - {item[dt_label] > self.end_dt} .")
             self.undesire_links_count = self.undesire_links_count + 1 #accumulate  
         elif check_spams(item['org_title']): # the title of a post/article is mandatory.
+            self.undesire_links_count = self.undesire_links_count + 1 #accumulate 
             pass #do nothing
-        elif item['url']=='' or (item['url'] in self.existing_URLs): # url already exists or empty
+        elif item['url']=='' or ((item['url']).strip() in self.existing_URLs): # url already exists or empty
+            self.undesire_links_count = self.undesire_links_count + 1 #accumulate 
             pass
         else:
             self.links.append(item)

@@ -330,7 +330,7 @@ if __name__ == '__main__':
         'starting_page_url': "https://www.kaskus.co.id/komunitas/10/berita-dan-politik",
         'source_id': 19,
         'lang': 'BI',
-        'links_threshold':300,
+        'links_threshold':600,
         'begin_datetime': begain_datetime,
         'end_datetime': end_datetime,
         'headless':headless,
