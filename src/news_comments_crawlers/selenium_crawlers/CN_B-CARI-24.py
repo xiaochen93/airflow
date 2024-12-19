@@ -332,7 +332,7 @@ if __name__ == '__main__':
         'starting_page_url': "https://c.cari.com.my/forum.php?mod=forumdisplay&fid=564",
         'source_id': 17,
         'lang': 'CN',
-        'links_threshold':1000,
+        'links_threshold':600,
         'begin_datetime': begain_datetime,
         'end_datetime': end_datetime,
         'headless':headless, # headless true no display false display
