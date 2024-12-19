@@ -87,7 +87,7 @@ class B_CARI_Crawler(ForumWebCrawler):
 
         #test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"
         #posts_in_db = getExistingPostItems(self.end_dt,noOfDays=self.noOfDays,sid=self.source_id)
-        posts_in_db = self._fetchPostByTimeRange(table="test", dt_label="published_datetime", end_datetime=self.end_dt, begain_datetime=self.begin_dt, sid=self.source_id)
+        posts_in_db = self._fetchPostByTimeRange(table="test", dt_label="published_datetime", lang='CN', end_datetime=self.end_dt, begain_datetime=self.begin_dt, sid=self.source_id)
 
         for post_item in posts_in_db:
             url, post_id = post_item['URL'].split('|')[-1], post_item['article_id']
@@ -224,12 +224,24 @@ class B_CARI_Crawler(ForumWebCrawler):
 
 
     def _test_cmt_item_processing(self, item, post_id=None):
-        item['cmt_published_datetime'] = str(item['cmt_published_datetime'].strftime("%Y-%m-%d %H:%M:%S"))
-        item['cmt_id'] = post_id if item['cmt_id'] == "" else item['cmt_id']
-        item['cmt_article_id'] = post_id
-        item['source_id'] = self.source_id
-        item['translated'] = self.translated
-        item['lang'] = self.lang
+        try:
+            
+            if type(item['cmt_published_datetime']) != str:
+                item['cmt_published_datetime'] = str(item['cmt_published_datetime'].strftime("%Y-%m-%d %H:%M:%S")) # updated: 2024-12-18 datetime parser
+            else:
+                item['cmt_published_datetime'] = " ".join(item['cmt_published_datetime'].split()[1:])
+                item['cmt_published_datetime'] = datetime.strptime(str(item['cmt_published_datetime']), "%d-%m-%Y %H:%M %p")
+                item['cmt_published_datetime'] = str(item['cmt_published_datetime'].strftime("%Y-%m-%d %H:%M:%S"))
+            
+            item['cmt_id'] = post_id if item['cmt_id'] == "" else item['cmt_id']
+            item['cmt_article_id'] = post_id
+            item['source_id'] = self.source_id
+            item['translated'] = self.translated
+            item['lang'] = self.lang
+        except Exception as e:
+            print('\n-- DEBUG: Error with comment item processing, error: ', e)
+            print(item)
+            raise e
 
         return item
 
@@ -320,7 +332,7 @@ if __name__ == '__main__':
         'starting_page_url': "https://c.cari.com.my/forum.php?mod=forumdisplay&fid=564",
         'source_id': 17,
         'lang': 'CN',
-        'links_threshold':200,
+        'links_threshold':1000,
         'begin_datetime': begain_datetime,
         'end_datetime': end_datetime,
         'headless':headless, # headless true no display false display

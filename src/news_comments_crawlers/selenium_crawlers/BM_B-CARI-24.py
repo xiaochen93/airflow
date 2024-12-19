@@ -87,7 +87,7 @@ class B_CARI_Crawler(ForumWebCrawler):
 
         #test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"
         #posts_in_db = getExistingPostItems(self.end_dt,noOfDays=self.noOfDays,sid=self.source_id)
-        posts_in_db = self._fetchPostByTimeRange(table="test", dt_label="published_datetime", end_datetime=self.end_dt, begain_datetime=self.begin_dt, sid=self.source_id)
+        posts_in_db = self._fetchPostByTimeRange(table="test", dt_label="published_datetime", lang='BM', end_datetime=self.end_dt, begain_datetime=self.begin_dt, sid=self.source_id)
 
         for post_item in posts_in_db:
             url, post_id = post_item['URL'].split('|')[-1], post_item['article_id']
@@ -359,7 +359,6 @@ if __name__ == '__main__':
             'XP_CMT_NEXT' : "//div[contains(@id, 'pgt')]//div[contains(@class,'pg')]/a[text()='Next']",
             'XP_CMT_DEL': ".//descendant-or-self::font[(ancestor::blockquote)]",
             'CMT_DATETIME_FMT': "%d-%m-%Y %I:%M %p"
-
         }
     }
 

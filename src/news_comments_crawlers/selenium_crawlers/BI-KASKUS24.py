@@ -138,7 +138,7 @@ class Kaskus_Crawler(ForumWebCrawler):
 
         #test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"
         #posts_in_db = getExistingPostItems(self.end_dt,noOfDays=self.noOfDays,sid=self.source_id)
-        posts_in_db = self._fetchPostByTimeRange(table="test", dt_label="published_datetime", end_datetime=self.end_dt, begain_datetime=self.begin_dt, sid=self.source_id)
+        posts_in_db = self._fetchPostByTimeRange(table="test", dt_label="published_datetime", lang='BI' end_datetime=self.end_dt, begain_datetime=self.begin_dt, sid=self.source_id)
 
         for post_item in posts_in_db:
             url, post_id = post_item['URL'].split('|')[-1], post_item['article_id']
@@ -296,15 +296,15 @@ class Kaskus_Crawler(ForumWebCrawler):
         return item
 
     #2024-03-12: select post in db by time range
-    def _fetchPostByTimeRange(self, table="", dt_label="", end_datetime="", begain_datetime="", sid=""):
-        #from datetime import timedelta
-        items=["article_id", 'source_id', 'URL']
-        query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt_label} BETWEEN '{begain_datetime}' AND '{end_datetime}') AND source_id={sid} AND deleted=0;"
-        print(query)
-        out_items = fetch_db_response(query) # remove duplicate and size
-        if out_items == []:
-            raise
-        return out_items
+    #def _fetchPostByTimeRange(self, table="", dt_label="", end_datetime="", begain_datetime="", sid=""):
+    #    #from datetime import timedelta
+    #    items=["article_id", 'source_id', 'URL']
+    #    query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt_label} BETWEEN '{begain_datetime}' AND '{end_datetime}') AND source_id={sid} AND deleted=0;"
+    #    print(query)
+    #    out_items = fetch_db_response(query) # remove duplicate and size
+    #    if out_items == []:
+    #        raise
+    #    return out_items
 
 if __name__ == '__main__':
     args = parser.parse_args()

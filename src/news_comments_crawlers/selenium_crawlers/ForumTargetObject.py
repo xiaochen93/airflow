@@ -166,6 +166,7 @@ class ForumWebCrawler:
         t_name = 'dsta_db.test' if label == 'post' else 'dsta_db.test_24hr_comments'
         
         for idx, item in enumerate(items):
+
             try:
                 response = requests.post(INSERT_API,json={'table':t_name, 'data': item })       
             except Exception as e:
@@ -286,7 +287,6 @@ class ForumWebCrawler:
         
         self.insert_to_db(label='comments')
 
-
     def bypass_ads(self,XP_ads,i=5):
         time.sleep(1)
         self.driver.execute_script("""
@@ -331,10 +331,10 @@ class ForumWebCrawler:
             self.links.append(item)
 
     #2024-03-12: select post in db by time range
-    def _fetchPostByTimeRange(self, table="", dt_label="", end_datetime="", begain_datetime="", sid=""):
+    def _fetchPostByTimeRange(self, table="", dt_label="", end_datetime="", begain_datetime="", lang="", sid=""):
         #from datetime import timedelta
         items=["article_id", 'source_id', 'URL']
-        query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt_label} BETWEEN '{begain_datetime}' AND '{end_datetime}') AND source_id={sid} AND deleted=0;"
+        query = f"SELECT {', '.join(items)} FROM {table} WHERE ({dt_label} BETWEEN '{begain_datetime}' AND '{end_datetime}') AND lang='{lang}' AND source_id={sid} AND deleted=0;"
         print(query)
         out_items = fetch_db_response(query) # remove duplicate and size
         if out_items == []:
