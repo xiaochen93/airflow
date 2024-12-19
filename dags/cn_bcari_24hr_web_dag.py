@@ -52,7 +52,7 @@ today_datetime, previous_datetime = get_datetime_from_now(days=1)
 
 
 #initializing the dag object
-exe_web_crawlers_dag = DAG('CN_B-Cari_(JIA LI)_24hr_web_dag',
+exe_web_crawlers_dag = DAG('CN_JIA_LI_24hr_web_dag',
 		default_args=default_args,
 		description='The dag object to execute a series of web crawlers for data/comments collection .',
 		schedule_interval= '15 2 * * *', #schedule interval to execute the task '* * * * *' '0 */12 * * *'
