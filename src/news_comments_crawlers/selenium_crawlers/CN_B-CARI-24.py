@@ -215,7 +215,7 @@ class B_CARI_Crawler(ForumWebCrawler):
                     "cmt_published_datetime": cmt_published_datetime,
                     "cmt_replyTo": cmt_reply_to,
                     "cmt_user" : cmt_user,
-                    "lang" : 'CN',
+                    "lang" : self.lang,
                     "translated": 0,
                     "source_id": self.source_id
                 }
@@ -344,7 +344,9 @@ if __name__ == '__main__':
             'XP_CLOSE_ADS': ["//div[contains(@class,'button-common close-button')]//span", 
                             "//div[contains(@class, 'iz_osn_card_1')]//span[contains(@class, 'close')]", 
                             "//div[contains(@id, 'dismiss-button')]/div",
-                            "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]"],
+                            "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]",
+                            "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'btn_close_')]"]
+                            ,
             'XP_POST_LISTING': "//table[contains(@id, 'threadlisttableid')]//tbody[contains(@id, 'normalthread')]",
             'XP_POST_NEXT_BTN': "//div[contains(@id, 'pgt')]//div[contains(@class,'pg')]/a[@class='nxt']",
             'XP_POST_URL': ".//descendant-or-self::tr//th//a[contains(@class, 's xst')]",

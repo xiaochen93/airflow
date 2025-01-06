@@ -101,10 +101,10 @@ S_ID = 3
 URLS = ['https://www.zaobao.com.sg/realtime/singapore', 'https://www.zaobao.com.sg/realtime/china', 'https://www.zaobao.com.sg/realtime/world', 'https://www.zaobao.com.sg/realtime/finance']
 
 css_paths = {
-    'title': 'div[class*="article-title"]',
-    'category': 'ul[class*="breadcrumbs-list"]',
-    'date': 'div[class*="group-story-postdate"]',
-    'article': 'div[class*="article-content-rawhtml"]'
+    'title': 'div > article[class*="max-w-full"] > h1',
+    'category': 'div[class*="clear-both"] div[class*="flex"] > a',
+    'date': 'script[id="seo-article-page"]',
+    'article': 'div > article[class*="max-w-full"] > div[class*="articleBody text"]'
     }
 
 def _parse_datetime(relative_time_str):
@@ -197,12 +197,17 @@ def _extract_datetime(raw_date_string, crawler_datetime):
         date_publish = datetime.today()
         
         raw_date_string = re.sub('\s+',' ',raw_date_string)
-      
-        date_time = re.findall(r'\d+[^\x00-\xff]+\d+[^\x00-\xff]+\d+[^\x00-\xff]+\s\d+\:\d+\s\w\w', raw_date_string)[0]
+        data = json.loads(raw_date_string)
         
-        date_time = pd.to_datetime(date_time, format='%Y年%m月%d日 %H:%M %p')
-    except:
+        date_time = (data.get("@graph")[0]['datePublished']).split(".")[0]
+        
+        date_time = pd.to_datetime(date_time, format='%Y-%m-%dT%H:%M:%S')
+        #date_time = re.findall(r'\d+[^\x00-\xff]+\d+[^\x00-\xff]+\d+[^\x00-\xff]+\s\d+\:\d+\s\w\w', raw_date_string)[0]
+        #date_time = pd.to_datetime(date_time, format='%Y年%m月%d日 %H:%M %p')
+
+    except Exception as e:
         date_time = crawler_datetime
+        print(f"\n-- DEBUG: datetime error with {e}")
         
     return date_time
 
@@ -216,7 +221,7 @@ def main():
 
     #save the raw json file
     with open(DATA_JSON_FILEPATH, 'w', encoding='utf-8') as output_file:
-        json.dump(articles , output_file ,indent = 2, ensure_ascii=False, default=str)
+        json.dump(articles_df.to_dict(orient="records") , output_file ,indent = 2, ensure_ascii=False, default=str)
 
     #save the dataframe object
     with open(DATA_DF_FILEPATH, 'wb') as output_file:
