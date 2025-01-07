@@ -72,7 +72,8 @@ class ForumWebCrawler:
             # check if the page is loaded 
             wait = WebDriverWait(self.driver, Xparam['wait'])
             page_loaded = wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-            print("\n-- DEBUG: Page loaded successfully!")
+            if page_loaded:
+                print("\n-- DEBUG: Page loaded successfully!")
             #1. close pop-up ads
             self.bypass_ads(Xparam['XP_CLOSE_ADS'],i=1)
 
@@ -95,6 +96,7 @@ class ForumWebCrawler:
 
             try:
                 self.bypass_ads(Xparam['XP_CLOSE_ADS'])
+                
             except Exception as e:
                 print(f'\nDEBUG: An error occur on CLOSE_ADS :{e}')
 
@@ -105,8 +107,7 @@ class ForumWebCrawler:
                 print(f'\nDEBUG: An error occur on NEXT_BTN :{e}')
                 time.sleep(Xparam['wait']) #give program a pause to reset
            
-            time.sleep(1)
-            self.bypass_ads(Xparam['XP_CLOSE_ADS'])
+
 
     '''
     private function, scrape the inital post/article for that post from a given discussion (post) URL.

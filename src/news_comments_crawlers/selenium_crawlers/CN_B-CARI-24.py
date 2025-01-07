@@ -339,16 +339,18 @@ if __name__ == '__main__':
         'remote': remote,
         'noOfDays':noOfDays,
         'main_Xparam':{
-            'wait': 15,
+            'wait': 5,
             #'XP_CLOSE_ADS': "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]",
-            'XP_CLOSE_ADS': ["//div[contains(@class,'button-common close-button')]//span", 
+            'XP_CLOSE_ADS': [
+                            "//div[contains(@class,'button-common close-button')]//span", 
                             "//div[contains(@class, 'iz_osn_card_1')]//span[contains(@class, 'close')]", 
                             "//div[contains(@id, 'dismiss-button')]/div",
                             "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]",
-                            "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'btn_close_')]"]
+                            "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'btn_close_')]"
+            ]
                             ,
             'XP_POST_LISTING': "//table[contains(@id, 'threadlisttableid')]//tbody[contains(@id, 'normalthread')]",
-            'XP_POST_NEXT_BTN': "//div[contains(@id, 'pgt')]//div[contains(@class,'pg')]/a[@class='nxt']",
+            'XP_POST_NEXT_BTN': "//span[contains(@id, 'fd_page_top')]//div[contains(@class,'pg')]//a[@class='nxt' and text()='下一页']",
             'XP_POST_URL': ".//descendant-or-self::tr//th//a[contains(@class, 's xst')]",
             'XP_POST_TITLE': ".//descendant-or-self::tr//th//a[contains(@class, 's xst')]",
             'XP_POST_DATETIME': ".//descendant-or-self::tr//th//font//span",
@@ -370,7 +372,7 @@ if __name__ == '__main__':
             'XP_CMT_CONTENT': " .//descendant-or-self::div[contains(@class, 't_fsz')]/table/tbody/tr/td",
             'XP_CMT_REPLY_TO': " .//descendant-or-self::div[contains(@class, 't_fsz')]/table/tbody/tr/td//blockquote",
             'XP_CMT_USER' :".//descendant-or-self::div[@class='pi']/div[contains(@class,'authi')]",
-            'XP_CMT_NEXT' :  "//div[contains(@id, 'pgt')]//div[contains(@class,'pg')]/a[@class='nxt']",
+            'XP_CMT_NEXT' :  "//div[contains(@class,'pg')]/a[@class='nxt' and text()='下一页']",
             'XP_CMT_DEL': ".//descendant-or-self::font[(ancestor::blockquote)]",
             'CMT_DATETIME_FMT': "%d-%m-%Y %I:%M %p"
         }
