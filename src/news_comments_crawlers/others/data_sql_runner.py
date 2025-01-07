@@ -60,7 +60,7 @@ REMOVE_DUPLICATED_NEWS_RECORDS = '''
     UPDATE news
     SET deleted = 1, last_modified = CURDATE()
     WHERE (url IS NOT NULL and url != 'Unknown' and url != '')
-    AND news.published_datetime BETWEEN '2024-08-01 00:00:00' AND '2024-12-31 23:59:59'
+    AND news.published_datetime BETWEEN '2025-01-01 00:00:00' AND '2025-12-31 23:59:59'
     AND EXISTS (
     SELECT 1
         FROM VIEW_DUPLICATES
@@ -94,7 +94,7 @@ REMOVE_DUPLICATED_TEST_RECORDS = '''
         UPDATE test
         SET deleted = 1, last_modified = CURDATE()
         WHERE (url IS NOT NULL and url != 'Unknown' and url != '')
-        AND test.published_datetime BETWEEN '2024-08-01 00:00:00' AND '2024-12-31 23:59:59'
+        AND test.published_datetime BETWEEN '2025-01-01 00:00:00' AND '2025-12-31 23:59:59'
         AND EXISTS (
         SELECT 1
             FROM TEST_VIEW_DUPLICATES
