@@ -95,10 +95,14 @@ class ForumWebCrawler:
 
             try:
                 self.bypass_ads(Xparam['XP_CLOSE_ADS'])
+            except Exception as e:
+                print(f'\nDEBUG: An error occur on CLOSE_ADS :{e}')
+
+            try:
                 goNextPage(self.driver, Xparam['XP_POST_NEXT_BTN']) 
                 #clickMany(self.driver, Xparam['XP_CLOSE_ADS'])
             except Exception as e:
-                print('\nDEBUG: An error occur has occured .')
+                print(f'\nDEBUG: An error occur on NEXT_BTN :{e}')
                 time.sleep(Xparam['wait']) #give program a pause to reset
            
             time.sleep(1)
@@ -130,7 +134,7 @@ class ForumWebCrawler:
                     item['url'] = item['url'] + '|' + item['cmt_url']
                     del item['cmt_url']
                 if "published_datetime" in item.keys() and item['published_datetime'] != '':
-                    item['published_datetime'] = (item['published_datetime'].strftime("%Y-%m-%d %H:%M:%S"))
+                    item['published_datetime'] = str((item['published_datetime'].strftime("%Y-%m-%d %H:%M:%S")))
                 else:
                     item['published_datetime'] = str(item['published_datetime'])
                 
@@ -172,6 +176,7 @@ class ForumWebCrawler:
             except Exception as e:
                 if label == 'post':
                     print(f'\n--DEBUG: 1 post is failed to be added {item["url"]} - index {idx}')
+                    print("\n\t--DEBUG: ", item)
                 else:
                     print(f'\n--DEBUG: 1 comment is failed to be added {item["cmt_org_content"]} - index {idx}')
                 print(e)
