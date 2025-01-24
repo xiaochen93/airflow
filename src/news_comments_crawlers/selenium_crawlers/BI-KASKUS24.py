@@ -330,14 +330,14 @@ if __name__ == '__main__':
         'starting_page_url': "https://www.kaskus.co.id/komunitas/10/berita-dan-politik",
         'source_id': 19,
         'lang': 'BI',
-        'links_threshold':600,
+        'links_threshold':1000,
         'begin_datetime': begain_datetime,
         'end_datetime': end_datetime,
         'headless':headless,
         'remote': remote,
         'noOfDays':noOfDays,
         'main_Xparam':{
-            'wait': 4,
+            'wait': 5,
             #'XP_CLOSE_ADS': "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]",
             'XP_CLOSE_ADS': [
                             "//button[contains(text(), 'Terima')]",

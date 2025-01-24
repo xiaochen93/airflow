@@ -211,6 +211,15 @@ def _extract_datetime(raw_date_string, crawler_datetime):
         
     return date_time
 
+# Function to check if the text is mostly garbled
+def is_mostly_garbled(text, threshold=0.5):
+    # Detect non-UTF-8 or non-readable sequences
+    garbled_pattern = re.compile(r'[^\x00-\x7F\u4e00-\u9fff.,!?-]')  # Non-ASCII and non-Chinese
+    garbled_count = len(garbled_pattern.findall(text))  # Count garbled characters
+    total_count = len(text)  # Total length of the text
+    # Return True if the proportion of garbled characters exceeds the threshold
+    return (garbled_count / total_count) > threshold if total_count > 0 else True
+
 def main():
     
     link_list = c_scrape_links(USE_CACHE, LINK_FILEPATH, gather_urls)
@@ -241,7 +250,7 @@ def main():
         print(f'\n--DEBUG: {articles_df.shape[0]} has been written into database.')
     except Exception as e:
         print(f'\n--DEBUG: API error {e}')
-      
+
 if __name__ == '__main__':
     t1 = time.perf_counter()
     print('\n--DEBUG: Platform - ', args.name)

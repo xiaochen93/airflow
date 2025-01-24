@@ -329,10 +329,10 @@ if __name__ == '__main__':
     noOfDays = int(args.noOfDays)
 
     B_CARI_object = {
-        'starting_page_url': "https://c.cari.com.my/forum.php?mod=forumdisplay&fid=564",
+        'starting_page_url': "https://c.cari.com.my/forum.php?mod=forumdisplay&fid=564&page=7",
         'source_id': 17,
         'lang': 'CN',
-        'links_threshold':600,
+        'links_threshold':6000,
         'begin_datetime': begain_datetime,
         'end_datetime': end_datetime,
         'headless':headless, # headless true no display false display

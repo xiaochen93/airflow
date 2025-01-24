@@ -29,7 +29,7 @@ class ForumWebCrawler:
         self.end_dt = object['end_datetime']
         self.noOfDays = object['noOfDays']
         self.default_dt = datetime.now()
-        self.existing_URLs = getExistingURLs(self.end_dt,noOfDays=self.noOfDays,sid=self.source_id)
+        self.existing_URLs = set(getExistingURLs(self.end_dt,noOfDays=self.noOfDays,sid=self.source_id))
         self.lang = object['lang']
         self.translated = 0
         print(f'\n-- DEBUG: Existing urls are {len(self.existing_URLs)}')
@@ -107,8 +107,6 @@ class ForumWebCrawler:
                 print(f'\nDEBUG: An error occur on NEXT_BTN :{e}')
                 time.sleep(Xparam['wait']) #give program a pause to reset
            
-
-
     '''
     private function, scrape the inital post/article for that post from a given discussion (post) URL.
 
@@ -335,6 +333,17 @@ class ForumWebCrawler:
             pass
         else:
             self.links.append(item)
+            self.existing_URLs.append(item['url'])
+            # Remove duplicates
+            #seen_urls = set()  # To track URLs
+            #unique_data = []   # To store unique dictionaries
+
+            #for item in self.links:
+            #    if item['url'] not in seen_urls:
+            #        unique_data.append(item)
+            #        seen_urls.add(item['url'])
+            
+            #self.links = list(seen_urls + unique_data)
 
     #2024-03-12: select post in db by time range
     def _fetchPostByTimeRange(self, table="", dt_label="", end_datetime="", begain_datetime="", lang="", sid=""):

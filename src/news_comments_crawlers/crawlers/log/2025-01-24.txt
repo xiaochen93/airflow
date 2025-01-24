@@ -1,0 +1,34 @@
+
+
+-- Platform: ZAOBAO
+	-- No of. articles scraped: 92
+
+-- Platform: ZAOBAO
+	-- No of. articles scraped: 92
+
+-- Platform: ZAOBAO
+	-- No of. articles scraped: 92
+
+-- Platform: ZAOBAO
+	-- No of. articles scraped: 92
+
+-- Platform: ZAOBAO
+	-- No of. articles scraped: 92
+
+-- Platform: ZAOBAO
+	-- No of. articles scraped: 92
+
+-- Platform: ZAOBAO
+	-- No of. articles scraped: 64
+
+-- Platform: ZAOBAO
+	-- No of. articles scraped: 58
+
+-- Platform: ZAOBAO
+	-- No of. articles scraped: 58
+
+-- Platform: ZAOBAO
+	-- No of. articles scraped: 62
+
+-- Platform: ZAOBAO
+	-- No of. articles scraped: 62

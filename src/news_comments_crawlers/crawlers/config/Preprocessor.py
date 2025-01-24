@@ -63,6 +63,12 @@ class Preprocessor:
         self.stop_words = set(stopwords.words('english'))
         
     def create_dataframe(self):
+
+        #self.json = [
+        #item for item in self.json
+        #if not is_mostly_garbled(str(item['org_title']))
+        #]
+
         df = pd.DataFrame.from_dict(self.json,orient='columns')
     
         df['lang'] = self.lang
@@ -78,8 +84,10 @@ class Preprocessor:
     def prepare(self, func=lambda x: x):
         try:
             df = self.df.dropna(subset = ['org_content'])
-            
+            df = df[~df['org_content'].apply(lambda x: is_mostly_garbled(str(x)))]
+
             # update the published_datetime into datetime object
+
             df['published_datetime'] = df.apply(lambda row: func(row['published_datetime'],row['crawled_datetime']), axis=1)
 
             df['published_datetime'] = df['published_datetime'].apply(lambda x: str(x))
@@ -96,6 +104,7 @@ class Preprocessor:
                 df['title'] = ''
             
             # clean the original text
+            
             df['content'] = df['content'].apply(lambda x: clean(x, pre_text_patterns))           
             df['content'] = df['content'].apply(lambda x: clean(x, pre_text_patterns))
 
@@ -108,7 +117,9 @@ class Preprocessor:
     def preprocess(self, func=lambda x: x):
         try:
             df = self.df.dropna(subset = ['org_content'])
+
             df['publish_datetime'] = df.apply(lambda row: func(row['publish_datetime'],row['date_crawler']), axis=1)
+            
             #df = df[(df['publish_datetime'] >= CONS.BEGIN_FROM) & (df['publish_datetime'] <= CONS.END_AT)]
         
         except Exception as e:
@@ -119,6 +130,14 @@ class Preprocessor:
             
         return df
 
+# Function to check if the text is mostly garbled
+def is_mostly_garbled(text, threshold=0.5):
+    # Detect non-UTF-8 or non-readable sequences
+    garbled_pattern = re.compile(r'[^\x00-\x7F\u4e00-\u9fff.,!?-]')  # Non-ASCII and non-Chinese
+    garbled_count = len(garbled_pattern.findall(text))  # Count garbled characters
+    total_count = len(text)  # Total length of the text
+    # Return True if the proportion of garbled characters exceeds the threshold
+    return (garbled_count / total_count) > threshold if total_count > 0 else True
 
     
 def drop_na(df):
