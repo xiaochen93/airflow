@@ -5,6 +5,7 @@ The forum object follows the sequence of
 '''
 from Functions import *
 from tqdm import tqdm
+
 '''
 The forum object follows the sequence of 
 1. initalization -> 
@@ -12,7 +13,6 @@ The forum object follows the sequence of
 3. scrape URL items -> 
 4. additional step clearance -> 
 5. scrape content
-
 '''
 class ForumWebCrawler:
     def __init__(self, object):
@@ -40,7 +40,8 @@ class ForumWebCrawler:
         self._scrape_post_workflow(Xparam, collect_item_fn=collect_item_fn)
         # To-be-Implemented: remove duplicated URLs 
 
-        self.links = [each for each in self.links if self.begin_dt <= each['published_datetime'] <= self.end_dt]
+        #self.links = [each for each in self.links if self.begin_dt <= each['published_datetime'] <= self.end_dt]
+        #self.lins = [each ]
 
         print(f'\n-- DEBUG: Total no. of {len(self.links)} links has been collected. ')
         if len(self.links) > 1:
@@ -133,7 +134,10 @@ class ForumWebCrawler:
                     item['url'] = item['url'] + '|' + item['cmt_url']
                     del item['cmt_url']
                 if "published_datetime" in item.keys() and item['published_datetime'] != '':
-                    item['published_datetime'] = str((item['published_datetime'].strftime("%Y-%m-%d %H:%M:%S")))
+                    try:
+                        item['published_datetime'] = str((item['published_datetime'].strftime("%Y-%m-%d %H:%M:%S")))
+                    except:
+                        item['published_datetime'] = item['published_datetime']
                 else:
                     item['published_datetime'] = str(item['published_datetime'])
                 
@@ -144,17 +148,14 @@ class ForumWebCrawler:
                 self.links[idx] = item
 
             except Exception as e:
-                print("\n\t-- DEBUG: Error with scrapping post, skip this one")
-            
+                print(f"\n\t-- DEBUG: Error with scrapping this post, skip this one {e}, item is {item}")
 
-        
         # delete the post item with empty content
         try:
             for del_idx in del_idxes:
                 self.links.pop(del_idx)
         except:
             print(f"\n-- DEBUG: To be deleted with empty content .{del_idxes}")
-
 
     '''
     Insert one record at a time to db via provided API.
@@ -310,7 +311,6 @@ class ForumWebCrawler:
             i = i - 1
 
     def update_links(self, item, dt_label='published_datetime'):
-
         #print(item[dt_label], self.begin_dt, self.end_dt, (item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt))
         #print('\n--DEBUG: If a post datetime is a string or empty ? ',item[dt_label]=="" or isinstance(item[dt_label], str))
         #print(f'\n\t--DEBUG: {item[dt_label]}')
@@ -332,6 +332,7 @@ class ForumWebCrawler:
             self.undesire_links_count = self.undesire_links_count + 1 #accumulate 
             pass
         else:
+            item[dt_label] = str(item[dt_label])
             self.links.append(item)
             self.existing_URLs.append(item['url'])
             # Remove duplicates

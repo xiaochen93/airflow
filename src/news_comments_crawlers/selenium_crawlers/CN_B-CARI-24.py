@@ -329,10 +329,10 @@ if __name__ == '__main__':
     noOfDays = int(args.noOfDays)
 
     B_CARI_object = {
-        'starting_page_url': "https://c.cari.com.my/forum.php?mod=forumdisplay&fid=564&page=7",
+        'starting_page_url': "https://c.cari.com.my/forum.php?mod=forumdisplay&fid=564&page=1",
         'source_id': 17,
         'lang': 'CN',
-        'links_threshold':6000,
+        'links_threshold':300,
         'begin_datetime': begain_datetime,
         'end_datetime': end_datetime,
         'headless':headless, # headless true no display false display
@@ -347,8 +347,7 @@ if __name__ == '__main__':
                             "//div[contains(@id, 'dismiss-button')]/div",
                             "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'iz_osn_close_1')]",
                             "//div[contains(@id, 'innity_adslot_')]//a[contains(@id, 'btn_close_')]"
-            ]
-                            ,
+            ],
             'XP_POST_LISTING': "//table[contains(@id, 'threadlisttableid')]//tbody[contains(@id, 'normalthread')]",
             'XP_POST_NEXT_BTN': "//span[contains(@id, 'fd_page_top')]//div[contains(@class,'pg')]//a[@class='nxt' and text()='下一页']",
             'XP_POST_URL': ".//descendant-or-self::tr//th//a[contains(@class, 's xst')]",
