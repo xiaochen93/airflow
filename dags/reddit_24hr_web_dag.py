@@ -15,6 +15,8 @@ import os
 
 import pytz
 
+from functions import *
+
 # Get the Beijing time zone
 beijing_timezone = pytz.timezone('Asia/Shanghai')
 
@@ -22,6 +24,8 @@ start_date = datetime.now(beijing_timezone)
 
 # Calculate tomorrow's date
 start_date = start_date - timedelta(days=1)
+
+today_datetime, previous_datetime = get_datetime_from_now(days=1)
 
 # Create a new datetime object for tomorrow at 12 PM
 _start_date = datetime(
@@ -64,7 +68,7 @@ task_1 = BashOperator(
 
 task_2 = BashOperator(
     task_id = "id_2",
-    bash_command = "python /opt/airflow/src/news_comments_crawlers/selenium_crawlers/REDDIT24.py --remote=True --headless=False",
+    bash_command = f"python /opt/airflow/src/news_comments_crawlers/selenium_crawlers/EN_REDDIT24.py --begain_datetime="{previous_datetime}" --end_datetime="{today_datetime}" --noOfDay=4 --remote=True --headless=False",
     execution_timeout=timeout,
     dag = exe_web_crawlers_dag
 )

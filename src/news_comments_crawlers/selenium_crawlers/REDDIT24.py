@@ -8,7 +8,7 @@ warnings.filterwarnings("ignore")
 
 today, last24hours=get_datetime()
 
-url= "https://old.reddit.com/r/singapore/top/"
+url= "https://old.reddit.com/r/singapore/top/?sort=top&t=month"
 
 INSERT_API = 'http://10.2.56.213:8086/insert'
 

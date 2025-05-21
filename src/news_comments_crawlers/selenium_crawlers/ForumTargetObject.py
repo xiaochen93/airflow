@@ -68,6 +68,7 @@ class ForumWebCrawler:
     '''
     def _scrape_post_workflow(self, Xparam, collect_item_fn=lambda x: x):
         SEARCHING = True
+
         while SEARCHING:
             _search_begin = time.perf_counter()
             # check if the page is loaded 
@@ -79,6 +80,7 @@ class ForumWebCrawler:
             self.bypass_ads(Xparam['XP_CLOSE_ADS'],i=1)
 
             post_items = getPostListings(self.driver, Xparam['XP_POST_LISTING'])
+
             print(f'\n-- DEBUG: Total {len(post_items)} no. of elements on the table .')
             #3. loop and get each post item from the table
             many_posts = [collect_item_fn(post, Xparam) for post in post_items]
@@ -124,12 +126,17 @@ class ForumWebCrawler:
         for idx, item in tqdm(enumerate(self.links),total=len(self.links)):
             # get the original article_content
             try:
-                org_content = collect_article(driver=self.driver, xpath_content=Xparam['XP_POST_ART'], url=item['url'])
-                time.sleep(Xparam['wait'])
-                if (org_content == '' or len(org_content) < 20 or org_content is None):
+                try:
+                    org_content = collect_article(driver=self.driver, xpath_content=Xparam['XP_POST_ART'], url=item['url'])
+                    item['org_content'] = org_content
+                except:
+                    pass
+                #time.sleep(Xparam['wait'])
+                # 2025-05-21 update checking org_content is a key of item dictionary
+                if not "org_content" in item or item['org_content'] == '' or len(item['org_content']) < 20 or item['org_content'] is None:
                     del_idxes.append(idx)
                     continue
-                item['org_content'] = org_content
+
                 if "cmt_url" in item.keys():
                     item['url'] = item['url'] + '|' + item['cmt_url']
                     del item['cmt_url']
@@ -334,7 +341,7 @@ class ForumWebCrawler:
         else:
             item[dt_label] = str(item[dt_label])
             self.links.append(item)
-            self.existing_URLs.append(item['url'])
+            self.existing_URLs.add(item['url'])
             # Remove duplicates
             #seen_urls = set()  # To track URLs
             #unique_data = []   # To store unique dictionaries

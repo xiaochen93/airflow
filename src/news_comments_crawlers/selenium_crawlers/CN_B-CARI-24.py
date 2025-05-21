@@ -88,7 +88,7 @@ class B_CARI_Crawler(ForumWebCrawler):
         #test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"
         #posts_in_db = getExistingPostItems(self.end_dt,noOfDays=self.noOfDays,sid=self.source_id)
         posts_in_db = self._fetchPostByTimeRange(table="test", dt_label="published_datetime", lang='CN', end_datetime=self.end_dt, begain_datetime=self.begin_dt, sid=self.source_id)
-
+        print(posts_in_db)
         for post_item in posts_in_db:
             url, post_id = post_item['URL'].split('|')[-1], post_item['article_id']
             comments_this_post = self._test_scrape_cmt_workflow(url,self.driver, self.object['cmt_Xparam'], post_id)
@@ -221,7 +221,6 @@ class B_CARI_Crawler(ForumWebCrawler):
                 }
 
         return out
-
 
     def _test_cmt_item_processing(self, item, post_id=None):
         try:
