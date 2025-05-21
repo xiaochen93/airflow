@@ -77,7 +77,7 @@ class B_CARI_Crawler(ForumWebCrawler):
         # Call the superclass' __init__ method to initialize the attribute
         super().__init__(required_parameter)
         #2024-03-12: no need to check existing URLs
-        self.existing_URLs = []
+        #self.existing_URLs = []
         #2024-03-12: no need to check existing URLs
         #print(f'\n-- DEBUG: Existing urls are {len(self.existing_URLs)}')
         #print(f'\n-- DEBUG: Date range is from {self.begin_dt} to {self.end_dt}.')
