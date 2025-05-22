@@ -47,7 +47,10 @@ class RedditCrawler(ForumWebCrawler):
     def __init__(self, required_parameter):
         super().__init__(required_parameter)
         self.source_id = 16
-
+        print("Detected block — refreshing the page")
+        self.driver.refresh()
+        time.sleep(2)
+        
     def scrape_comments(self):
         posts_in_db = self._fetchPostByTimeRange(table="test", dt_label="published_datetime", lang='EN', end_datetime=self.end_dt, begain_datetime=self.begin_dt, sid=self.source_id)
 
