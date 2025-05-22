@@ -133,7 +133,7 @@ class Kaskus_Crawler(ForumWebCrawler):
         #print(f'\n-- DEBUG: Existing urls are {len(self.existing_URLs)}')
         #print(f'\n-- DEBUG: Date range is from {self.begin_dt} to {self.end_dt}.')
         #print(f'\n\t-- DEBUG: We are looking at {self.noOfDays} no.of days for accumlating comments.')
-        
+
     def scrape_comments(self):
 
         #test_url = "https://www.kaskus.co.id/thread/65a5ff757231b47a32216a30/survei-galidata-ganjar-mahfud-pimpin-elektabilitas-pilpres-2024"

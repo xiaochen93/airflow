@@ -153,7 +153,8 @@ if __name__ == "__main__":
     end_datetime = datetime.strptime(args.end_datetime, "%Y-%m-%d %H:%M:%S")
 
     reddit_crawler_obj = {
-        'starting_page_url': "https://old.reddit.com/r/singapore/top/?sort=top&t=month",
+        #'starting_page_url': "https://old.reddit.com/r/singapore/top/?sort=top&t=month",
+        'starting_page_url': "https://old.reddit.com/r/singapore/",
         'source_id': 16,
         'lang': 'EN',
         'links_threshold': 200,
