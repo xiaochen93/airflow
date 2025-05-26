@@ -322,36 +322,40 @@ class ForumWebCrawler:
         #print('\n--DEBUG: If a post datetime is a string or empty ? ',item[dt_label]=="" or isinstance(item[dt_label], str))
         #print(f'\n\t--DEBUG: {item[dt_label]}')
         #print(f'\n--DEBUG: If a post datetime is in range {self.begin_dt} - {self.end_dt} ? ', item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt)
-        
-        if item[dt_label]=="" or isinstance(item[dt_label], str):
-            #print(f"published datetime - {item[dt_label]}")
-            #print(f"1. is datetime a NULL string or invalid parsing datetime object - True .")
-            self.undesire_links_count = self.undesire_links_count + 1 #accumulate 
-        elif(item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt):
-            #print(f"published datetime - {item[dt_label]}")
-            #print(f"2. is datetime < begain_datetime ? - {item[dt_label] < self.begin_dt} .")
-            #print(f"3. is datetime > end_datetime ? - {item[dt_label] > self.end_dt} .")
-            self.undesire_links_count = self.undesire_links_count + 1 #accumulate  
-        elif check_spams(item['org_title']): # the title of a post/article is mandatory.
-            self.undesire_links_count = self.undesire_links_count + 1 #accumulate 
-            pass #do nothing
-        elif item['url']=='' or ((item['url']).strip() in self.existing_URLs): # url already exists or empty
-            self.undesire_links_count = self.undesire_links_count + 1 #accumulate 
-            pass
-        else:
-            item[dt_label] = str(item[dt_label])
-            self.links.append(item)
-            self.existing_URLs.add(item['url'])
-            # Remove duplicates
-            #seen_urls = set()  # To track URLs
-            #unique_data = []   # To store unique dictionaries
+        try:
+            if item[dt_label]==None or item[dt_label]=="" or isinstance(item[dt_label], str):
+                #print(f"published datetime - {item[dt_label]}")
+                #print(f"1. is datetime a NULL string or invalid parsing datetime object - True .")
+                self.undesire_links_count = self.undesire_links_count + 1 #accumulate
 
-            #for item in self.links:
-            #    if item['url'] not in seen_urls:
-            #        unique_data.append(item)
-            #        seen_urls.add(item['url'])
-            
-            #self.links = list(seen_urls + unique_data)
+            elif(item[dt_label] < self.begin_dt or item[dt_label] > self.end_dt):
+                #print(f"published datetime - {item[dt_label]}")
+                #print(f"2. is datetime < begain_datetime ? - {item[dt_label] < self.begin_dt} .")
+                #print(f"3. is datetime > end_datetime ? - {item[dt_label] > self.end_dt} .")
+                self.undesire_links_count = self.undesire_links_count + 1 #accumulate  
+            elif check_spams(item['org_title']): # the title of a post/article is mandatory.
+                self.undesire_links_count = self.undesire_links_count + 1 #accumulate 
+                pass #do nothing
+            elif item['url']=='' or ((item['url']).strip() in self.existing_URLs): # url already exists or empty
+                self.undesire_links_count = self.undesire_links_count + 1 #accumulate 
+                pass
+            else:
+                item[dt_label] = str(item[dt_label])
+                self.links.append(item)
+                self.existing_URLs.add(item['url'])
+                # Remove duplicates
+                #seen_urls = set()  # To track URLs
+                #unique_data = []   # To store unique dictionaries
+
+                #for item in self.links:
+                #    if item['url'] not in seen_urls:
+                #        unique_data.append(item)
+                #        seen_urls.add(item['url'])
+                
+                #self.links = list(seen_urls + unique_data)
+        except Exception as e:
+            print(item)
+            raise
 
     #2024-03-12: select post in db by time range
     def _fetchPostByTimeRange(self, table="", dt_label="", end_datetime="", begain_datetime="", lang="", sid=""):

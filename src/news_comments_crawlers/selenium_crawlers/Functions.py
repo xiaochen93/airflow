@@ -179,7 +179,7 @@ def getNewsContentByGoogle(title):
     count = 0
     
     try:
-        for j in search(query):
+        for j in search(query, num_results=10, unique=True):
             url = j
 
             domain = urlparse(j).netloc
@@ -200,7 +200,7 @@ def getNewsContentByGoogle(title):
 def getPostListings(driver, xpath_items):
     try:
         items = driver.find_elements("xpath", xpath_items)
-    except Excpetion as e:
+    except Exception as e:
         print('\n Empty post listing due to ',e)
         items = []
         pass

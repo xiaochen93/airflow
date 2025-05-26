@@ -24,7 +24,8 @@ def _collect_reddit_post_item(post, Xparam):
         datetime_ = post.find_element("xpath", Xparam['XP_POST_DATETIME']).get_attribute('datetime')
         datetime_ = pd.to_datetime(datetime_, format='%Y-%m-%dT%H:%M:%S+00:00')
         domain = urlparse(article_url).netloc
-    except:
+    except Exception as e:
+        print('\n-- DEBUG: Error with scrapping post item: ', e)
         return None
     
     content = getNewsContentByArticle(Article, article_url)
@@ -162,7 +163,7 @@ if __name__ == "__main__":
         #'starting_page_url': "https://old.reddit.com/r/singapore/",
         'source_id': 16,
         'lang': 'EN',
-        'links_threshold': 200,
+        'links_threshold': 100,
         'begin_datetime': begain_datetime,
         'end_datetime': end_datetime,
         'headless': eval(args.headless),
