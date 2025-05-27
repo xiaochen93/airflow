@@ -56,7 +56,7 @@ class RedditCrawler(ForumWebCrawler):
 
     def scrape_comments(self):
         posts_in_db = self._fetchPostByTimeRange(table="test", dt_label="published_datetime", lang='EN', end_datetime=self.end_dt, begain_datetime=self.begin_dt, sid=self.source_id)
-
+        print(f'\n-- DEBUG: In total of {len(posts_in_db)} posts fetched from db including news posts.' )
         for post_item in tqdm(posts_in_db):
             url, post_id = post_item['URL'].split('|')[-1], post_item['article_id']
             comments_this_post = self._test_scrape_cmt_workflow(url,self.driver, self.object['cmt_Xparam'], post_id)
@@ -159,7 +159,7 @@ if __name__ == "__main__":
     end_datetime = datetime.strptime(args.end_datetime, "%Y-%m-%d %H:%M:%S")
 
     reddit_crawler_obj = {
-        'starting_page_url': "https://old.reddit.com/r/singapore/top/?sort=top&t=month",
+        'starting_page_url': "https://old.reddit.com/r/singapore/top/?sort=top&t=week",
         #'starting_page_url': "https://old.reddit.com/r/singapore/",
         'source_id': 16,
         'lang': 'EN',
@@ -172,7 +172,8 @@ if __name__ == "__main__":
         'main_Xparam': {
             'wait': 5,
             'XP_CLOSE_ADS': [],
-            'XP_POST_LISTING':  "//div[contains(@class,'thing id-t3')  and .//SPAN/@title='News']",
+            #'XP_POST_LISTING':  "//div[contains(@class,'thing id-t3')  and .//SPAN/@title='News']",
+            'XP_POST_LISTING':  "//div[contains(@class,'thing id-t3') and .//span[contains(@class,'linkflairlabel')] and not(.//span[@title='Video' or @title='Image' or @title='Photography'])]",
             'XP_POST_TITLE': ".//descendant-or-self::A[contains(@class,'title may-blank')]",
             'XP_POST_DATETIME': ".//descendant-or-self::p[contains(@class, 'tagline')]/time",
             'XP_POST_NEXT_BTN': "//div[contains(@class, 'nav-buttons')]//a[contains(text(), 'next')]",
