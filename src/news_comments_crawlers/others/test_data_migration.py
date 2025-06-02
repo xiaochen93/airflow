@@ -87,7 +87,11 @@ def migrate_data(limit=500):
         datetime_cond = (current_datetime - article_datetime).days < 3
 
         #print(f"\n-- DEBUG: source id {each_article['source_id']} and date difference {(current_datetime - article_datetime).days}")
-        _is_from_forum = int(each_article['source_id']) in [5,16,17,19]
+        try:
+            _is_from_forum = int(each_article['source_id']) in [5,16,17,19]
+        except Exception as e:
+            print("\n-- DEBUG: Error with source_id selection {e} - {each_article}")
+            continue
         _is_within_time_range = datetime_cond
         if _is_from_forum and _is_within_time_range:
             print(f"\n-- DEBUG: article {each_article['title']}")
