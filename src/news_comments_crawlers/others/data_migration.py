@@ -99,8 +99,9 @@ def migrate_data(limit=500):
         try:
             _is_from_forum = int(each_article['source_id']) in [5,16,17,19]
         except Exception as e:
-            print(f"\n-- DEBUG: Error with source detection {e} {each_comment}")
+            print(f"\n-- DEBUG: Error with source detection {e} \n \t {each_comment}")
             continue
+
         _is_within_time_range = (current_datetime - article_datetime).days <= 3
         
         if _is_from_forum and _is_within_time_range:
