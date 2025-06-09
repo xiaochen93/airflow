@@ -318,6 +318,7 @@ if __name__ == '__main__':
 
     B_CARI_object = {
         'starting_page_url': "https://b.cari.com.my/forum.php?mod=forumdisplay&fid=154&filter=author&orderby=dateline",
+        #'starting_page_url': "https://b.cari.com.my/forum.php?mod=forumdisplay&fid=144&page=1",
         'source_id': 17,
         'lang': 'BM',
         'links_threshold':1000,
