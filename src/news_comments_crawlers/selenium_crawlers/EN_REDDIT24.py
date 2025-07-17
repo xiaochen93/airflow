@@ -89,9 +89,9 @@ class RedditCrawler(ForumWebCrawler):
 
         root_items = getPostListings(driver, Xparam['XP_CMT_LISTING'])
 
-        return self._test_scrape_comments(root_items, post_id, Xparam)
+        return self._test_scrape_cmt_items(root_items, post_id, Xparam)
 
-    def _test_scrape_comments(self, items, p_id, Xparam):
+    def _test_scrape_cmt_items(self, items, p_id, Xparam):
         out = []
         for item in items:
             try:
@@ -121,7 +121,7 @@ class RedditCrawler(ForumWebCrawler):
             try:
                 child_element = item.find_element("xpath", Xparam['XP_CMT_CHILD_BLOCK'])
                 children = child_element.find_elements("xpath", Xparam['XP_CMT_CHILD'])
-                out.extend(self._extract_reddit_comments(children, cmt_id, Xparam))
+                out.extend(self._test_scrape_cmt_items(children, cmt_id, Xparam))
             except:
                 continue
 
@@ -159,11 +159,11 @@ if __name__ == "__main__":
     end_datetime = datetime.strptime(args.end_datetime, "%Y-%m-%d %H:%M:%S")
 
     reddit_crawler_obj = {
-        'starting_page_url': "https://old.reddit.com/r/singapore/top/?sort=top&t=day",
+        'starting_page_url': "https://old.reddit.com/r/singapore/top/?sort=top&t=week",
         #'starting_page_url': "https://old.reddit.com/r/singapore/",
         'source_id': 16,
         'lang': 'EN',
-        'links_threshold': 100,
+        'links_threshold': 14,
         'begin_datetime': begain_datetime,
         'end_datetime': end_datetime,
         'headless': eval(args.headless),
