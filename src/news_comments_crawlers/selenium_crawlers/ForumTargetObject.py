@@ -104,11 +104,17 @@ class ForumWebCrawler:
                 print(f'\nDEBUG: An error occur on CLOSE_ADS :{e}')
 
             try:
-                goNextPage(self.driver, Xparam['XP_POST_NEXT_BTN']) 
+                current_url = self.driver.current_url                                    
+                goNextPage(self.driver, Xparam['XP_POST_NEXT_BTN'])
+                if self.driver.current_url == current_url:
+                    print(current_url, self.driver.url)
+                    raise
                 #clickMany(self.driver, Xparam['XP_CLOSE_ADS'])
             except Exception as e:
                 print(f'\nDEBUG: An error occur on NEXT_BTN :{e}')
                 time.sleep(Xparam['wait']) #give program a pause to reset
+                SEARCHING = False
+                break
            
     '''
     private function, scrape the inital post/article for that post from a given discussion (post) URL.
@@ -282,7 +288,9 @@ class ForumWebCrawler:
                     continue
                 try:
                     #self.bypass_ads(Xparam['XP_CLOSE_ADS'])
-                    goNextPage(self.driver, Xparam['XP_CMT_NEXT']) 
+                    goNextPage(self.driver, Xparam['XP_CMT_NEXT'])
+
+                    
                 except Exception as e:
                     #print('\nDEBUG: An error occur has occured clicking next page.')
                     SEARCHING = False
